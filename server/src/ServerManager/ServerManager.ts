@@ -61,8 +61,6 @@ export default class ServerManger {
   }
 
   public async up() {
-    waitForDebugger();
-
     WorkspaceProvider.register(this);
 
     if (this.capabilitiesHandler.getSupportsWorkspaceConfiguration()) {

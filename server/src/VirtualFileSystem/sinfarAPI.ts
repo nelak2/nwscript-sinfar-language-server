@@ -7,7 +7,7 @@ export class SinfarAPI {
     this.connection = connection;
   }
 
-  public async getFile(uri: string): Promise<Uint8Array> {
+  public async getFile(uri: string): Promise<string> {
     return await this.connection.sendRequest("sinfar/getFile", uri);
   }
 }

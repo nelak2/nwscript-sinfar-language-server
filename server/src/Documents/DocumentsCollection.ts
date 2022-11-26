@@ -81,7 +81,7 @@ export default class DocumentsCollection extends Dictionnary<string, Document> {
       }
 
       const content = await this.sinfarApi.getFile(key);
-      const globalScope = this.tokenizer.tokenizeContent(content.toString(), TokenizedScope.global);
+      const globalScope = this.tokenizer.tokenizeContent(content, TokenizedScope.global);
       const document = this.initializeDocument(key, globalScope);
       this.overwriteDocument(document);
       return document;

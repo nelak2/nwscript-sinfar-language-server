@@ -42,11 +42,11 @@ export function InitLSP(context: ExtensionContext) {
 }
 
 export function registerCustomRequests() {
-  client.onRequest("sinfar/getSession", () => {
-    return authentication.getSession("SinfarAuth", [], { createIfNone: true });
-  });
   client.onRequest("sinfar/getFile", async (uri: string) => {
-    return await fs.readFile(vscode.Uri.parse(uri));
+    console.log("LSP Requesting file: " + uri);
+    const file = await fs.readFile(vscode.Uri.parse(uri));
+    const decoder = new TextDecoder();
+    return decoder.decode(file);
   });
 }
 
