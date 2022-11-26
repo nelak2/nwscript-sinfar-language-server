@@ -12,9 +12,9 @@ export enum LanguageTypes {
   talent = "talent",
   vector = "vector",
   void = "void",
-  json = "json",
-  sqlquery = "sqlquery",
-  cassowary = "cassowary",
+  array = "array",
+  dictionary = "dictionary",
+  dbresult = "dbresult",
   none = "none",
 }
 
