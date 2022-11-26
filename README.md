@@ -111,6 +111,15 @@ I personally use the [One Dark Pro](https://marketplace.visualstudio.com/items?i
 - In the project root directory, invoke `vsce package` which will produce a .vsix file.
 - To install, in VS Code on the extension pane, click on the three dots at the top right then select `Install From VSIX` and navigate to the package you just produced.
 
+## Attaching the debugger
+
+- Build and successfully run the extension
+- Invoke `yarn webpack`
+- Invoke `yarn run compile`
+- Add a `waitForDebugger()` statement somewhere near the server startup (otherwise the additional processes the server spawns seem to confuse the debugger and it won't attach properly)
+- Use Launch the client command
+- Use Attach to Server
+
 ### Generating the language library definitions
 
 Replace `server/scripts/nwscript.nss` by its new version and execute `yarn run generate-lib-defs` in the server root directory.

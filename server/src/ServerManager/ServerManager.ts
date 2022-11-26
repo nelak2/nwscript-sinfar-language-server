@@ -1,13 +1,9 @@
-import { cpus } from "os";
-import { join } from "path";
-import { pathToFileURL } from "url";
-import * as clustering from "cluster";
 import type { Connection, InitializeParams } from "vscode-languageserver";
+import { waitForDebugger } from "inspector";
 
 import {
   CompletionItemsProvider,
   ConfigurationProvider,
-  DiagnosticsProvider,
   DocumentFormatingProvider,
   DocumentRangeFormattingProvider,
   GotoDefinitionProvider,
@@ -21,6 +17,7 @@ import { WorkspaceFilesSystem } from "../WorkspaceFilesSystem";
 import { Logger } from "../Logger";
 import { defaultServerConfiguration } from "./Config";
 import CapabilitiesHandler from "./CapabilitiesHandler";
+import { SinfarAPI } from "../VirtualFileSystem/sinfarAPI";
 
 export default class ServerManger {
   public connection: Connection;
@@ -33,6 +30,7 @@ export default class ServerManger {
   public tokenizer: Tokenizer | null = null;
   public hasIndexedDocuments = false;
   public documentsWaitingForPublish: string[] = [];
+  public sinfarAPI: SinfarAPI;
 
   constructor(connection: Connection, params: InitializeParams) {
     this.connection = connection;
@@ -40,13 +38,16 @@ export default class ServerManger {
     this.capabilitiesHandler = new CapabilitiesHandler(params.capabilities);
     this.workspaceFilesSystem = new WorkspaceFilesSystem(params.rootPath!, params.workspaceFolders!);
     this.liveDocumentsManager = new LiveDocumentsManager();
-    this.documentsCollection = new DocumentsCollection();
+    this.sinfarAPI = new SinfarAPI(this.connection);
+    this.documentsCollection = new DocumentsCollection(this.sinfarAPI);
 
     this.liveDocumentsManager.listen(this.connection);
   }
 
   public async initialize() {
     this.tokenizer = await new Tokenizer().loadGrammar();
+    this.documentsCollection.tokenizer = this.tokenizer;
+
     this.registerProviders();
     this.registerLiveDocumentsEvents();
 
@@ -60,6 +61,8 @@ export default class ServerManger {
   }
 
   public async up() {
+    waitForDebugger();
+
     WorkspaceProvider.register(this);
 
     if (this.capabilitiesHandler.getSupportsWorkspaceConfiguration()) {
@@ -69,41 +72,6 @@ export default class ServerManger {
     }
 
     await this.loadConfig();
-
-    const diagnosticsProvider = DiagnosticsProvider.register(this) as DiagnosticsProvider;
-    const numCPUs = cpus().length;
-    const cluster = clustering.default;
-    if (cluster.isPrimary) {
-      cluster.setupPrimary({
-        exec: join(__dirname, "indexer.js"),
-      });
-    }
-
-    let filesIndexedCount = 0;
-    const filesPath = this.workspaceFilesSystem.getAllFilesPath();
-    const progressReporter = await this.connection.window.createWorkDoneProgress();
-    const filesCount = filesPath.length;
-
-    progressReporter.begin("Indexing files for NWScript: EE LSP ...", 0);
-    const partCount = filesCount / numCPUs;
-    for (let i = 0; i < Math.min(numCPUs, filesCount); i++) {
-      const worker = cluster.fork();
-      worker.send(filesPath.slice(i * partCount, Math.min((i + 1) * partCount, filesCount - 1)).join(","));
-      worker.on("message", (message: string) => {
-        const { filePath, globalScope } = JSON.parse(message);
-        this.documentsCollection?.createDocument(pathToFileURL(filePath).href, globalScope);
-        filesIndexedCount++;
-        progressReporter?.report(filesIndexedCount / filesCount);
-      });
-    }
-
-    cluster.on("exit", () => {
-      if (Object.keys(cluster.workers || {}).length === 0) {
-        progressReporter?.done();
-        this.hasIndexedDocuments = true;
-        diagnosticsProvider?.processDocumentsWaitingForPublish();
-      }
-    });
   }
 
   public down() {}

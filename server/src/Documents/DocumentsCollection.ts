@@ -1,4 +1,4 @@
-import { basename, join } from "path";
+import path, { join } from "path";
 import { readFileSync } from "fs";
 import { TextDocument } from "vscode-languageserver-textdocument";
 
@@ -7,13 +7,17 @@ import type { ComplexToken } from "../Tokenizer/types";
 import { GlobalScopeTokenizationResult, TokenizedScope } from "../Tokenizer/Tokenizer";
 import { Dictionnary } from "../Utils";
 import Document from "./Document";
-import { FILES_EXTENSION } from "../WorkspaceFilesSystem/WorkspaceFilesSystem";
+import { SinfarAPI } from "../VirtualFileSystem/sinfarAPI";
 
 export default class DocumentsCollection extends Dictionnary<string, Document> {
   public readonly standardLibComplexTokens: ComplexToken[] = [];
+  public sinfarApi: SinfarAPI;
+  public tokenizer: Tokenizer | null = null;
 
-  constructor() {
+  constructor(sinfarAPI: SinfarAPI) {
     super();
+
+    this.sinfarApi = sinfarAPI;
 
     this.standardLibComplexTokens = JSON.parse(
       readFileSync(join(__dirname, "..", "resources", "standardLibDefinitions.json")).toString(),
@@ -33,11 +37,11 @@ export default class DocumentsCollection extends Dictionnary<string, Document> {
   }
 
   public getKey(uri: string) {
-    return basename(uri, FILES_EXTENSION).slice(0, -1);
+    return path.parse(uri).name;
   }
 
-  public getFromUri(uri: string) {
-    return this.get(this.getKey(uri));
+  public async getFromUri(uri: string): Promise<Document> {
+    return await this.get(this.getKey(uri));
   }
 
   public createDocument(uri: string, globalScope: GlobalScopeTokenizationResult) {
@@ -48,5 +52,26 @@ export default class DocumentsCollection extends Dictionnary<string, Document> {
     const globalScope = tokenizer.tokenizeContent(document.getText(), TokenizedScope.global);
 
     this.overwriteDocument(this.initializeDocument(document.uri, globalScope));
+  }
+
+  // Override default dictionary get() to handle file requests when the file is not in the collection
+  public async get(key: string): Promise<Document> {
+    if (this.exist(key)) {
+      return this._get(key) as Document;
+    }
+
+    if (!this.tokenizer) {
+      throw new Error("Tokenizer is not initialized");
+    }
+
+    const content = await this.sinfarApi.getFile(key);
+    const globalScope = this.tokenizer.tokenizeContent(content.toString(), TokenizedScope.global);
+    const document = this.initializeDocument(key, globalScope);
+    this.overwriteDocument(document);
+    return document;
+  }
+
+  public getLocalOnly(key: string): Document {
+    return this._get(key) as Document;
   }
 }

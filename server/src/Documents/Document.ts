@@ -17,9 +17,9 @@ export default class Document {
     return this.collection.getKey(this.uri);
   }
 
-  public getChildren(computedChildren: string[] = []): string[] {
-    return this.children.concat(
-      this.children.flatMap((child) => {
+  public async getChildren(computedChildren: string[] = []): Promise<string[]> {
+    const output = await Promise.all(
+      this.children.flatMap(async (child) => {
         // Cycling children or/and duplicates
         if (computedChildren.includes(child)) {
           return [];
@@ -27,26 +27,54 @@ export default class Document {
           computedChildren.push(child);
         }
 
-        const childDocument = this.collection.get(child);
+        const childDocument = await this.collection.get(child);
 
         if (!childDocument) {
           return [];
         }
 
-        return childDocument.getChildren(computedChildren);
+        return await childDocument.getChildren(computedChildren);
       }),
     );
+
+    return this.children.concat(output.flat());
   }
 
-  public getGlobalComplexTokensWithRef(computedChildren: string[] = []): OwnedComplexTokens[] {
-    const localStandardLibDefinitions = this.collection.get("nwscript");
+  public async getGlobalComplexTokensWithRef(computedChildren: string[] = []): Promise<OwnedComplexTokens[]> {
+    const localStandardLibDefinitions = this.collection.getLocalOnly("nwscript");
+
+    const tokens = await Promise.all(
+      this.children.flatMap(async (child) => {
+        // Cycling children or/and duplicates
+        if (computedChildren.includes(child)) {
+          return [];
+        } else {
+          computedChildren.push(child);
+        }
+
+        const childDocument = await this.collection.get(child);
+
+        if (!childDocument) {
+          return [];
+        }
+
+        return await childDocument.getGlobalComplexTokensWithRef(computedChildren);
+      }),
+    );
     return [
       { owner: this.uri, tokens: this.complexTokens },
       ...(localStandardLibDefinitions
         ? [{ owner: localStandardLibDefinitions.uri, tokens: localStandardLibDefinitions.complexTokens }]
         : []),
-    ].concat(
-      this.children.flatMap((child) => {
+    ].concat(tokens.flat());
+  }
+
+  public async getGlobalComplexTokens(
+    computedChildren: string[] = [],
+    localFunctionIdentifiers: string[] = [],
+  ): Promise<ComplexToken[]> {
+    const tokens = await Promise.all(
+      this.children.flatMap(async (child) => {
         // Cycling children or/and duplicates
         if (computedChildren.includes(child)) {
           return [];
@@ -54,43 +82,22 @@ export default class Document {
           computedChildren.push(child);
         }
 
-        const childDocument = this.collection.get(child);
+        const childDocument = await this.collection.get(child);
 
         if (!childDocument) {
           return [];
         }
 
-        return childDocument.getGlobalComplexTokensWithRef(computedChildren);
+        return await childDocument.getGlobalComplexTokens(computedChildren);
       }),
     );
+
+    return this.complexTokens.filter((token) => !localFunctionIdentifiers.includes(token.identifier)).concat(tokens.flat());
   }
 
-  public getGlobalComplexTokens(computedChildren: string[] = [], localFunctionIdentifiers: string[] = []): ComplexToken[] {
-    return this.complexTokens
-      .filter((token) => !localFunctionIdentifiers.includes(token.identifier))
-      .concat(
-        this.children.flatMap((child) => {
-          // Cycling children or/and duplicates
-          if (computedChildren.includes(child)) {
-            return [];
-          } else {
-            computedChildren.push(child);
-          }
-
-          const childDocument = this.collection.get(child);
-
-          if (!childDocument) {
-            return [];
-          }
-
-          return childDocument.getGlobalComplexTokens(computedChildren);
-        }),
-      );
-  }
-
-  public getGlobalStructComplexTokensWithRef(computedChildren: string[] = []): OwnedStructComplexTokens[] {
-    return [{ owner: this.uri, tokens: this.structComplexTokens }].concat(
-      this.children.flatMap((child) => {
+  public async getGlobalStructComplexTokensWithRef(computedChildren: string[] = []): Promise<OwnedStructComplexTokens[]> {
+    const tokens = await Promise.all(
+      this.children.flatMap(async (child) => {
         // Cycling children or/and duplicates
         if (computedChildren.includes(child)) {
           return [];
@@ -98,20 +105,21 @@ export default class Document {
           computedChildren.push(child);
         }
 
-        const childDocument = this.collection.get(child);
+        const childDocument = await this.collection.get(child);
 
         if (!childDocument) {
           return [];
         }
 
-        return childDocument.getGlobalStructComplexTokensWithRef(computedChildren);
+        return await childDocument.getGlobalStructComplexTokensWithRef(computedChildren);
       }),
     );
+    return [{ owner: this.uri, tokens: this.structComplexTokens }].concat(tokens.flat());
   }
 
-  public getGlobalStructComplexTokens(computedChildren: string[] = []): StructComplexToken[] {
-    return this.structComplexTokens.concat(
-      this.children.flatMap((child) => {
+  public async getGlobalStructComplexTokens(computedChildren: string[] = []): Promise<StructComplexToken[]> {
+    const tokens = await Promise.all(
+      this.children.flatMap(async (child) => {
         // Cycling children or/and duplicates
         if (computedChildren.includes(child)) {
           return [];
@@ -119,14 +127,16 @@ export default class Document {
           computedChildren.push(child);
         }
 
-        const childDocument = this.collection.get(child);
+        const childDocument = await this.collection.get(child);
 
         if (!childDocument) {
           return [];
         }
 
-        return childDocument.getGlobalStructComplexTokens(computedChildren);
+        return await childDocument.getGlobalStructComplexTokens(computedChildren);
       }),
     );
+
+    return this.structComplexTokens.concat(tokens.flat());
   }
 }

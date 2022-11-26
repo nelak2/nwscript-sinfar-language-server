@@ -7,6 +7,7 @@ import { TriggerCharacters } from ".";
 import { Document } from "../Documents";
 import { LanguageTypes } from "../Tokenizer/constants";
 import Provider from "./Provider";
+import { ComplexToken } from "../Tokenizer/types";
 
 export default class CompletionItemsProvider extends Provider {
   constructor(server: ServerManager) {
@@ -19,14 +20,14 @@ export default class CompletionItemsProvider extends Provider {
   }
 
   private providerHandler(params: CompletionParams) {
-    return () => {
+    return async () => {
       const {
         textDocument: { uri },
         position,
       } = params;
 
       const liveDocument = this.server.liveDocumentsManager.get(uri);
-      const document = this.server.documentsCollection.getFromUri(uri);
+      const document = await this.server.documentsCollection.getFromUri(uri);
 
       if (liveDocument) {
         const localScope = this.server.tokenizer?.tokenizeContent(liveDocument.getText(), TokenizedScope.local, 0, position.line);
@@ -44,8 +45,7 @@ export default class CompletionItemsProvider extends Provider {
                 (token) => token.identifier === structVariableIdentifier,
               )?.valueType;
 
-              return document
-                .getGlobalStructComplexTokens()
+              return (await document.getGlobalStructComplexTokens())
                 .find((token) => token.identifier === structIdentifer)
                 ?.properties.map((property) => {
                   return CompletionItemBuilder.buildItem(property);
@@ -56,12 +56,12 @@ export default class CompletionItemsProvider extends Provider {
               this.server.tokenizer?.findLineIdentiferFromPositionAt(liveDocument.getText(), position, -3) ===
               LanguageTypes.struct
             ) {
-              return document.getGlobalStructComplexTokens().map((token) => CompletionItemBuilder.buildItem(token));
+              return (await document.getGlobalStructComplexTokens()).map((token) => CompletionItemBuilder.buildItem(token));
             }
           }
 
           return this.getLocalScopeCompletionItems(localScope)
-            .concat(this.getGlobalScopeCompletionItems(document, localScope))
+            .concat(await this.getGlobalScopeCompletionItems(document, localScope))
             .concat(this.getStandardLibCompletionItems());
         }
       }
@@ -77,14 +77,17 @@ export default class CompletionItemsProvider extends Provider {
     return functionVariablesCompletionItems.concat(functionsCompletionItems);
   }
 
-  private getGlobalScopeCompletionItems(document: Document | undefined, localScope: LocalScopeTokenizationResult) {
+  private async getGlobalScopeCompletionItems(document: Document | undefined, localScope: LocalScopeTokenizationResult) {
+    if (!document) {
+      return [];
+    }
     return (
-      document
-        ?.getGlobalComplexTokens(
+      (
+        await document.getGlobalComplexTokens(
           [],
           localScope.functionsComplexTokens.map((token) => token.identifier),
         )
-        .map((token) => CompletionItemBuilder.buildItem(token)) || []
+      ).map((token: ComplexToken) => CompletionItemBuilder.buildItem(token)) || []
     );
   }
 

@@ -14,14 +14,14 @@ export default class GotoDefinitionProvider extends Provider {
   }
 
   private providerHandler(params: DefinitionParams) {
-    return () => {
+    return async () => {
       const {
         textDocument: { uri },
         position,
       } = params;
 
       const liveDocument = this.server.liveDocumentsManager.get(uri);
-      const document = this.server.documentsCollection.getFromUri(uri);
+      const document = await this.server.documentsCollection.getFromUri(uri);
 
       if (liveDocument && this.server.tokenizer) {
         let token: ComplexToken | undefined;
@@ -47,7 +47,7 @@ export default class GotoDefinitionProvider extends Provider {
               (token) => token.identifier === structVariableIdentifier,
             )?.valueType;
 
-            const tokensWithRef = document.getGlobalStructComplexTokensWithRef();
+            const tokensWithRef = await document.getGlobalStructComplexTokensWithRef();
             for (let i = 0; i < tokensWithRef.length; i++) {
               ref = tokensWithRef[i];
 
@@ -62,7 +62,7 @@ export default class GotoDefinitionProvider extends Provider {
           }
 
           if (!token && tokenType === CompletionItemKind.Struct) {
-            const tokensWithRef = document.getGlobalStructComplexTokensWithRef();
+            const tokensWithRef = await document.getGlobalStructComplexTokensWithRef();
             for (let i = 0; i < tokensWithRef.length; i++) {
               ref = tokensWithRef[i];
 
@@ -74,7 +74,7 @@ export default class GotoDefinitionProvider extends Provider {
           }
 
           if (!token && (tokenType === CompletionItemKind.Constant || tokenType === CompletionItemKind.Function)) {
-            const tokensWithRef = document.getGlobalComplexTokensWithRef();
+            const tokensWithRef = await document.getGlobalComplexTokensWithRef();
             for (let i = 0; i < tokensWithRef.length; i++) {
               ref = tokensWithRef[i];
 

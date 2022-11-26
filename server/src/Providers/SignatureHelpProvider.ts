@@ -15,7 +15,7 @@ export default class SignatureHelpProvider extends Provider {
   }
 
   private providerHandler(params: SignatureHelpParams) {
-    return () => {
+    return async () => {
       const {
         textDocument: { uri },
         position,
@@ -23,7 +23,7 @@ export default class SignatureHelpProvider extends Provider {
       } = params;
 
       const liveDocument = this.server.liveDocumentsManager.get(uri);
-      const document = this.server.documentsCollection.getFromUri(uri);
+      const document = await this.server.documentsCollection.getFromUri(uri);
 
       let functionComplexToken: ComplexToken | undefined;
       if (liveDocument) {
@@ -75,7 +75,9 @@ export default class SignatureHelpProvider extends Provider {
 
           if (document) {
             if (!functionComplexToken) {
-              functionComplexToken = document.getGlobalComplexTokens().find((token) => token.identifier === functionIdentifier);
+              functionComplexToken = (await document.getGlobalComplexTokens()).find(
+                (token: { identifier: string | undefined }) => token.identifier === functionIdentifier,
+              );
             }
 
             if (!functionComplexToken) {

@@ -14,14 +14,14 @@ export default class HoverContentProvider extends Provider {
   }
 
   private providerHandler(params: HoverParams) {
-    return () => {
+    return async () => {
       const {
         textDocument: { uri },
         position,
       } = params;
 
       const liveDocument = this.server.liveDocumentsManager.get(uri);
-      const document = this.server.documentsCollection.getFromUri(uri);
+      const document = await this.server.documentsCollection.getFromUri(uri);
 
       if (liveDocument && this.server.tokenizer) {
         let token: ComplexToken | undefined;
@@ -46,19 +46,18 @@ export default class HoverContentProvider extends Provider {
               (token) => token.identifier === structVariableIdentifier,
             )?.valueType;
 
-            token = document
-              .getGlobalStructComplexTokens()
+            token = (await document.getGlobalStructComplexTokens())
               .find((token) => token.identifier === structIdentifer)
               ?.properties.find((property) => property.identifier === identifier);
           }
 
           if (!token && tokenType === CompletionItemKind.Struct) {
-            const tokens = document.getGlobalStructComplexTokens();
+            const tokens = await document.getGlobalStructComplexTokens();
             token = tokens.find((token) => token.identifier === identifier);
           }
 
           if (!token && (tokenType === CompletionItemKind.Constant || tokenType === CompletionItemKind.Function)) {
-            const tokens = document.getGlobalComplexTokens();
+            const tokens = await document.getGlobalComplexTokens();
             token = tokens.find((token) => token.identifier === identifier);
           }
         }

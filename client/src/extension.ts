@@ -2,7 +2,7 @@ import { join } from "path";
 import { LanguageClient, ServerOptions, TransportKind } from "vscode-languageclient/node";
 
 import type { LanguageClientOptions } from "vscode-languageclient/node";
-import { ExtensionContext } from "vscode";
+import { ExtensionContext, authentication } from "vscode";
 
 let client: LanguageClient;
 const serverConfig = (serverPath: string) => {
@@ -17,12 +17,25 @@ export function activate(context: ExtensionContext) {
   };
 
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: "file", language: "nwscript" }],
+    documentSelector: [{ scheme: "sinfar", language: "nwscript" }],
   };
 
   client = new LanguageClient("nwscript", "NWscript Language Server", serverOptions, clientOptions);
   client.registerProposedFeatures();
   client.start();
+
+  void client.onReady().then(() => {
+    registerCustomRequests();
+  });
+}
+
+export function registerCustomRequests() {
+  client.onRequest("sinfar/getSession", () => {
+    return authentication.getSession("SinfarAuth", [], { createIfNone: true });
+  });
+  client.onRequest("sinfar/getFile", (uri: string) => {
+    throw new Error("Method not implemented.");
+  });
 }
 
 export async function deactivate() {

@@ -7,3 +7,6 @@ server/scripts/nwscript.nss
 yarn-error.log
 .DS_Store
 TODO.txt
+server/syntaxes/language-configuration.json
+server/syntaxes/nwscript-ee.tmLanguage
+server/syntaxes/nwscript-ee.tmLanguage.json
