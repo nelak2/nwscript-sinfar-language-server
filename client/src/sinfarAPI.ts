@@ -83,10 +83,9 @@ export class SinfarAPI {
     let script = $("script").text().match(regex)?.at(2);
 
     // Replace escaped characters
-    script = script?.replace("\\\\", "\\");
+    // script = script?.replace("\\\\", "\\");
     script = script?.replaceAll("\\/", "/");
-    script = script?.replaceAll("\\r", "\r");
-    script = script?.replaceAll("\\n", "\n");
+    script = script?.replaceAll("\\r\\n", "\r\n");
     // eslint-disable-next-line prettier/prettier
     script = script?.replaceAll('\\"', '"');
     script = script?.replaceAll("\\'", "'");
