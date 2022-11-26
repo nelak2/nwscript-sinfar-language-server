@@ -26,7 +26,12 @@
     "Neverwinter Nights: EE"
   ],
   "activationEvents": [
-    "onLanguage:nwscript"
+    "onLanguage:nwscript",
+    "onFileSystem:sinfar",
+    "onAuthenticationRequest:SinfarAuth",
+    "onCommand:sinfar.setup",
+    "onCommand:sinfar.login",
+    "onCommand:sinfar.logout"
   ],
   "preview": true,
   "main": "./client/out/extension",
@@ -141,7 +146,21 @@
           }
         }
       }
-    }
+    },
+    "commands": [
+      {
+        "command": "sinfar.setup",
+        "title": "Create Sinfar Workspace"
+      },
+      {
+        "command": "sinfar.login",
+        "title": "Login to Sinfar"
+      },
+      {
+        "command": "sinfar.logout",
+        "title": "Logout from Sinfar"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn webpack",
