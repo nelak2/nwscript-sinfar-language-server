@@ -89,6 +89,11 @@ export default class ServerManger {
         this.documentsCollection?.updateDocument(event.document, this.tokenizer);
       }
     });
+    this.liveDocumentsManager.onDidOpen((event) => {
+      if (this.tokenizer) {
+        this.documentsCollection?.updateDocument(event.document, this.tokenizer);
+      }
+    });
   }
 
   private async loadConfig() {
