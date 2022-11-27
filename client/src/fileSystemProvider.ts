@@ -158,13 +158,11 @@ export class SinfarFS implements vscode.FileSystemProvider {
     // then writeFile() is not being called from our initialization functions and therefore we can
     // safely upload the files to the server.
     if (!options.initializing) {
-      // Get the script name without file extensions
-      const scriptName = path.parse(uri.path).name;
       // Verify our folder is correctly associated with an ERF
       if (!parent.erf) {
         throw new Error("Invalid ERF");
       }
-      await this.remoteAPI.writeFile(parent.erf.id.toString(), scriptName, content);
+      await this.remoteAPI.writeFile(parent.erf.id.toString(), uri, content, this);
     }
     this._fireSoon({ type: vscode.FileChangeType.Changed, uri });
   }

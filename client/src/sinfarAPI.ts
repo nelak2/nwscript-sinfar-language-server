@@ -3,6 +3,9 @@ import * as cheerio from "cheerio";
 import * as vscode from "vscode";
 import { CookieAuthenticationProvider } from "./authProvider";
 import "isomorphic-fetch";
+import path from "path";
+import { SinfarFS } from "./fileSystemProvider";
+import { stringify } from "querystring";
 
 export type ERF = {
   id: number;
@@ -41,6 +44,8 @@ export type Resources = {
 };
 
 export class SinfarAPI {
+  private readonly diagCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection("Sinfar");
+
   private async _getCookies(): Promise<string> {
     const session = await vscode.authentication.getSession(CookieAuthenticationProvider.id, []);
     if (!session) {
@@ -98,8 +103,10 @@ export class SinfarAPI {
     return new TextEncoder().encode(script.scriptData);
   }
 
-  public async writeFile(erfId: string, resref: string, content: Uint8Array): Promise<void> {
+  public async writeFile(erfId: string, uri: vscode.Uri, content: Uint8Array, fileSystem: SinfarFS): Promise<void> {
     const token = await this._getCookies();
+
+    const resref = path.parse(uri.path).name;
 
     const headerParams: HeadersInit = new Headers({
       "content-type": "application/x-www-form-urlencoded",
@@ -119,22 +126,49 @@ export class SinfarAPI {
 
     const response = await res.text();
 
+    // Clear the diagnostics collection for this file
+    this.diagCollection.delete(uri);
     if (
       response === "<font color=#00FF00>The script has been successfully compiled.</font>" ||
       response === "<font color=#00FF00>Include script saved.</font>"
     ) {
       void vscode.window.showInformationMessage("The script has been successfully saved and compiled.");
     } else {
-      // Not registering as VS Code diagnostics to avoid conflicting with language server
       const errorList = response.split("<br/>");
       if (errorList.length > 0) {
         void vscode.window.showWarningMessage("The script saved but had compilation errors. See the log for more details");
+        // const diagnostics: vscode.Diagnostic[] = [];
+        const set: { loc: vscode.Uri; diag: vscode.Diagnostic[] }[] = [];
 
         for (const errorListItem of errorList) {
-          if (errorListItem === "<font color=#FF0000>Compilation aborted with errors</font>") {
-            console.log("Compilation aborted with errors");
+          const parse = errorListItem.match(/(^.*.nss)(\(\d*\))(:)(.*)/);
+          const scriptName = parse?.at(1);
+          let lineNumber = parse?.at(2);
+          const message = parse?.at(4);
+
+          if (scriptName && lineNumber && message) {
+            const location = fileSystem.findFile(scriptName);
+            lineNumber = lineNumber.replace("(", "").replace(")", "");
+
+            const range = new vscode.Range(Number(lineNumber) - 1, 0, Number(lineNumber) - 1, 100);
+
+            const diagnostic: vscode.Diagnostic = {
+              severity: vscode.DiagnosticSeverity.Error,
+              range,
+              message,
+              source: "Sinfar",
+            };
+
+            const existing = set.find((s) => s.loc.path === location.path);
+            if (existing) {
+              existing.diag.push(diagnostic);
+            } else {
+              set.push({ loc: location, diag: [diagnostic] });
+            }
           }
-          console.log(errorListItem);
+        }
+        for (const s of set) {
+          this.diagCollection.set(s.loc, s.diag);
         }
       }
     }
