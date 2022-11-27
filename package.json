@@ -1,18 +1,18 @@
 {
-  "name": "nwscript-ee-language-server",
-  "displayName": "nwscript-ee-language-server",
-  "description": "A language server for the NWScript language.",
+  "name": "nwscript-sinfar-scripters-extension",
+  "displayName": "nwscript-sinfar-scripters-extension",
+  "description": "Language server and virtual file system for Sinfar's scripting environment. This is a fork of the original nwscript-ee-language-server by Philippe Chab.",
   "icon": "NWN.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PhilippeChab/nwscript-ee-language-server"
+    "url": "https://github.com/nelak2/nwscript-sinfar-language-server"
   },
   "license": "MIT",
-  "version": "1.5.3",
+  "version": "0.9.0",
   "author": {
-    "name": "Philippe Chabot"
+    "name": "NelaK"
   },
-  "publisher": "PhilippeChab",
+  "publisher": "NelaK",
   "engines": {
     "vscode": "^1.66.2"
   },

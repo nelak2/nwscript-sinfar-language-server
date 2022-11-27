@@ -1,11 +1,9 @@
-# NWScript: EE Language Server
+# Sinfar Scripters Extension
 
-![Build](https://github.com/PhilippeChab/nwscript-ee-language-server/actions/workflows/build.yml/badge.svg)
-![Tests](https://github.com/PhilippeChab/nwscript-ee-language-server/actions/workflows/tests.yml/badge.svg)
+Sinfar Scripters Extension is a Visual Studio Code extension which enables working on scripts for the Sinfar NWN server using VS Code.
 
-NWScript: EE Language Server is a Visual Studio Code extension for the NWScript language.
-
-While it seems to work well, even in bigger and older code bases, it is still an early project and there might be some unintended behaviours.
+The extension provides a virtual file system connected back to the Sinfar Dev server so all files are opened from and saved back to the server. Nothing is stored locally.
+NWScript Language Server functionality is provided by the a modified version of Philippe Chab's NWScript: EE Language Server (https://github.com/PhilippeChab/nwscript-ee-language-server)
 
 ## Features
 
@@ -18,94 +16,35 @@ While it seems to work well, even in bigger and older code bases, it is still an
 - Signature help
 - Diagnostics
 
-## Dependencies
-
 ### Formatting
 
 [clang-format](https://clang.llvm.org/docs/ClangFormat.html).
 
-### Diagnostics
-
-Neverwinter Nights home and installation folders.
-
 ## Usage
 
-Simply open a project with nss files and the extension installed. The extension will index your files and you will be ready to go - it can currently take up to 10-15 seconds to index big projects.
+After installing the extension 
+1) Close all open folders.
+2) Press `F1` and select `Create Sinfar Workspace` from the commands menu. The extension will setup a new workspace called Sinfar.
+3) Press `F1` again and this time select `Login to Sinfar`. This can take a few seconds depending on how many ERF you have access to.
+4) Once it completes expand the Sinfar folder and you will see all the ERF and scripts underneath
 
-![](https://i.imgur.com/DKn8znH.png)
-
-Notes:
-
-- The files are indexed in background processes, which means it will not block other features of the language server like formatting, and a file's local definitions generated on the fly will be available.
-- The files are indexed incrementally, which means a file's global definitions become available as soon as it has been indexed.
-- Functions in includes will only be suggested by the code completions if they have a prototype definition. For example:
+- You can click on any file and it will open from the server. To refresh a file just close it's tab and reopen it.
+- To save just go `File->Save` or `CTRL+S`
+- You can download individual scripts or entire ERF's by right clicking on them and going to `Download`
+- You can also open the ERF or script in your default browser by right clicking and picking `Open in Browser`
+- If the ERF folder in VS Code is no longer in sync with what is on the server (files were added/removed on the website) simply right click on the ERF and click `Refresh ERF`
+- Functions in #includes will only be suggested by the code completions if they have a prototype definition. For example:
 ```
-void myFunction(int param);
+void myFunction(int param); // this is a function prototype
 void myFunction(int param)
 {
   // code here...
 }
 ```
 
-### Formatting
-
-```
-{
-  "editor.formatOnSave": true,
-  "files.associations": {
-    "*.nss": "nwscript"
-  },
-  "[nwscript]": {
-    "editor.defaultFormatter": "PhilippeChab.nwscript-ee-language-server"
-  },
-  "nwscript-ee-lsp.formatter": {
-    "enabled": true,
-    "executable": "clang-format",
-    "ignoredGlobs": ["/folder/to/ignore/*.nss", "file/to/ignore/filename.nss"],
-    "style": {
-      "BasedOnStyle": "Google",
-      "AlignTrailingComments": true,
-      "AlignConsecutiveAssignments": true,
-      "ColumnLimit": 250,
-      "BreakBeforeBraces": "Allman",
-      "AlignEscapedNewlinesLeft": true,
-      "AlwaysBreakBeforeMultilineStrings": true,
-      "MaxEmptyLinesToKeep": 1,
-      "TabWidth": 4,
-      "IndentWidth": 4,
-      "UseTab": "Always"
-    }
-  }
-}
-```
-
 Notes:
 
-- The executable setting must either bet set to your path executable's identifier, or its absolute path.
-- The style object must respect clang-format [rules](https://clang.llvm.org/docs/ClangFormatStyleOptions.html).
-
-### Diagnostics
-
-```
-{
-  "nwscript-ee-lsp.compiler": {
-    "enabled": true,
-    "verbose": false,
-    "nwnHome": "C:\\Users\\YOUR_USERNAME\\Documents\\Neverwinter Nights",
-    "nwnInstallation": "D:\\Program Files (x86)\\Steam\\steamapps\\common\\Neverwinter Nights"
-  }
-}
-```
-
-Notes:
-
-- Diagnostics are provided by compiling the file with the [nwnsc](https://github.com/nwneetools/nwnsc) executable.
-- The compiler executable is provided for Windows, Darwin and Linux operating systems.
-- Diagnostics are currently published when opening or saving a file.
-- By default, the compiler will try to detect automatically your Neverwinter Nights home and installation folders if they are not specified. If it fails to do so, you can provide the paths in the extension settings like shown above - input paths are wrapped into quotes automatically.
-- In order to compile a file's includes, the compiler needs to know their directories. Files that had been requested a diagnostic while the project is being indexed are queued and processed once the indexing is done.
-- You can set the `verbose` setting to `true` if you wish to see detailed logs of the compilation process.
-- Big files with a lot of includes can take between half a second to a second to compile on older machines - it will not affect the client performances as the processing is done on the server.
+- Diagnostics are not currently working
 
 ### Syntax highligthing
 
@@ -124,9 +63,9 @@ I personally use the [One Dark Pro](https://marketplace.visualstudio.com/items?i
 - Build and successfully run the extension
 - Invoke `yarn webpack`
 - Invoke `yarn run compile`
-- Add a `waitForDebugger()` statement somewhere near the server startup (otherwise the additional processes the server spawns seem to confuse the debugger and it won't attach properly)
-- Use Launch the client command
-- Use Attach to Server
+- You may have to add a `waitForDebugger()` statement somewhere near the server startup (otherwise the additional processes the server spawns seem to confuse the debugger and it won't attach properly)
+- Use `Launch the Client` command
+- Use `Attach to Server`
 
 ### Generating the language library definitions
 
@@ -134,4 +73,4 @@ Replace `server/scripts/nwscript.nss` by its new version and execute `yarn run g
 
 ## Issues
 
-Please report any issues on the github [repository](https://github.com/PhilippeChab/nwscript-ee-language-server/issues).
+Please report any issues on the github [repository](https://github.com/nelak2/nwscript-sinfar-language-server).
