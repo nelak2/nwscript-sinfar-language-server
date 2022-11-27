@@ -177,12 +177,12 @@
       "explorer/context": [
         {
           "command": "sinfar.reloadERF",
-          "when": "resourceScheme == 'sinfar' && explorerResourceIsFolder",
+          "when": "resourceScheme == 'sinfar' && explorerResourceIsFolder && resourcePath != '\\'",
           "group": "sinfar"
         },
         {
           "command": "sinfar.gotoERF",
-          "when": "resourceScheme == 'sinfar' && explorerResourceIsFolder",
+          "when": "resourceScheme == 'sinfar' && explorerResourceIsFolder && resourcePath != '\\'",
           "group": "sinfar"
         },
         {

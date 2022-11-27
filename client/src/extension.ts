@@ -115,23 +115,28 @@ export function InitSinfar(context: ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("sinfar.reloadERF", async (event) => {
-      const erfID: string = event.path
-        .match(/(\()([0-9]{1,4})(\))$/)
-        .at(2)
-        .toString();
+      void vscode.window.withProgress(
+        { location: vscode.ProgressLocation.SourceControl, title: "Fetching data from server..." },
+        async (progress) => {
+          const erfID: string = event.path
+            .match(/(\()([0-9]{1,4})(\))$/)
+            .at(2)
+            .toString();
 
-      const ERF = await remoteAPI.getERF(erfID);
+          const ERF = await remoteAPI.getERF(erfID);
 
-      await fs.deleteVirtualFiles(event);
+          await fs.deleteVirtualFiles(event);
 
-      for (const res of ERF.resources?.nss ?? []) {
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        await fs.writeFile(vscode.Uri.parse(event + "/" + res + ".nss"), new Uint8Array(0), {
-          create: true,
-          overwrite: true,
-          initializing: true,
-        });
-      }
+          for (const res of ERF.resources?.nss ?? []) {
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+            await fs.writeFile(vscode.Uri.parse(event + "/" + res + ".nss"), new Uint8Array(0), {
+              create: true,
+              overwrite: true,
+              initializing: true,
+            });
+          }
+        },
+      );
     }),
   );
 
@@ -147,41 +152,43 @@ export function InitSinfar(context: ExtensionContext) {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const session = await vscode.authentication.getSession(CookieAuthenticationProvider.id, [], { createIfNone: true });
+      void vscode.window.withProgress(
+        { location: vscode.ProgressLocation.Notification, title: "Fetching data from server...", cancellable: true },
+        async (progress) => {
+          try {
+            const erfList = await remoteAPI.getAllResources();
 
-      try {
-        void vscode.window.showInformationMessage("Downloading ERF data...");
+            for (const _erf of erfList) {
+              const folder =
+                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                "sinfar:/" + _erf.prefix + " - " + _erf.title.replace(/[/\\*."\\[\]:;|,<>?]/g, "") + " (" + _erf.id + ")";
+              const folderUri = vscode.Uri.parse(folder);
 
-        const erfList = await remoteAPI.getAllResources();
+              fs.createDirectoryInit(folderUri);
+              const dir = fs.stat(folderUri);
+              if (dir instanceof Directory) {
+                dir.erf = _erf;
+              }
 
-        for (const _erf of erfList) {
-          const folder =
-            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-            "sinfar:/" + _erf.prefix + " - " + _erf.title.replace(/[/\\*."\\[\]:;|,<>?]/g, "") + " (" + _erf.id + ")";
-          const folderUri = vscode.Uri.parse(folder);
-
-          fs.createDirectoryInit(folderUri);
-          const dir = fs.stat(folderUri);
-          if (dir instanceof Directory) {
-            dir.erf = _erf;
-          }
-
-          if (_erf.resources?.nss) {
-            for (const _nss of _erf.resources.nss) {
-              await fs.writeFile(vscode.Uri.parse(folder + "/" + _nss + ".nss"), new Uint8Array(0), {
-                create: true,
-                overwrite: false,
-                initializing: true,
-              });
+              if (_erf.resources?.nss) {
+                for (const _nss of _erf.resources.nss) {
+                  await fs.writeFile(vscode.Uri.parse(folder + "/" + _nss + ".nss"), new Uint8Array(0), {
+                    create: true,
+                    overwrite: false,
+                    initializing: true,
+                  });
+                }
+              }
             }
-          }
-        }
 
-        void vscode.window.showInformationMessage("ERF's loaded! Workspace ready for use");
-      } catch (e: any) {
-        // Clear session and throw error
-        await context.secrets.delete(CookieAuthenticationProvider.id);
-        throw new Error(e.toString());
-      }
+            void vscode.window.showInformationMessage("ERF's loaded! Workspace ready for use");
+          } catch (e: any) {
+            // Clear session and throw error
+            await context.secrets.delete(CookieAuthenticationProvider.id);
+            throw new Error(e.toString());
+          }
+        },
+      );
     }),
   );
 }
