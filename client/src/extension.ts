@@ -152,7 +152,7 @@ export function InitSinfar(context: ExtensionContext) {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const session = await vscode.authentication.getSession(CookieAuthenticationProvider.id, [], { createIfNone: true });
-      void vscode.window.withProgress(
+      await vscode.window.withProgress(
         { location: vscode.ProgressLocation.Notification, title: "Fetching data from server...", cancellable: true },
         async (progress) => {
           try {
