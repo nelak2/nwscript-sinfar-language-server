@@ -66,8 +66,11 @@ export class SinfarFS implements vscode.FileSystemProvider {
   findFile(name: string): vscode.Uri {
     for (const erf of this.root.entries) {
       if (erf[1] instanceof Directory) {
-        if (erf[1].erf?.resources?.nss?.includes(path.parse(name).name)) {
-          return vscode.Uri.from({ scheme: "sinfar", path: `/${erf[1].name}/${path.parse(name).name}` + ".nss" });
+        for (const file of erf[1].entries) {
+          if (file[0] === name) {
+            // return vscode.Uri.parse(path.join("sinfar:/", erf[0], file[0]));
+            return vscode.Uri.from({ scheme: "sinfar", path: `/${erf[0]}/${file[0]}` });
+          }
         }
       }
     }
@@ -130,6 +133,9 @@ export class SinfarFS implements vscode.FileSystemProvider {
         throw new Error("All resource prefixes must match the parent ERF prefix");
       }
 
+      if (path.parse(basename).ext !== ".nss") {
+        throw new Error("Script must have a .nss extension");
+      }
       // Ensure files in the VFS are always created with an nss extension so the language server can
       // pick them up
       basename = path.parse(basename).name + ".nss";
@@ -142,9 +148,11 @@ export class SinfarFS implements vscode.FileSystemProvider {
         }
       }
 
-      entry = new File(basename);
+      entry = new File(basename); // Read from the server
       parent.entries.set(basename, entry);
-      this._fireSoon({ type: vscode.FileChangeType.Created, uri });
+
+      const newUri = vscode.Uri.from({ scheme: "sinfar", path: `/${parent.name}/${basename}` });
+      this._fireSoon({ type: vscode.FileChangeType.Created, uri: newUri });
     }
 
     // Update virtual file
