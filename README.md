@@ -38,6 +38,14 @@ Notes:
 
 - The files are indexed in background processes, which means it will not block other features of the language server like formatting, and a file's local definitions generated on the fly will be available.
 - The files are indexed incrementally, which means a file's global definitions become available as soon as it has been indexed.
+- Functions in includes will only be suggested by the code completions if they have a prototype definition. For example:
+```
+void myFunction(int param);
+void myFunction(int param)
+{
+  // code here...
+}
+```
 
 ### Formatting
 
