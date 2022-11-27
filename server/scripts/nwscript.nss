@@ -5483,7 +5483,6 @@ int NAME_FIRST_HUMAN_MALE=20;
 int NAME_FIRST_HUMAN_FEMALE=21;
 int NAME_LAST_HUMAN=22;
 string sLanguage="nwscript";
-#include "x_nwscript_const"
 int Random(int nMaxInteger);
 void PrintString(string sString);
 void PrintFloat(float fFloat, int nWidth=18, int nDecimals=9);
@@ -6880,6 +6879,10 @@ const int PLAYER_SERVER_ROLE_ADMIN =                0x00000080;
 const int ACTION_IN_PROGRESS = 1;
 const int ACTION_COMPLETE = 2;
 const int ACTION_FAILED = 3;
+
+/// @brief Gets the item appearance as an XDATA string
+/// @param oItem Item to get the appearance of
+/// @return XDATA string representing the item appearance
 string GetEntireItemAppearance(object oItem);
 void RestoreItemAppearance(object oItem, string sAppearance);
 object GetActionTarget(object oCreature);
