@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 import * as vscode from "vscode";
 import { CookieAuthenticationProvider } from "./authProvider";
 import "isomorphic-fetch";
+import { LanguageClient } from "vscode-languageclient/node";
 
 export type ERF = {
   id: number;
@@ -41,6 +42,8 @@ export type Resources = {
 };
 
 export class SinfarAPI {
+  public languageServer: LanguageClient | undefined;
+
   private async _getCookies(): Promise<string> {
     const session = await vscode.authentication.getSession(CookieAuthenticationProvider.id, []);
     if (!session) {
@@ -64,6 +67,11 @@ export class SinfarAPI {
   public async readFile(resref: string): Promise<Uint8Array> {
     const token = await this._getCookies();
 
+    // ignore vscode workspace files
+    if (resref === "launch" || resref === "tasks" || resref === "settings") {
+      return new Uint8Array();
+    }
+
     // Query the server for the script
     const url = "https://nwn.sinfar.net/res_nss_edit.php?name=" + resref;
     const res = await fetch(url, {
@@ -78,19 +86,20 @@ export class SinfarAPI {
     // the scriptData variable
     const $ = cheerio.load(await res.text());
 
-    // Use regex to extract the scriptData variable
-    const regex = /(var scriptData = ")([\s\S]*)(";\s*var scriptResRef = ".*";)/;
-    let script = $("script").text().match(regex)?.at(2);
+    // Extract the scriptData variable from the script block
+    const script = JSON.parse(
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      '{"scriptData":"' +
+        $("script")
+          ?.text()
+          ?.match(/var scriptData = ".*/)
+          ?.at(0)
+          ?.match(/(")(.*)(";)/)
+          ?.at(2) +
+        '"}',
+    );
 
-    // Replace escaped characters
-    // script = script?.replace("\\\\", "\\");
-    script = script?.replaceAll("\\/", "/");
-    script = script?.replaceAll("\\r\\n", "\r\n");
-    // eslint-disable-next-line prettier/prettier
-    script = script?.replaceAll('\\"', '"');
-    script = script?.replaceAll("\\'", "'");
-
-    const enc = new TextEncoder().encode(script);
+    const enc = new TextEncoder().encode(script.scriptData);
     return enc;
   }
 
