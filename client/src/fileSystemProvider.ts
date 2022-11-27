@@ -122,13 +122,18 @@ export class SinfarFS implements vscode.FileSystemProvider {
     if (entry && options.create && !options.overwrite) {
       throw vscode.FileSystemError.FileExists(uri);
     }
+    // Ensure files in the VFS are always created with an nss extension so the language server can
+    // pick them up
+    const scriptPrefix = basename.split("_")[0];
+    basename = path.parse(basename).name + ".nss";
+    const newUri = vscode.Uri.from({ scheme: "sinfar", path: `/${parent.name}/${basename}` });
+
     // Create new file
     if (!entry) {
       if (!parent.erf) {
         throw new Error("Invalid ERF");
       }
 
-      const scriptPrefix = basename.split("_")[0];
       if (!options.initializing && scriptPrefix !== parent.erf.prefix) {
         throw new Error("All resource prefixes must match the parent ERF prefix");
       }
@@ -136,9 +141,6 @@ export class SinfarFS implements vscode.FileSystemProvider {
       if (path.parse(basename).ext !== ".nss") {
         throw new Error("Script must have a .nss extension");
       }
-      // Ensure files in the VFS are always created with an nss extension so the language server can
-      // pick them up
-      basename = path.parse(basename).name + ".nss";
 
       // Check for resref name length. It is limited to 16 characters + 4 characters for the file extension
       if (basename.length > 20) {
@@ -151,7 +153,6 @@ export class SinfarFS implements vscode.FileSystemProvider {
       entry = new File(basename); // Read from the server
       parent.entries.set(basename, entry);
 
-      const newUri = vscode.Uri.from({ scheme: "sinfar", path: `/${parent.name}/${basename}` });
       this._fireSoon({ type: vscode.FileChangeType.Created, uri: newUri });
     }
 
@@ -172,7 +173,7 @@ export class SinfarFS implements vscode.FileSystemProvider {
       }
       await this.remoteAPI.writeFile(parent.erf.id.toString(), uri, content, this);
     }
-    this._fireSoon({ type: vscode.FileChangeType.Changed, uri });
+    this._fireSoon({ type: vscode.FileChangeType.Changed, uri: newUri });
   }
 
   // --- manage files/folders
