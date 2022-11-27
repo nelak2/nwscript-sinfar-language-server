@@ -198,6 +198,28 @@ export class SinfarAPI {
     return erfList;
   }
 
+  public async getERF(erfID: string): Promise<ERF> {
+    const token = await this._getCookies();
+
+    const res = await fetch("https://nwn.sinfar.net/erf/api/" + erfID, {
+      method: "GET",
+      headers: {
+        accept: "*/*",
+        cookie: token,
+      },
+    });
+    const test = await res.text();
+    // const erf: ERF = <ERF>await res.json();
+    const erf = JSON.parse(test) as ERF;
+
+    // If the return is 401 (unauthorized) rather than an erf as expected
+    if (typeof erf === "number") {
+      throw new Error("Unauthorized. Please sign out then sign in again");
+    }
+
+    return erf;
+  }
+
   public async doLogin(userid: string, password: string): Promise<string> {
     const bodyParams: URLSearchParams = new URLSearchParams({
       format: "json",

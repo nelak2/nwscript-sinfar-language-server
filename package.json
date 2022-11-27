@@ -159,8 +159,39 @@
       {
         "command": "sinfar.logout",
         "title": "Logout from Sinfar"
+      },
+      {
+        "command": "sinfar.reloadERF",
+        "title": "Refresh ERF"
+      },
+      {
+        "command": "sinfar.gotoERF",
+        "title": "Open in Browser"
+      },
+      {
+        "command": "sinfar.gotoNSS",
+        "title": "Open in Browser"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "sinfar.reloadERF",
+          "when": "resourceScheme == 'sinfar' && explorerResourceIsFolder",
+          "group": "sinfar"
+        },
+        {
+          "command": "sinfar.gotoERF",
+          "when": "resourceScheme == 'sinfar' && explorerResourceIsFolder",
+          "group": "sinfar"
+        },
+        {
+          "command": "sinfar.gotoNSS",
+          "when": "resourceScheme == 'sinfar' && !explorerResourceIsFolder",
+          "group": "sinfar"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn webpack",
