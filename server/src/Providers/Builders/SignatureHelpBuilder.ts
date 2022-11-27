@@ -15,12 +15,24 @@ export default class SignatureHelpBuilder extends Builder {
           }, "")})`,
           undefined,
           ...token.params.map<ParameterInformation>((param) =>
-            ParameterInformation.create(`${param.valueType} ${param.identifier}`),
+            ParameterInformation.create(
+              `${param.valueType} ${param.identifier}`,
+              this.getCommentFromToken(token, param.identifier),
+            ),
           ),
         ),
       ],
       activeSignature: 0,
       activeParameter: activeParameter || null,
     };
+  }
+
+  static getCommentFromToken(token: FunctionComplexToken, identifier: string): string | undefined {
+    for (const comment of token.comments) {
+      if (comment.includes("@param " + identifier)) {
+        return comment;
+      }
+    }
+    return undefined;
   }
 }
