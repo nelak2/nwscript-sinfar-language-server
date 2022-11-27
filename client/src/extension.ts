@@ -3,7 +3,7 @@ import { LanguageClient, ServerOptions, TransportKind } from "vscode-languagecli
 import * as vscode from "vscode";
 
 import type { LanguageClientOptions } from "vscode-languageclient/node";
-import { ExtensionContext, authentication } from "vscode";
+import { ExtensionContext } from "vscode";
 
 import { Directory, SinfarFS } from "./fileSystemProvider";
 import { CookieAuthenticationProvider } from "./authProvider";
@@ -43,7 +43,6 @@ export function InitLSP(context: ExtensionContext) {
 
 export function registerCustomRequests() {
   client.onRequest("sinfar/getFile", async (uri: string) => {
-    console.log("LSP Requesting file: " + uri);
     const file = await fs.readFile(vscode.Uri.parse(uri));
     const decoder = new TextDecoder();
     return decoder.decode(file);
