@@ -3,7 +3,6 @@ import * as cheerio from "cheerio";
 import * as vscode from "vscode";
 import { CookieAuthenticationProvider } from "./authProvider";
 import "isomorphic-fetch";
-import { LanguageClient } from "vscode-languageclient/node";
 
 export type ERF = {
   id: number;
@@ -42,8 +41,6 @@ export type Resources = {
 };
 
 export class SinfarAPI {
-  public languageServer: LanguageClient | undefined;
-
   private async _getCookies(): Promise<string> {
     const session = await vscode.authentication.getSession(CookieAuthenticationProvider.id, []);
     if (!session) {
@@ -98,9 +95,7 @@ export class SinfarAPI {
           ?.at(2) +
         '"}',
     );
-
-    const enc = new TextEncoder().encode(script.scriptData);
-    return enc;
+    return new TextEncoder().encode(script.scriptData);
   }
 
   public async writeFile(erfId: string, resref: string, content: Uint8Array): Promise<void> {
@@ -180,7 +175,6 @@ export class SinfarAPI {
         cookie: token,
       },
     });
-
     return await res.text();
   }
 
