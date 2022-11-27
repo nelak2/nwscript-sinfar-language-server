@@ -62,6 +62,18 @@ export class SinfarFS implements vscode.FileSystemProvider {
     return result;
   }
 
+  // find a file based on a file name
+  findFile(name: string): vscode.Uri {
+    for (const erf of this.root.entries) {
+      if (erf[1] instanceof Directory) {
+        if (erf[1].erf?.resources?.nss?.includes(path.parse(name).name)) {
+          return vscode.Uri.from({ scheme: "sinfar", path: `/${erf[1].name}/${path.parse(name).name}` + ".nss" });
+        }
+      }
+    }
+    return vscode.Uri.parse(name);
+  }
+
   // --- manage file contents
 
   async readFile(uri: vscode.Uri): Promise<Uint8Array> {
@@ -254,6 +266,16 @@ export class SinfarFS implements vscode.FileSystemProvider {
     } else {
       void vscode.window.showInformationMessage("Unexpected error. Please try again (" + result + ")");
     }
+  }
+
+  async deleteVirtualFiles(uri: vscode.Uri): Promise<void> {
+    const folder = this._lookupAsDirectory(uri, false);
+
+    if (!folder || !(folder instanceof Directory)) {
+      throw new Error("Not a valid ERF");
+    }
+    folder.entries.clear();
+    this._fireSoon({ type: vscode.FileChangeType.Changed, uri }, { uri, type: vscode.FileChangeType.Deleted });
   }
 
   createDirectory(uri: vscode.Uri): void {

@@ -1,4 +1,4 @@
-import { join } from "path";
+import path, { join } from "path";
 import { LanguageClient, ServerOptions, TransportKind } from "vscode-languageclient/node";
 import * as vscode from "vscode";
 
@@ -42,10 +42,12 @@ export function InitLSP(context: ExtensionContext) {
 }
 
 export function registerCustomRequests() {
-  client.onRequest("sinfar/getFile", async (uri: string) => {
-    const file = await fs.readFile(vscode.Uri.parse(uri));
+  client.onRequest("sinfar/getFile", async (resref: string) => {
+    const filePath = fs.findFile(resref);
+
+    const file = await fs.readFile(filePath);
     const decoder = new TextDecoder();
-    return decoder.decode(file);
+    return { uri: filePath.toString(), content: decoder.decode(file) };
   });
 }
 
@@ -64,40 +66,30 @@ export function InitSinfar(context: ExtensionContext) {
   let initialized = false;
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("sinfar.reset", async (_) => {
-      for (const [name] of fs.readDirectory(vscode.Uri.parse("sinfar:/"))) {
-        await fs.delete(vscode.Uri.parse(`sinfar:/${name}`));
-      }
-      initialized = false;
-    }),
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand("sinfar.addFile", async (_) => {
-      if (initialized) {
-        await fs.writeFile(vscode.Uri.parse("sinfar:/file.txt"), Buffer.from("foo"), {
-          create: true,
-          overwrite: true,
-          initializing: true,
-        });
-      }
-    }),
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand("sinfar.deleteFile", async (_) => {
-      if (initialized) {
-        await fs.delete(vscode.Uri.parse("sinfar:/file.txt"));
-      }
-    }),
-  );
-
-  context.subscriptions.push(
     vscode.authentication.registerAuthenticationProvider(
       CookieAuthenticationProvider.id,
       "Sinfar Dev",
       new CookieAuthenticationProvider(context.secrets),
     ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("sinfar.gotoERF", async (event) => {
+      const erfID: string = event.path
+        .match(/(\()([0-9]{1,4})(\))$/)
+        .at(2)
+        .toString();
+
+      void vscode.env.openExternal(vscode.Uri.parse("https://nwn.sinfar.net/res_list.php?erf_id=" + erfID));
+    }),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("sinfar.gotoNSS", async (event) => {
+      const resref: string = path.parse(event.path).name;
+
+      void vscode.env.openExternal(vscode.Uri.parse("https://nwn.sinfar.net/res_nss_edit.php?name=" + resref));
+    }),
   );
 
   context.subscriptions.push(
@@ -118,6 +110,28 @@ export function InitSinfar(context: ExtensionContext) {
         uri: vscode.Uri.parse("sinfar:/"),
         name: "Sinfar",
       });
+    }),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("sinfar.reloadERF", async (event) => {
+      const erfID: string = event.path
+        .match(/(\()([0-9]{1,4})(\))$/)
+        .at(2)
+        .toString();
+
+      const ERF = await remoteAPI.getERF(erfID);
+
+      await fs.deleteVirtualFiles(event);
+
+      for (const res of ERF.resources?.nss ?? []) {
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        await fs.writeFile(vscode.Uri.parse(event + "/" + res + ".nss"), new Uint8Array(0), {
+          create: true,
+          overwrite: true,
+          initializing: true,
+        });
+      }
     }),
   );
 

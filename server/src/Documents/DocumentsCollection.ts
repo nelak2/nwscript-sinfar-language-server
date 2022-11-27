@@ -80,9 +80,9 @@ export default class DocumentsCollection extends Dictionnary<string, Document> {
         throw new Error("Tokenizer is not initialized");
       }
 
-      const content = await this.sinfarApi.getFile(key);
-      const globalScope = this.tokenizer.tokenizeContent(content, TokenizedScope.global);
-      const document = this.initializeDocument(key, globalScope);
+      const file = await this.sinfarApi.getFile(key);
+      const globalScope = this.tokenizer.tokenizeContent(file.content, TokenizedScope.global);
+      const document = this.initializeDocument(file.uri.toString(), globalScope);
       this.overwriteDocument(document);
       return document;
     } finally {
