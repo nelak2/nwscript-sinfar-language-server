@@ -9,6 +9,7 @@ import { Directory, SinfarFS } from "./providers/fileSystemProvider";
 import { CookieAuthenticationProvider } from "./providers/authProvider";
 import { SinfarAPI } from "./api/sinfarAPI";
 import { AreaGitEditorProvider } from "./providers/areaGitEditorProvider";
+import { ERF } from "./api/types";
 
 let client: LanguageClient;
 let fs: SinfarFS;
@@ -129,17 +130,21 @@ export function InitSinfar(context: ExtensionContext) {
             .at(2)
             .toString();
 
-          const ERF = await remoteAPI.getERF(erfID);
+          const erf = await remoteAPI.getERF(erfID);
 
-          await fs.deleteVirtualFiles(event);
+          if (typeof erf === "string") {
+            void vscode.window.showErrorMessage(erf);
+          } else {
+            await fs.deleteVirtualFiles(event);
 
-          for (const res of ERF.resources?.nss ?? []) {
-            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-            await fs.writeFile(vscode.Uri.parse(event + "/" + res + ".nss"), new Uint8Array(0), {
-              create: true,
-              overwrite: true,
-              initializing: true,
-            });
+            for (const res of (<ERF>erf).resources?.nss ?? []) {
+              // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+              await fs.writeFile(vscode.Uri.parse(event + "/" + res + ".nss"), new Uint8Array(0), {
+                create: true,
+                overwrite: true,
+                initializing: true,
+              });
+            }
           }
         },
       );
@@ -163,6 +168,10 @@ export function InitSinfar(context: ExtensionContext) {
         async (progress) => {
           try {
             const erfList = await remoteAPI.getAllResources();
+
+            if (typeof erfList === "string") {
+              throw new Error(erfList);
+            }
 
             for (const _erf of erfList) {
               const folder =

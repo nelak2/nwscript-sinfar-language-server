@@ -1,3 +1,5 @@
+import * as vscode from "vscode";
+
 export type ERF = {
   id: number;
   prefix: string;
@@ -56,3 +58,7 @@ export enum ResourceType {
   UTT = "utt",
   IFO = "ifo",
 }
+export type CompilerReturn = {
+  location: vscode.Uri;
+  diagnostics: vscode.Diagnostic[];
+};

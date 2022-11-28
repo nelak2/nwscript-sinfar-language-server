@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { ERF, SinfarAPI } from "../api/sinfarAPI";
+import { SinfarAPI } from "../api/sinfarAPI";
+import { ERF } from "../api/types";
 
 export class File implements vscode.FileStat {
   type: vscode.FileType;
@@ -45,6 +46,7 @@ export type Entry = File | Directory;
 export class SinfarFS implements vscode.FileSystemProvider {
   root = new Directory("");
   remoteAPI = new SinfarAPI();
+  private readonly diagCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection("Sinfar");
 
   // --- manage file metadata
 
@@ -197,7 +199,20 @@ export class SinfarFS implements vscode.FileSystemProvider {
       if (!parent.erf) {
         throw new Error("Invalid ERF");
       }
-      await this.remoteAPI.writeFile(parent.erf.id.toString(), uri, content, this);
+
+      // Clear diagnostics
+      this.diagCollection.delete(uri);
+      const results = await this.remoteAPI.writeFile(parent.erf.id.toString(), uri, content, this);
+      if (results.status) {
+        void vscode.window.showInformationMessage("The script has been successfully saved and compiled.");
+      } else {
+        void vscode.window.showWarningMessage("The script saved but had compilation errors. See the log for more details");
+
+        // Display diagnostics
+        for (const s of results.messages || []) {
+          this.diagCollection.set(s.location, s.diagnostics);
+        }
+      }
     }
     this._fireSoon({ type: vscode.FileChangeType.Changed, uri: newUri });
   }

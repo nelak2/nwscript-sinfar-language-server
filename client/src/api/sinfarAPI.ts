@@ -5,11 +5,9 @@ import { CookieAuthenticationProvider } from "../providers/authProvider";
 import "isomorphic-fetch";
 import path from "path";
 import { SinfarFS } from "../providers/fileSystemProvider";
-import { ERF } from "./types";
+import { CompilerReturn, ERF, ResourceType } from "./types";
 
 export class SinfarAPI {
-  private readonly diagCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection("Sinfar");
-
   private async _getCookies(): Promise<string> {
     const session = await vscode.authentication.getSession(CookieAuthenticationProvider.id, []);
     if (!session) {
@@ -67,15 +65,16 @@ export class SinfarAPI {
     return new TextEncoder().encode(script.scriptData);
   }
 
-  public async writeFile(erfId: string, uri: vscode.Uri, content: Uint8Array, fileSystem: SinfarFS): Promise<void> {
+  public async writeFile(
+    erfId: string,
+    uri: vscode.Uri,
+    content: Uint8Array,
+    fileSystem: SinfarFS,
+  ): Promise<{ status: Boolean; messages: CompilerReturn[] | undefined }> {
     const token = await this._getCookies();
 
     const resref = path.parse(uri.path).name;
 
-    const headerParams: HeadersInit = new Headers({
-      "content-type": "application/x-www-form-urlencoded",
-      cookie: token,
-    });
     const bodyParams: URLSearchParams = new URLSearchParams({
       name: resref,
       erfId,
@@ -84,26 +83,24 @@ export class SinfarAPI {
     });
     const res = await fetch("https://nwn.sinfar.net/nss_compile.php", {
       method: "POST",
-      headers: headerParams,
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+        cookie: token,
+      },
       body: bodyParams,
     });
 
     const response = await res.text();
 
-    // Clear the diagnostics collection for this file
-    this.diagCollection.delete(uri);
     if (
       response === "<font color=#00FF00>The script has been successfully compiled.</font>" ||
       response === "<font color=#00FF00>Include script saved.</font>"
     ) {
-      void vscode.window.showInformationMessage("The script has been successfully saved and compiled.");
+      return { status: true, messages: undefined };
     } else {
+      const set: CompilerReturn[] = [];
       const errorList = response.split("<br/>");
       if (errorList.length > 0) {
-        void vscode.window.showWarningMessage("The script saved but had compilation errors. See the log for more details");
-        // const diagnostics: vscode.Diagnostic[] = [];
-        const set: { loc: vscode.Uri; diag: vscode.Diagnostic[] }[] = [];
-
         for (const errorListItem of errorList) {
           const parse = errorListItem.match(/(^.*.nss)(\(\d*\))(:)(.*)/);
           const scriptName = parse?.at(1);
@@ -123,19 +120,18 @@ export class SinfarAPI {
               source: "Sinfar",
             };
 
-            const existing = set.find((s) => s.loc.path === location.path);
+            const existing = set.find((s) => s.location.path === location.path);
             if (existing) {
-              existing.diag.push(diagnostic);
+              existing.diagnostics.push(diagnostic);
             } else {
-              set.push({ loc: location, diag: [diagnostic] });
+              set.push({ location, diagnostics: [diagnostic] });
             }
           }
         }
-        for (const s of set) {
-          this.diagCollection.set(s.loc, s.diag);
-        }
+        return { status: false, messages: set };
       }
     }
+    return { status: true, messages: undefined };
   }
 
   public async renameFile(oldErfId: string, oldResRef: string, newResRef: string): Promise<string> {
@@ -176,7 +172,9 @@ export class SinfarAPI {
     return await res.text();
   }
 
-  public async getAllResources(): Promise<ERF[]> {
+  // Gets a JSON list of all the resources in all ERFs
+  // return JSON representation of the ERF list or an error message
+  public async getAllResources(): Promise<ERF[] | string> {
     const token = await this._getCookies();
 
     const res = await fetch("https://nwn.sinfar.net/erf/api", {
@@ -190,13 +188,15 @@ export class SinfarAPI {
 
     // If the return is 401 (unauthorized) rather than an erfList as expected
     if (typeof erfList === "number") {
-      throw new Error("Unauthorized. Please sign out then sign in again");
+      return "Unauthorized. Please sign out then sign in again";
     }
 
     return erfList;
   }
 
-  public async getERF(erfID: string): Promise<ERF> {
+  // Gets a JSON list of all the resources in the given ERF
+  // return JSON representation of the ERF or an error message
+  public async getERF(erfID: string): Promise<ERF | String> {
     const token = await this._getCookies();
 
     const res = await fetch("https://nwn.sinfar.net/erf/api/" + erfID, {
@@ -212,7 +212,7 @@ export class SinfarAPI {
 
     // If the return is 401 (unauthorized) rather than an erf as expected
     if (typeof erf === "number") {
-      throw new Error("Unauthorized. Please sign out then sign in again");
+      return "Unauthorized. Please sign out then sign in again";
     }
 
     return erf;
@@ -239,55 +239,21 @@ export class SinfarAPI {
     return this._parseCookies(response);
   }
 
-  public async getScript(resref: string): Promise<Uint8Array> {} // TODO
+  public async getScript(resref: string): Promise<Uint8Array> {
+    throw new Error("Method not implemented.");
+  } // TODO
 
-  public async saveScript(resref: string, content: Uint8Array): Promise<void> {} // TODO
+  public async saveScript(resref: string, content: Uint8Array): Promise<String[]> {
+    throw new Error("Method not implemented.");
+  } // TODO
 
-  public async getArea(resref: string): Promise<Uint8Array> {} // TODO
+  public async getResource(
+    resref: string,
+  ): Promise<{ erfId: String; resref: String; resType: ResourceType; content: Uint8Array }> {
+    throw new Error("Method not implemented.");
+  } // TODO
 
-  public async saveArea(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getDialog(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveDialog(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getItem(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveItem(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getCreature(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveCreature(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getPlaceable(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async savePlaceable(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getEncounter(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveEncounter(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getTrigger(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveTrigger(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getMerchant(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveMerchant(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getDoor(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveDoor(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getWaypoint(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveWaypoint(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async getSound(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async saveSound(resref: string, content: Uint8Array): Promise<void> {} // TODO
-
-  public async get2DA(resref: string): Promise<Uint8Array> {} // TODO
-
-  public async save2DA(resref: string, content: Uint8Array): Promise<void> {} // TODO
+  public async saveResource(resref: string, content: Uint8Array): Promise<String> {
+    throw new Error("Method not implemented.");
+  } // TODO
 }
