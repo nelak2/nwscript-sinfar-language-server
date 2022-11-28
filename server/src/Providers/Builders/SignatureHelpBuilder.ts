@@ -30,7 +30,7 @@ export default class SignatureHelpBuilder extends Builder {
   static getCommentFromToken(token: FunctionComplexToken, identifier: string): string | undefined {
     for (const comment of token.comments) {
       if (comment.includes("@param " + identifier)) {
-        return comment;
+        return comment.replace("@param " + identifier, "").trim();
       }
     }
     return undefined;

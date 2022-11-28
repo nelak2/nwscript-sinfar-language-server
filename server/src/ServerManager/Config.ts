@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 const defaultServerConfiguration = {
   autoCompleteFunctionsWithParams: false,
-  includeCommentsInFunctionsHover: false,
+  includeCommentsInFunctionsHover: true,
   formatter: {
     enabled: false,
     verbose: false,
@@ -22,7 +22,7 @@ const defaultServerConfiguration = {
     },
   },
   compiler: {
-    enabled: true,
+    enabled: false,
     verbose: false,
     reportWarnings: true,
     nwnHome: "",

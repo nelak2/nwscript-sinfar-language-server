@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionItemKind } from "vscode-languageserver";
+import { CompletionItem, CompletionItemKind, MarkupKind } from "vscode-languageserver";
 
 import type {
   ComplexToken,
@@ -85,6 +85,22 @@ export default class CompletionItemBuilder extends Builder {
         }`;
       }, "")}): ${this.handleLanguageType(token.returnType)}`,
       data: token.params,
+      documentation: this.buildMarkdown(token.comments),
+    };
+  }
+
+  private static buildMarkdown(content: string[] | string, prepend: string[] = [], postpend: string[] = []) {
+    let formattedContent = content;
+    if (typeof content === "string") {
+      formattedContent = [content];
+    }
+
+    return {
+      kind: MarkupKind.Markdown,
+      value: prepend
+        .concat(["```nwscript", ...formattedContent, "```"])
+        .concat(postpend)
+        .join("\r\n"),
     };
   }
 
