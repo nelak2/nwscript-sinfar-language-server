@@ -45,6 +45,9 @@
         "_erf_closed": {
             "iconPath": "./erf_closed.png"
         },
+        "_root":{
+            "iconPath": "./root.png"
+        }
         
     },
     "folderNames": {
@@ -60,8 +63,25 @@
         "sounds": "_sound",
         "areas": "_area",
         "conversation": "_conversation",
-        "2da": "_2da"
+        "2da": "_2da",
+    },
+    "folderNamesExpanded": {
+        "creatures": "_creature",
+        "doors": "_door",
+        "encounters": "_encounter",
+        "items": "_item",
+        "merchants": "_merchant",
+        "placeables": "_placeable",
+        "scripts": "_script",
+        "triggers": "_trigger",
+        "waypoints": "_waypoint",
+        "sounds": "_sound",
+        "areas": "_area",
+        "conversation": "_conversation",
+        "2da": "_2da",
     },
     "folder": "_erf_closed",
-    "folderExpanded": "_erf_open"
+    "folderExpanded": "_erf_open",
+    "rootFolder": "_root",
+    "rootFolderExpanded": "_root"
 }
