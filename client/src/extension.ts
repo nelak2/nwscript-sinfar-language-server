@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 import type { LanguageClientOptions } from "vscode-languageclient/node";
 import { ExtensionContext } from "vscode";
 
-import { Directory, SinfarFS } from "./providers/fileSystemProvider";
+import { SinfarFS } from "./providers/fileSystemProvider";
 import { CookieAuthenticationProvider } from "./providers/authProvider";
 import { SinfarAPI } from "./api/sinfarAPI";
 import { AreaGitEditorProvider } from "./providers/areaGitEditorProvider";
@@ -174,26 +174,7 @@ export function InitSinfar(context: ExtensionContext) {
             }
 
             for (const _erf of erfList) {
-              const folder =
-                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                "sinfar:/" + _erf.prefix + " - " + _erf.title.replace(/[/\\*."\\[\]:;|,<>?]/g, "") + " (" + _erf.id + ")";
-              const folderUri = vscode.Uri.parse(folder);
-
-              fs.createDirectoryInit(folderUri);
-              const dir = fs.stat(folderUri);
-              if (dir instanceof Directory) {
-                dir.erf = _erf;
-              }
-
-              if (_erf.resources?.nss) {
-                for (const _nss of _erf.resources.nss) {
-                  await fs.writeFile(vscode.Uri.parse(folder + "/" + _nss + ".nss"), new Uint8Array(0), {
-                    create: true,
-                    overwrite: false,
-                    initializing: true,
-                  });
-                }
-              }
+              await remoteAPI.createERFFolder(_erf, fs, false);
             }
 
             void vscode.window.showInformationMessage("ERF's loaded! Workspace ready for use");

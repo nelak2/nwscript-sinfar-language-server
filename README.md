@@ -22,11 +22,12 @@ NWScript Language Server functionality is provided by the a modified version of 
 
 ## Usage
 
-After installing the extension 
-1) Close all open folders.
-2) Press `F1` and select `Create Sinfar Workspace` from the commands menu. The extension will setup a new workspace called Sinfar.
-3) Press `F1` again and this time select `Login to Sinfar`. This can take a few seconds depending on how many ERF you have access to.
-4) Once it completes expand the Sinfar folder and you will see all the ERF and scripts underneath
+After installing the extension
+
+1. Close all open folders.
+2. Press `F1` and select `Create Sinfar Workspace` from the commands menu. The extension will setup a new workspace called Sinfar.
+3. Press `F1` again and this time select `Login to Sinfar`. This can take a few seconds depending on how many ERF you have access to.
+4. Once it completes expand the Sinfar folder and you will see all the ERF and scripts underneath
 
 - You can click on any file and it will open from the server. To refresh a file just close it's tab and reopen it.
 - To save just go `File->Save` or `CTRL+S`
@@ -34,6 +35,7 @@ After installing the extension
 - You can also open the ERF or script in your default browser by right clicking and picking `Open in Browser`
 - If the ERF folder in VS Code is no longer in sync with what is on the server (files were added/removed on the website) simply right click on the ERF and click `Refresh ERF`
 - Functions in #includes will only be suggested by the code completions if they have a prototype definition. For example:
+
 ```
 void myFunction(int param); // this is a function prototype
 void myFunction(int param)
@@ -74,3 +76,14 @@ Replace `server/scripts/nwscript.nss` by its new version and execute `yarn run g
 ## Issues
 
 Please report any issues on the github [repository](https://github.com/nelak2/nwscript-sinfar-language-server).
+
+## Credit
+
+- Philippe Chab and the contributors of the NWScript: EE Language Server for providing the core language parsing functionality (https://github.com/PhilippeChab/nwscript-ee-language-server)
+- Icons from https://www.flaticon.com/ by the following authors:
+  - Freepik (https://www.freepik.com)
+  - pongsakornRed (https://www.flaticon.com/authors/pongsakornred)
+  - xnimrodx (https://www.flaticon.com/authors/xnimrodx)
+  - wanicon (https://www.flaticon.com/authors/wanicon)
+  - Smashicons (https://www.flaticon.com/authors/smashicons)
+  - Pixel perfect (https://www.flaticon.com/authors/pixel-perfect)

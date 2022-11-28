@@ -136,11 +136,6 @@ export class SinfarFS implements vscode.FileSystemProvider {
     const parent = this._lookupParentDirectory(uri);
     let entry = parent.entries.get(basename);
 
-    if (path.parse(uri.path).ext === ".git") {
-      await this.writeGIT(uri, content, options);
-      return;
-    }
-
     if (entry instanceof Directory) {
       throw vscode.FileSystemError.FileIsADirectory(uri);
     }
@@ -153,22 +148,22 @@ export class SinfarFS implements vscode.FileSystemProvider {
     // Ensure files in the VFS are always created with an nss extension so the language server can
     // pick them up
     const scriptPrefix = basename.split("_")[0];
-    basename = path.parse(basename).name + ".nss";
+    // basename = path.parse(basename).name + ".nss";
     const newUri = vscode.Uri.from({ scheme: "sinfar", path: `/${parent.name}/${basename}` });
 
     // Create new file
     if (!entry) {
-      if (!parent.erf) {
-        throw new Error("Invalid ERF");
-      }
+      // if (!parent.erf) {
+      //   throw new Error("Invalid ERF");
+      // }
 
-      if (!options.initializing && scriptPrefix !== parent.erf.prefix) {
-        throw new Error("All resource prefixes must match the parent ERF prefix");
-      }
+      // if (!options.initializing && scriptPrefix !== parent.erf.prefix) {
+      //   throw new Error("All resource prefixes must match the parent ERF prefix");
+      // }
 
-      if (path.parse(basename).ext !== ".nss") {
-        throw new Error("Script must have a .nss extension");
-      }
+      // if (path.parse(basename).ext !== ".nss") {
+      //   throw new Error("Script must have a .nss extension");
+      // }
 
       // Check for resref name length. It is limited to 16 characters + 4 characters for the file extension
       if (basename.length > 20) {

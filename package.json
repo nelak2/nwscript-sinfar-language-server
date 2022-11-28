@@ -197,6 +197,13 @@
         }
       ]
     },
+    "iconThemes": [
+      {
+        "id": "sinfar",
+        "label": "Sinfar",
+        "path": "./client/fileicons/sinfar-icon-theme.json"
+      }
+    ],
     "customEditors": [
       {
         "viewType": "sinfar.areaGitEditor",

@@ -4,10 +4,12 @@ import * as vscode from "vscode";
 import { CookieAuthenticationProvider } from "../providers/authProvider";
 import "isomorphic-fetch";
 import path from "path";
-import { SinfarFS } from "../providers/fileSystemProvider";
+import { Directory, SinfarFS } from "../providers/fileSystemProvider";
 import { CompilerReturn, ERF, ResourceType } from "./types";
 
 export class SinfarAPI {
+  private _erfStore: ERF[] = [];
+
   private async _getCookies(): Promise<string> {
     const session = await vscode.authentication.getSession(CookieAuthenticationProvider.id, []);
     if (!session) {
@@ -191,6 +193,8 @@ export class SinfarAPI {
       return "Unauthorized. Please sign out then sign in again";
     }
 
+    this._erfStore = erfList;
+
     return erfList;
   }
 
@@ -256,4 +260,194 @@ export class SinfarAPI {
   public async saveResource(resref: string, content: Uint8Array): Promise<String> {
     throw new Error("Method not implemented.");
   } // TODO
+
+  public async createERFFolder(erf: ERF, fs: SinfarFS, onlyScripts: boolean) {
+    const folder =
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      "sinfar:/" + erf.prefix + " - " + erf.title.replace(/[/\\*."\\[\]:;|,<>?]/g, "") + " (" + erf.id + ")";
+    const folderUri = vscode.Uri.parse(folder);
+
+    fs.createDirectoryInit(folderUri);
+    const dir = fs.stat(folderUri);
+    if (dir instanceof Directory) {
+      dir.erf = erf;
+    }
+
+    if (onlyScripts) {
+      if (erf.resources?.nss) {
+        for (const _nss of erf.resources.nss) {
+          await fs.writeFile(vscode.Uri.parse(folder + "/" + _nss + ".nss"), new Uint8Array(0), {
+            create: true,
+            overwrite: false,
+            initializing: true,
+          });
+        }
+      }
+    } else {
+      await this.createERFSubFolders(erf, dir as Directory, folderUri, fs);
+    }
+  }
+
+  public async createERFSubFolders(erf: ERF, erfDir: Directory, erfPath: vscode.Uri, fs: SinfarFS) {
+    const root = erfPath.toString();
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Scripts"));
+    if (erf.resources?.nss) {
+      for (const nss of erf.resources.nss) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Scripts/" + nss + ".nss"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Areas"));
+    if (erf.resources?.are) {
+      for (const are of erf.resources.are) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Areas/" + are + ".are"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+        await fs.writeFile(vscode.Uri.parse(root + "/Areas/" + are + ".git"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Conversation"));
+    if (erf.resources?.dlg) {
+      for (const dlg of erf.resources.dlg) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Conversation/" + dlg + ".dlg"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Items"));
+    if (erf.resources?.uti) {
+      for (const uti of erf.resources.uti) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Items/" + uti + ".uti"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Creatures"));
+    if (erf.resources?.utc) {
+      for (const utc of erf.resources.utc) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Creatures/" + utc + ".utc"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Placeables"));
+    if (erf.resources?.utp) {
+      for (const utp of erf.resources.utp) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Placeables/" + utp + ".utp"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Encounters"));
+    if (erf.resources?.ute) {
+      for (const ute of erf.resources.ute) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Encounters/" + ute + ".ute"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Triggers"));
+    if (erf.resources?.utt) {
+      for (const utt of erf.resources.utt) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Triggers/" + utt + ".utt"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Merchants"));
+    if (erf.resources?.utm) {
+      for (const utm of erf.resources.utm) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Merchants/" + utm + ".utm"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Doors"));
+    if (erf.resources?.utd) {
+      for (const utd of erf.resources.utd) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Doors/" + utd + ".utd"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Waypoints"));
+    if (erf.resources?.utw) {
+      for (const utw of erf.resources.utw) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Waypoints/" + utw + ".utw"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Sounds"));
+    if (erf.resources?.uts) {
+      for (const uts of erf.resources.uts) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Sounds/" + uts + ".uts"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/2DA"));
+    if (erf.resources?.["2da"]) {
+      for (const _2da of erf.resources["2da"]) {
+        await fs.writeFile(vscode.Uri.parse(root + "/2DA/" + _2da + ".2da"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Module Info"));
+    if (erf.resources?.ifo) {
+      for (const ifo of erf.resources.ifo) {
+        await fs.writeFile(vscode.Uri.parse(root + "/Module Info/" + ifo + ".ifo"), new Uint8Array(0), {
+          create: true,
+          overwrite: false,
+          initializing: true,
+        });
+      }
+    }
+  }
 }
