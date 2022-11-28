@@ -5,9 +5,10 @@ import * as vscode from "vscode";
 import type { LanguageClientOptions } from "vscode-languageclient/node";
 import { ExtensionContext } from "vscode";
 
-import { Directory, SinfarFS } from "./fileSystemProvider";
-import { CookieAuthenticationProvider } from "./authProvider";
-import { SinfarAPI } from "./sinfarAPI";
+import { Directory, SinfarFS } from "./providers/fileSystemProvider";
+import { CookieAuthenticationProvider } from "./providers/authProvider";
+import { SinfarAPI } from "./api/sinfarAPI";
+import { AreaGitEditorProvider } from "./providers/areaGitEditorProvider";
 
 let client: LanguageClient;
 let fs: SinfarFS;
@@ -19,6 +20,11 @@ const serverConfig = (serverPath: string) => {
 export function activate(context: ExtensionContext) {
   InitSinfar(context);
   InitLSP(context);
+  InitEditors(context);
+}
+
+export function InitEditors(context: ExtensionContext) {
+  context.subscriptions.push(AreaGitEditorProvider.register(context));
 }
 
 export function InitLSP(context: ExtensionContext) {

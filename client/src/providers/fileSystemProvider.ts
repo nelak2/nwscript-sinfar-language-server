@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { ERF, SinfarAPI } from "./sinfarAPI";
+import { ERF, SinfarAPI } from "../api/sinfarAPI";
 
 export class File implements vscode.FileStat {
   type: vscode.FileType;
@@ -80,6 +80,10 @@ export class SinfarFS implements vscode.FileSystemProvider {
   // --- manage file contents
 
   async readFile(uri: vscode.Uri): Promise<Uint8Array> {
+    if (uri.path.endsWith(".git")) {
+      return await this.readGIT(uri);
+    }
+
     const resref = path.parse(uri.path).name;
 
     const enc = await this.remoteAPI.readFile(resref);
@@ -94,6 +98,23 @@ export class SinfarFS implements vscode.FileSystemProvider {
     }
 
     return enc;
+  }
+
+  async readGIT(uri: vscode.Uri): Promise<Uint8Array> {
+    let data: Uint8Array | undefined;
+
+    // Store the downloaded script
+    const basename = path.posix.basename(uri.path);
+    const parent = this._lookupParentDirectory(uri);
+    const entry = parent.entries.get(basename);
+    if (entry && entry instanceof File) {
+      data = entry.data;
+    }
+
+    if (data?.length) {
+      return data;
+    }
+    return new Uint8Array();
   }
 
   /**
@@ -112,6 +133,11 @@ export class SinfarFS implements vscode.FileSystemProvider {
     let basename = path.posix.basename(uri.path);
     const parent = this._lookupParentDirectory(uri);
     let entry = parent.entries.get(basename);
+
+    if (path.parse(uri.path).ext === ".git") {
+      await this.writeGIT(uri, content, options);
+      return;
+    }
 
     if (entry instanceof Directory) {
       throw vscode.FileSystemError.FileIsADirectory(uri);
@@ -174,6 +200,41 @@ export class SinfarFS implements vscode.FileSystemProvider {
       await this.remoteAPI.writeFile(parent.erf.id.toString(), uri, content, this);
     }
     this._fireSoon({ type: vscode.FileChangeType.Changed, uri: newUri });
+  }
+
+  async writeGIT(
+    uri: vscode.Uri,
+    content: Uint8Array,
+    options: { create: boolean; overwrite: boolean; initializing: boolean },
+  ): Promise<void> {
+    const basename = path.posix.basename(uri.path);
+    const parent = this._lookupParentDirectory(uri);
+    let entry = parent.entries.get(basename);
+
+    if (entry instanceof Directory) {
+      throw vscode.FileSystemError.FileIsADirectory(uri);
+    }
+    if (!entry && !options.create) {
+      throw vscode.FileSystemError.FileNotFound(uri);
+    }
+    if (entry && options.create && !options.overwrite) {
+      throw vscode.FileSystemError.FileExists(uri);
+    }
+
+    entry = new File(basename); // Read from the server
+    parent.entries.set(basename, entry);
+
+    this._fireSoon({ type: vscode.FileChangeType.Created, uri });
+
+    const test =
+      // eslint-disable-next-line @typescript-eslint/quotes
+      '{\r\n  "scratches": [\r\n    {\r\n      "id": "8lYOoWqz2rHtPuhvnZ43eMx1mG6WnFrm",\r\n      "text": "\uD83D\uDE38",\r\n      "created": 1584577931699\r\n    },\r\n    {\r\n      "id": "aZ57bJUEaXZ5wuBAX6NfGuj85Y6iw84N",\r\n      "text": "\uD83D\uDE3B",\r\n      "created": 1584577933329\r\n    }\r\n  ]\r\n}';
+    const enc = new TextEncoder();
+    const data = enc.encode(test);
+    // Update virtual file
+    entry.mtime = Date.now();
+    entry.size = data.byteLength;
+    entry.data = data;
   }
 
   // --- manage files/folders

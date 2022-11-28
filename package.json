@@ -31,7 +31,8 @@
     "onAuthenticationRequest:SinfarAuth",
     "onCommand:sinfar.setup",
     "onCommand:sinfar.login",
-    "onCommand:sinfar.logout"
+    "onCommand:sinfar.logout",
+    "onCustomEditor:sinfar.git"
   ],
   "preview": true,
   "main": "./client/out/extension",
@@ -171,6 +172,10 @@
       {
         "command": "sinfar.gotoNSS",
         "title": "Open in Browser"
+      },
+      {
+        "command": "sinfar.editGit",
+        "title": "Edit Area - GIT"
       }
     ],
     "menus": {
@@ -191,7 +196,19 @@
           "group": "sinfar"
         }
       ]
-    }
+    },
+    "customEditors": [
+      {
+        "viewType": "sinfar.areaGitEditor",
+        "displayName": "Area - GIT",
+        "selector": [
+          {
+            "filenamePattern": "*.git",
+            "resourceScheme": "sinfar"
+          }
+        ]
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn webpack",

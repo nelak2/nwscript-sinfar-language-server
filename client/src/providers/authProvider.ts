@@ -10,7 +10,7 @@ import {
   SecretStorage,
   window,
 } from "vscode";
-import { SinfarAPI } from "./sinfarAPI";
+import { SinfarAPI } from "../api/sinfarAPI";
 
 class SinfarAuthSession implements AuthenticationSession {
   id: string = CookieAuthenticationProvider.id;
