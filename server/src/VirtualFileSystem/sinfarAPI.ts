@@ -1,3 +1,4 @@
+import path from "path";
 import type { Connection } from "vscode-languageserver";
 
 export class SinfarAPI {
@@ -8,6 +9,6 @@ export class SinfarAPI {
   }
 
   public async getFile(uri: string): Promise<{ uri: string; content: string }> {
-    return await this.connection.sendRequest("sinfar/getFile", uri);
+    return await this.connection.sendRequest("sinfar/getFile", path.parse(uri).name + ".nss");
   }
 }
