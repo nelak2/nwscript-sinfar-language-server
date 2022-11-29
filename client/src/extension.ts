@@ -50,14 +50,14 @@ export function InitLSP(context: ExtensionContext) {
 
 export function registerCustomRequests() {
   client.onRequest("sinfar/getFile", async (resref: string) => {
-    const filePath = fs.findFile(resref, fs.root);
-    // const filePath = fs.findFile(resref);
+    let filePath = fs.findFile(resref, fs.root);
 
-    if (filePath) {
-      const file = await fs.readFile(filePath);
-      const decoder = new TextDecoder();
-      return { uri: filePath.toString(), content: decoder.decode(file) };
+    if (!filePath) {
+      filePath = vscode.Uri.from({ scheme: "sinfar", path: resref });
     }
+    const file = await fs.readFile(filePath);
+    const decoder = new TextDecoder();
+    return { uri: filePath.toString(), content: decoder.decode(file) ?? " " };
   });
 }
 

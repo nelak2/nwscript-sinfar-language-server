@@ -47,7 +47,7 @@ export class SinfarAPI {
       data = await this.readScript(resref, ext);
     }
 
-    return new TextEncoder().encode(data);
+    return new TextEncoder().encode(data ?? "");
   }
 
   private async readResource(resref: string, ext: string): Promise<string> {
@@ -68,10 +68,8 @@ export class SinfarAPI {
     // Extract the scriptData variable from the script block
 
     const resource = $("script").text();
-    const variableLines = resource.match(/var .*/g);
-    if (variableLines == undefined) {
-      return "";
-    }
+    const variableLines = resource.match(/var .*/g) ?? "";
+
     const parsedValues: string[] = ["{"];
 
     for (let i = 0; i < variableLines?.length; i++) {

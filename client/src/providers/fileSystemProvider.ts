@@ -86,14 +86,17 @@ export class SinfarFS implements vscode.FileSystemProvider {
   async readFile(uri: vscode.Uri): Promise<Uint8Array> {
     const enc = await this.remoteAPI.readFile(uri);
 
-    // Store the downloaded script
-    const basename = path.posix.basename(uri.path);
-    const parent = this._lookupParentDirectory(uri);
-    const entry = parent.entries.get(basename);
-    if (entry && entry instanceof File) {
-      entry.size = enc.byteLength;
-      entry.data = enc;
-    }
+    // Store the downloaded script. If the file doesn't exist
+    // this will fail
+    try {
+      const basename = path.posix.basename(uri.path);
+      const parent = this._lookupParentDirectory(uri);
+      const entry = parent.entries.get(basename);
+      if (entry && entry instanceof File) {
+        entry.size = enc.byteLength;
+        entry.data = enc;
+      }
+    } catch {}
 
     return enc;
   }
@@ -111,8 +114,9 @@ export class SinfarFS implements vscode.FileSystemProvider {
     content: Uint8Array,
     options: { create: boolean; overwrite: boolean; initializing: boolean },
   ): Promise<void> {
-    let basename = path.posix.basename(uri.path);
+    const basename = path.posix.basename(uri.path);
     const parent = this._lookupParentDirectory(uri);
+    const erfDir = this._lookupERFDirectory(uri);
     let entry = parent.entries.get(basename);
 
     if (entry instanceof Directory) {
@@ -126,7 +130,7 @@ export class SinfarFS implements vscode.FileSystemProvider {
     }
     // Ensure files in the VFS are always created with an nss extension so the language server can
     // pick them up
-    const scriptPrefix = basename.split("_")[0];
+    // const scriptPrefix = basename.split("_")[0];
     // basename = path.parse(basename).name + ".nss";
     const newUri = vscode.Uri.from({ scheme: "sinfar", path: `/${parent.name}/${basename}` });
 
@@ -170,13 +174,13 @@ export class SinfarFS implements vscode.FileSystemProvider {
     // safely upload the files to the server.
     if (!options.initializing) {
       // Verify our folder is correctly associated with an ERF
-      if (!parent.erf) {
+      if (!erfDir.erf) {
         throw new Error("Invalid ERF");
       }
 
       // Clear diagnostics
       this.diagCollection.delete(uri);
-      const results = await this.remoteAPI.writeFile(parent.erf.id.toString(), uri, content, this);
+      const results = await this.remoteAPI.writeFile(erfDir.erf.id.toString(), uri, content, this);
       if (results.status) {
         void vscode.window.showInformationMessage("The script has been successfully saved and compiled.");
       } else {
@@ -189,41 +193,6 @@ export class SinfarFS implements vscode.FileSystemProvider {
       }
     }
     this._fireSoon({ type: vscode.FileChangeType.Changed, uri: newUri });
-  }
-
-  async writeGIT(
-    uri: vscode.Uri,
-    content: Uint8Array,
-    options: { create: boolean; overwrite: boolean; initializing: boolean },
-  ): Promise<void> {
-    const basename = path.posix.basename(uri.path);
-    const parent = this._lookupParentDirectory(uri);
-    let entry = parent.entries.get(basename);
-
-    if (entry instanceof Directory) {
-      throw vscode.FileSystemError.FileIsADirectory(uri);
-    }
-    if (!entry && !options.create) {
-      throw vscode.FileSystemError.FileNotFound(uri);
-    }
-    if (entry && options.create && !options.overwrite) {
-      throw vscode.FileSystemError.FileExists(uri);
-    }
-
-    entry = new File(basename); // Read from the server
-    parent.entries.set(basename, entry);
-
-    this._fireSoon({ type: vscode.FileChangeType.Created, uri });
-
-    const test =
-      // eslint-disable-next-line @typescript-eslint/quotes
-      '{\r\n  "scratches": [\r\n    {\r\n      "id": "8lYOoWqz2rHtPuhvnZ43eMx1mG6WnFrm",\r\n      "text": "\uD83D\uDE38",\r\n      "created": 1584577931699\r\n    },\r\n    {\r\n      "id": "aZ57bJUEaXZ5wuBAX6NfGuj85Y6iw84N",\r\n      "text": "\uD83D\uDE3B",\r\n      "created": 1584577933329\r\n    }\r\n  ]\r\n}';
-    const enc = new TextEncoder();
-    const data = enc.encode(test);
-    // Update virtual file
-    entry.mtime = Date.now();
-    entry.size = data.byteLength;
-    entry.data = data;
   }
 
   // --- manage files/folders
@@ -403,6 +372,11 @@ export class SinfarFS implements vscode.FileSystemProvider {
 
   private _lookupParentDirectory(uri: vscode.Uri): Directory {
     const dirname = uri.with({ path: path.posix.dirname(uri.path) });
+    return this._lookupAsDirectory(dirname, false);
+  }
+
+  private _lookupERFDirectory(uri: vscode.Uri): Directory {
+    const dirname = uri.with({ path: path.parse(path.parse(uri.path).dir).dir });
     return this._lookupAsDirectory(dirname, false);
   }
 
