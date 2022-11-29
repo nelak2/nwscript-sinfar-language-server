@@ -30,14 +30,72 @@ export class SinfarAPI {
     return "";
   }
 
-  public async readFile(resref: string): Promise<Uint8Array> {
-    const token = await this._getCookies();
+  // Currently requesting once for text editor and again from LSP
+  public async readFile(uri: vscode.Uri): Promise<Uint8Array> {
+    const resref = path.parse(uri.path).name;
+    const ext = path.parse(uri.path).ext;
 
     // ignore vscode workspace files
     if (resref === "launch" || resref === "tasks" || resref === "settings") {
       return new Uint8Array();
     }
 
+    let data = "";
+    if (ext !== ".nss") {
+      data = await this.readResource(resref, ext);
+    } else {
+      data = await this.readScript(resref, ext);
+    }
+
+    return new TextEncoder().encode(data);
+  }
+
+  private async readResource(resref: string, ext: string): Promise<string> {
+    const token = await this._getCookies();
+    // Query the server for the script
+    const url = "https://nwn.sinfar.net/res_edit.php?name=" + resref + ext;
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        accept: "*/*",
+        cookie: token,
+      },
+    });
+    // We get the full html page back. We use cheerio to parse out the script block which contains
+    // the scriptData variable
+    const $ = cheerio.load(await res.text());
+
+    // Extract the scriptData variable from the script block
+
+    const resource = $("script").text();
+    const variableLines = resource.match(/var .*/g);
+    if (variableLines == undefined) {
+      return "";
+    }
+    const parsedValues: string[] = ["{"];
+
+    for (let i = 0; i < variableLines?.length; i++) {
+      const line = variableLines?.at(i)?.match(/(var )(.*) = (.*)(;)/);
+      const varName = line?.at(2);
+      const value = line?.at(3);
+
+      if (varName && value) {
+        if (i < variableLines?.length - 1) {
+          parsedValues.push('"' + varName + '":' + value + ",");
+        } else {
+          parsedValues.push('"' + varName + '":' + value);
+        }
+      }
+    }
+
+    parsedValues.push("}");
+    const content = parsedValues.join("");
+
+    return content;
+  }
+
+  private async readScript(resref: string, ext: string): Promise<string> {
+    const token = await this._getCookies();
     // Query the server for the script
     const url = "https://nwn.sinfar.net/res_nss_edit.php?name=" + resref;
     const res = await fetch(url, {
@@ -47,7 +105,6 @@ export class SinfarAPI {
         cookie: token,
       },
     });
-
     // We get the full html page back. We use cheerio to parse out the script block which contains
     // the scriptData variable
     const $ = cheerio.load(await res.text());
@@ -64,7 +121,7 @@ export class SinfarAPI {
           ?.at(2) +
         '"}',
     );
-    return new TextEncoder().encode(script.scriptData);
+    return script.scriptData;
   }
 
   public async writeFile(
@@ -110,7 +167,10 @@ export class SinfarAPI {
           const message = parse?.at(4);
 
           if (scriptName && lineNumber && message) {
-            const location = fileSystem.findFile(scriptName);
+            let location = fileSystem.findFile(scriptName, fileSystem.root);
+            if (!location) {
+              location = vscode.Uri.from({ scheme: "sinfar", path: scriptName });
+            }
             lineNumber = lineNumber.replace("(", "").replace(")", "");
 
             const range = new vscode.Range(Number(lineNumber) - 1, 0, Number(lineNumber) - 1, 100);
@@ -122,7 +182,7 @@ export class SinfarAPI {
               source: "Sinfar",
             };
 
-            const existing = set.find((s) => s.location.path === location.path);
+            const existing = set.find((s) => s.location.path === location?.path);
             if (existing) {
               existing.diagnostics.push(diagnostic);
             } else {
