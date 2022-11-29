@@ -65,30 +65,26 @@ export class SinfarFS implements vscode.FileSystemProvider {
   }
 
   // find a file based on a file name
-  findFile(name: string): vscode.Uri {
-    for (const erf of this.root.entries) {
+  findFile(name: string, parent: Directory): vscode.Uri | undefined {
+    for (const erf of parent.entries) {
       if (erf[1] instanceof Directory) {
-        for (const file of erf[1].entries) {
-          if (file[0] === name) {
-            // return vscode.Uri.parse(path.join("sinfar:/", erf[0], file[0]));
-            return vscode.Uri.from({ scheme: "sinfar", path: `/${erf[0]}/${file[0]}` });
-          }
+        const result = this.findFile(name, erf[1]);
+        if (result) {
+          return vscode.Uri.from({ scheme: "sinfar", path: "/" + erf[0] + "/" + result.path });
+        }
+      }
+      if (erf[1] instanceof File) {
+        if (erf[0] === name) {
+          return vscode.Uri.from({ scheme: "sinfar", path: erf[0] });
         }
       }
     }
-    return vscode.Uri.parse(name);
   }
 
   // --- manage file contents
 
   async readFile(uri: vscode.Uri): Promise<Uint8Array> {
-    if (uri.path.endsWith(".git")) {
-      return await this.readGIT(uri);
-    }
-
-    const resref = path.parse(uri.path).name;
-
-    const enc = await this.remoteAPI.readFile(resref);
+    const enc = await this.remoteAPI.readFile(uri);
 
     // Store the downloaded script
     const basename = path.posix.basename(uri.path);
@@ -100,23 +96,6 @@ export class SinfarFS implements vscode.FileSystemProvider {
     }
 
     return enc;
-  }
-
-  async readGIT(uri: vscode.Uri): Promise<Uint8Array> {
-    let data: Uint8Array | undefined;
-
-    // Store the downloaded script
-    const basename = path.posix.basename(uri.path);
-    const parent = this._lookupParentDirectory(uri);
-    const entry = parent.entries.get(basename);
-    if (entry && entry instanceof File) {
-      data = entry.data;
-    }
-
-    if (data?.length) {
-      return data;
-    }
-    return new Uint8Array();
   }
 
   /**
