@@ -17,9 +17,11 @@
     "vscode": "^1.66.2"
   },
   "dependencies": {
-    "vscode-languageclient": "^7.0.0"
+    "vscode-languageclient": "^7.0.0",
+    "@vscode/webview-ui-toolkit": "1.2.0"
   },
   "devDependencies": {
-    "@types/vscode": "^1.66.2"
+    "@types/vscode": "^1.66.2",
+    "@types/vscode-webview": "1.57.0"
   }
 }
