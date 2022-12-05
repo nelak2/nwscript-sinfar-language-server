@@ -8,7 +8,6 @@
     display: flex;
     padding-bottom: 5px;
     padding-top: 5px;
-    border-bottom: 1px solid #3c3e3f;
 }
 
 .col-label
@@ -23,3 +22,98 @@
 {
     width: auto;
 }
+/*
+fast-number-field
+{
+    font-family: var(--vscode-font-family);
+    outline: none;
+    user-select: none;
+}
+fast-number-field.root
+{
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    color: var(--vscode-input-foreground);
+    background: var(--vscode-input-background);
+    border: var(--vscode-input-border);
+    border-radius: var(--vscode-input-border-radius);
+    height: var(--input-height);
+    min-width: var(--input-min-width);
+}
+fast-number-field.control
+{
+    --webkit-appearance: none;
+    font: inherit;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    height: calc(100% - (var(--design-unit) * 1px));
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
+    border: none;
+    padding: 0 calc(var(--design-unit) * 2px + 1px);
+    font-size: var(--vscode-font-size);
+    line-height: var(--type-ramp-base-font-size);
+}
+
+fast-number-field.control:hover,
+.control:disabled,
+.control:active {
+    outline: none;
+}
+fast-number-field.label {
+    display: block;
+    color: var(--foreground);
+    cursor: pointer;
+    font-size: var(--type-ramp-base-font-size);
+    line-height: var(--type-ramp-base-line-height);
+    margin-bottom: 2px;
+}
+fast-number-field.label__hidden {
+    display: none;
+    visibility: hidden;
+}
+fast-number-field.start,
+.end {
+    display: flex;
+    margin: auto;
+    fill: currentcolor;
+}
+fast-number-field::slotted(svg),
+::slotted(span) {
+    width: calc(var(--design-unit) * 4px);
+    height: calc(var(--design-unit) * 4px);
+}
+fast-number-field.start {
+    margin-inline-start: calc(var(--design-unit) * 2px);
+}
+fast-number-field.end {
+    margin-inline-end: calc(var(--design-unit) * 2px);
+}
+fast-number-field:host(:hover:not([disabled])) .root {
+    background: var(--vscode-input-background);
+    border-color: var(--vscode-settings-dropdownBorder);
+}
+fast-number-field:host(:active:not([disabled])) .root {
+    background: var(--vscode-input-background);
+    border-color: var(--focus-border);
+}
+fast-number-field:host(:focus-within:not([disabled])) .root {
+    border-color: var(--focus-border);
+}
+fast-number-field:host([disabled]) .label,
+:host([readonly]) .label,
+:host([readonly]) .control,
+:host([disabled]) .control {
+    cursor: not-allowed
+}
+fast-number-field:host([disabled]) {
+    opacity: var(--disabled-opacity);
+}
+fast-number-field:host([disabled]) .control {
+    border-color: var(--vscode-settings-dropdownBorder);
+}
+*/

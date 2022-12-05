@@ -88,21 +88,23 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
     const fluentUri = getUri(webview, this.context.extensionUri, [
       "client",
       "node_modules",
-      "@fluentui",
-      "web-components",
+      "@microsoft",
+      "fast-components",
       "dist",
-      "web-components.js",
+      "fast-components.js",
     ]);
     const cssUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "styles.css"]);
     const mainUri = getUri(webview, this.context.extensionUri, ["client", "out", "gitEditor.js"]);
     const htmlUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "git", "gitEditor.html"]);
 
+    const css = fs.readFileSync(cssUri.fsPath, "utf8");
+
     const html = fs
       .readFileSync(htmlUri.fsPath, "utf8")
       .replace(/\${toolkitUri}/g, toolkitUri.toString())
       .replace(/\${mainUri}/g, mainUri.toString())
-      .replace(/\${cssUri}/g, cssUri.toString())
-      .replace(/\${fluentUri}/g, fluentUri.toString());
+      .replace(/\${fastUri}/g, fluentUri.toString())
+      .replace(/\/\*\${style}\*\//, css);
 
     return html;
   }

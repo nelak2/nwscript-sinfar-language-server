@@ -3,10 +3,12 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="${cssUri}">
+    <style>
+        /*${style}*/
+    </style>
     <script>var exports = {};</script>
     <script type="module" src="${toolkitUri}"></script>
-    <script type="module" src="${fluentUri}"></script>
+    <script type="module" src="${fastUri}"></script>
     <script type="module" src="${mainUri}"></script>
     <title>Edit Git</title>
   </head>
@@ -142,7 +144,7 @@
                 <label class="vscode-input-label" for="res_input_AmbientSndDayVol">Day - Ambient Volume:</label>
             </div>
             <div class="col-input">
-                <fast-number-field id="res_input_AmbientSndDayVol" placeholder="number" max="100" min="0" step="1"></fast-number-field>
+                <vscode-number-field id="res_input_AmbientSndDayVol" placeholder="Generic" max="127" min="0" step="1" appearance="filled"></vscode-number-field>
             </div>
         </div>
         <div class="row">
@@ -415,7 +417,7 @@
                 <label class="vscode-input-label" for="res_input_AmbientSndNitVol">Night - Ambient Volume:</label>
             </div>
             <div class="col-input">
-                <fast-number-field id="res_input_AmbientSndNitVol" placeholder="number" max="100" min="0" step="1"></fast-number-field>
+                <fast-number-field id="res_input_AmbientSndNitVol" placeholder="number" max="100" min="0" step="1" appearance="filled"></fast-number-field>
             </div>
         </div>
         <div class="row">
@@ -709,7 +711,7 @@
                 <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay (milliseconds):</label>
             </div>
             <div class="col-input">
-                <fast-number-field id="res_input_MusicDelay" placeholder="number" max="100" min="0" step="1"></fast-number-field>
+                <fast-number-field id="res_input_MusicDelay" placeholder="number" max="100" min="0" step="1" appearance="filled"></fast-number-field>
             </div>
         </div>
         <div class="row">

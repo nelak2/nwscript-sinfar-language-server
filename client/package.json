@@ -19,7 +19,7 @@
   "dependencies": {
     "vscode-languageclient": "^7.0.0",
     "@vscode/webview-ui-toolkit": "1.2.0",
-    "@fluentui/web-components": "2.5.8"
+    "@microsoft/fast-components": "^2.30.6"
   },
   "devDependencies": {
     "@types/vscode": "^1.66.2",

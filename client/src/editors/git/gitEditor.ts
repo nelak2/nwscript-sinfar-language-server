@@ -1,8 +1,15 @@
 import { erfData } from "../util";
-import { allComponents, provideFluentDesignSystem } from "@fluentui/web-components";
+import { NumberField } from "../components/numberField";
+import { fastNumberField, provideFASTDesignSystem } from "@microsoft/fast-components";
+import { numberFieldStyles } from "../components/numberField/number-field.styles";
 
 const vscode = acquireVsCodeApi();
-provideFluentDesignSystem().register(allComponents);
+
+provideFASTDesignSystem().register(
+  fastNumberField({
+    styles: numberFieldStyles.toString(),
+  }),
+);
 
 let content;
 
