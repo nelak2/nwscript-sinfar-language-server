@@ -117,3 +117,17 @@ fast-number-field:host([disabled]) .control {
     border-color: var(--vscode-settings-dropdownBorder);
 }
 */
+
+    /* color: var(--neutral-foreground-rest); <- --vscode-input-foreground */
+    /* background: var(--neutral-fill-input-rest); <- --vscode-input-background */ 
+
+    /* border-radius: calc(var(--control-corner-radius) * 1px); <- None */
+    /* border: calc(var(--stroke-width) * 1px) solid var(--accent-fill-rest); <- None */
+    /* height: calc((var(--base-height-multiplier) + var(--density)) * var(--design-unit) * 1px); <- 26px */
+    /* align-items: baseline;
+        height: 26px;
+}
+
+    :host([appearance="filled"]) .root {
+    background: var(--neutral-fill-rest);
+}
