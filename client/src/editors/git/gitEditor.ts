@@ -1,4 +1,4 @@
-import { erfData } from "./util";
+import { erfData } from "../util";
 import { allComponents, provideFluentDesignSystem } from "@fluentui/web-components";
 
 const vscode = acquireVsCodeApi();
