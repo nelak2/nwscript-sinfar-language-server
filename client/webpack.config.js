@@ -7,12 +7,13 @@ module.exports = withDefaults({
 	context: path.join(__dirname),
 	entry: {
 		extension: './src/extension.ts',
+		gitEditor: './src/editors/git/gitEditor.ts',
 	},
 	resolve: {
 		symlinks: false
 	},
 	output: {
-		filename: 'extension.js',
+		filename: '[name].js',
 		path: path.join(__dirname, 'out')
 	}
 });

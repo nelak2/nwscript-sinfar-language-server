@@ -94,8 +94,8 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
       "web-components.js",
     ]);
     const cssUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "styles.css"]);
-    const mainUri = getUri(webview, this.context.extensionUri, ["client", "out", "editors", "gitEditor.js"]);
-    const htmlUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "gitEditor.html"]);
+    const mainUri = getUri(webview, this.context.extensionUri, ["client", "out", "gitEditor.js"]);
+    const htmlUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "git", "gitEditor.html"]);
 
     const html = fs
       .readFileSync(htmlUri.fsPath, "utf8")
