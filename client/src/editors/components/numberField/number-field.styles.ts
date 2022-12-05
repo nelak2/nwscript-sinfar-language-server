@@ -15,7 +15,7 @@ import {
   inputMinWidth,
   typeRampBaseFontSize,
   typeRampBaseLineHeight,
-} from "@vscode/webview-ui-toolkit/dist/design-tokens";
+} from "../design-tokens";
 
 export const numberFieldStyles = (context: ElementDefinitionContext, definition: NumberFieldOptions) => css`
   ${display("inline-block")} :host {
