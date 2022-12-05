@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import * as vscode from "vscode";
 import { getNonce, getUri } from "./utils";
+import fs from "fs";
 
 export class GitEditorProvider implements vscode.CustomTextEditorProvider {
   public static register(context: vscode.ExtensionContext): vscode.Disposable {
@@ -84,24 +85,26 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
       "dist",
       "toolkit.js",
     ]);
+    const fluentUri = getUri(webview, this.context.extensionUri, [
+      "client",
+      "node_modules",
+      "@fluentui",
+      "web-components",
+      "dist",
+      "web-components.js",
+    ]);
+    const cssUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "styles.css"]);
     const mainUri = getUri(webview, this.context.extensionUri, ["client", "out", "editors", "gitEditor.js"]);
+    const htmlUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "gitEditor.html"]);
 
-    return /* html */ `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script type="module" src="${toolkitUri}"></script>
-        <script type="module" src="${mainUri}"></script>
-        <title>Hello World</title>
-      </head>
-      <body>
-        <h1>Hello World!</h1>
-        <vscode-button id="testButton">Test!</vscode-button>
-      </body>
-    </html>
-      `;
+    const html = fs
+      .readFileSync(htmlUri.fsPath, "utf8")
+      .replace(/\${toolkitUri}/g, toolkitUri.toString())
+      .replace(/\${mainUri}/g, mainUri.toString())
+      .replace(/\${cssUri}/g, cssUri.toString())
+      .replace(/\${fluentUri}/g, fluentUri.toString());
+
+    return html;
   }
 
   /**

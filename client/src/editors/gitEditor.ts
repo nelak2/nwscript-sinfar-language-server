@@ -1,7 +1,10 @@
-import type { erfData, ExtraData } from "./util";
+import { erfData } from "./util";
+import { allComponents, provideFluentDesignSystem } from "@fluentui/web-components";
 
 const vscode = acquireVsCodeApi();
-let content: erfData;
+provideFluentDesignSystem().register(allComponents);
+
+let content;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -15,13 +18,17 @@ function main() {
 
 function handleTestClick() {
   // const state: any = vscode.getState();
-
-  vscode.postMessage({
-    command: "test",
-    text: "Success",
-  });
+  const testButton = document.getElementById("testButton");
+  if (testButton) {
+    testButton.textContent = "Clicked";
+  }
+  // vscode.postMessage({
+  //   command: "test",
+  //   text: "Success",
+  // });
 }
 
+// let content: any;
 function InboundMessageHandler(event: any) {
   const message = event.data;
   if (event.type === "message" && message) {
@@ -30,7 +37,7 @@ function InboundMessageHandler(event: any) {
     switch (messageType) {
       case "update":
         try {
-          content = <erfData>JSON.parse(message.text);
+          content = JSON.parse(message.text);
           test3.innerText = "Data: " + JSON.stringify(content);
         } catch {
           test3.innerText = "Data: failed to parse";
@@ -39,24 +46,3 @@ function InboundMessageHandler(event: any) {
     }
   }
 }
-
-// function InboundMessageHandler(event: any) {
-//   const message = event.data;
-
-//   switch (message.command) {
-//     case "update":
-//       updateContent(message.text);
-//       break;
-//   }
-// }
-// function updateContent(text: any) {
-//   const testButton = document.getElementById("testButton");
-//   if (testButton) {
-//     testButton.textContent = "Success!";
-//   }
-// }
-
-// const state: any = vscode.getState();
-// if (state) {
-//   updateContent(state.text);
-// }

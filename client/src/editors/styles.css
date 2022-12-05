@@ -1,0 +1,25 @@
+.dropdown
+{
+    width: 300px;
+}
+
+.row
+{
+    display: flex;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border-bottom: 1px solid #3c3e3f;
+}
+
+.col-label
+{
+    width: 225px;
+    position: relative;
+    top: 4px;
+    white-space: nowrap;
+}
+
+.col-input
+{
+    width: auto;
+}
