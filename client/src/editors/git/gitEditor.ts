@@ -1,15 +1,20 @@
 import { erfData } from "../util";
 import { NumberField } from "../components/numberField";
-import { fastNumberField, provideFASTDesignSystem } from "@microsoft/fast-components";
+import {
+  fastNumberField,
+  provideFASTDesignSystem,
+  controlCornerRadius,
+  fillColor,
+  accentColor,
+  neutralColor,
+  typeRampBaseFontSize,
+  typeRampBaseLineHeight,
+  SwatchRGB,
+} from "@microsoft/fast-components";
 import { numberFieldStyles } from "../components/numberField/number-field.styles";
+import * as VSCODE_TOKEN from "../components/design-tokens";
 
 const vscode = acquireVsCodeApi();
-
-provideFASTDesignSystem().register(
-  fastNumberField({
-    styles: numberFieldStyles.toString(),
-  }),
-);
 
 let content;
 
@@ -21,6 +26,22 @@ function main() {
   if (testButton) {
     testButton.addEventListener("click", handleTestClick);
   }
+
+  applyCurrentTheme();
+
+  provideFASTDesignSystem().register(fastNumberField());
+
+  // const myElement = document.querySelector("fast-number-field") as HTMLElement;
+  // typeRampBaseFontSize.setValueFor(myElement, "20px");
+}
+
+function applyCurrentTheme() {
+  controlCornerRadius.withDefault(0);
+  fillColor.withDefault(SwatchRGB.create(30, 30, 30));
+  neutralColor.withDefault(SwatchRGB.create(204, 204, 204));
+  accentColor.withDefault(SwatchRGB.create(111, 195, 223));
+  typeRampBaseFontSize.withDefault("13px");
+  typeRampBaseLineHeight.withDefault("normal");
 }
 
 function handleTestClick() {

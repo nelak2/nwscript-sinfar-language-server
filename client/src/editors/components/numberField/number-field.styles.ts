@@ -1,5 +1,5 @@
-import { css } from "@microsoft/fast-element";
-import { disabledCursor, display, ElementDefinitionContext, focusVisible, NumberFieldOptions } from "@microsoft/fast-foundation";
+import { css, ElementStyles } from "@microsoft/fast-element";
+import { disabledCursor, display, focusVisible, NumberFieldOptions, FoundationElementTemplate } from "@microsoft/fast-foundation";
 import {
   borderWidth,
   cornerRadius,
@@ -17,7 +17,7 @@ import {
   typeRampBaseLineHeight,
 } from "../design-tokens";
 
-export const numberFieldStyles = (context: ElementDefinitionContext, definition: NumberFieldOptions) => css`
+export const numberFieldStyles: FoundationElementTemplate<ElementStyles, NumberFieldOptions> = (context, definition) => css`
   ${display("inline-block")} :host {
     font-family: ${fontFamily};
     outline: none;
