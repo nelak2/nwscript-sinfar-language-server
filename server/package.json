@@ -29,11 +29,9 @@
     "vscode-languageserver": "^7.0.0",
     "vscode-languageserver-textdocument": "^1.0.4",
     "vscode-oniguruma": "^1.6.1",
-    "vscode-textmate": "^7.0.1",
-    "isomorphic-fetch": "3.0.0"
+    "vscode-textmate": "^7.0.1"
   },
   "devDependencies": {
-    "@types/isomorphic-fetch": "0.0.36",
     "@types/chai": "^4.3.3",
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",

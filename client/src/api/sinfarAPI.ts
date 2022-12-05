@@ -2,7 +2,7 @@
 import * as cheerio from "cheerio";
 import * as vscode from "vscode";
 import { CookieAuthenticationProvider } from "../providers/authProvider";
-import "isomorphic-fetch";
+import fetch from "cross-fetch";
 import path from "path";
 import { Directory, SinfarFS } from "../providers/fileSystemProvider";
 import { CompilerReturn, ERF, ResourceType } from "./types";
