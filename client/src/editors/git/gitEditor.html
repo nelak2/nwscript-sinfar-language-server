@@ -8,7 +8,6 @@
     </style>
     <script>var exports = {};</script>
     <script type="module" src="${toolkitUri}"></script>
-    <script type="module" src="${fastUri}"></script>
     <script type="module" src="${mainUri}"></script>
     <title>Edit Git</title>
   </head>
@@ -144,7 +143,11 @@
                 <label class="vscode-input-label" for="res_input_AmbientSndDayVol">Day - Ambient Volume:</label>
             </div>
             <div class="col-input">
-                <fast-number-field id="res_input_AmbientSndDayVol" placeholder="Generic" max="127" min="0" step="1" appearance="filled"></fast-number-field>
+                <div style="width: 300px;">
+                    <sp-slider editable="" max="127" min="0" value="64" step="1" variant="ramp">
+                    </sp-slider>
+                </div>
+                <number-field-defined id="res_input_AmbientSndDayVol"></number-field-defined>
             </div>
         </div>
         <div class="row">
@@ -417,7 +420,11 @@
                 <label class="vscode-input-label" for="res_input_AmbientSndNitVol">Night - Ambient Volume:</label>
             </div>
             <div class="col-input">
-                <fast-number-field id="res_input_AmbientSndNitVol" placeholder="number" max="100" min="0" step="1" appearance="filled"></fast-number-field>
+                <div style="width: 300px;">
+                    <sp-slider editable="" max="127" min="0" value="64" step="1" variant="ramp">
+                    </sp-slider>
+                </div>
+                <number-field-defined id="res_input_AmbientSndNitVol"></number-field-defined>
             </div>
         </div>
         <div class="row">
@@ -708,10 +715,18 @@
         </div>
         <div class="row">
             <div class="col-label">
-                <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay (milliseconds):</label>
+                <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
             </div>
             <div class="col-input">
-                <fast-number-field id="res_input_MusicDelay" placeholder="number" max="100" min="0" step="1" appearance="filled"></fast-number-field>
+                <sp-number-field
+                    id="res_input_MusicDelay"
+                    style="width: 200px"
+                    value="4"
+                    format-options='{
+                        "style": "unit",
+                        "unit": "ms"
+                        }'
+                    ></sp-number-field>
             </div>
         </div>
         <div class="row">

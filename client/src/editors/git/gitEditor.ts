@@ -1,18 +1,5 @@
-import { erfData } from "../util";
-import { NumberField } from "../components/numberField";
-import {
-  fastNumberField,
-  provideFASTDesignSystem,
-  controlCornerRadius,
-  fillColor,
-  accentColor,
-  neutralColor,
-  typeRampBaseFontSize,
-  typeRampBaseLineHeight,
-  SwatchRGB,
-} from "@microsoft/fast-components";
-import { numberFieldStyles } from "../components/numberField/number-field.styles";
-import * as VSCODE_TOKEN from "../components/design-tokens";
+import "@spectrum-web-components/slider/sp-slider.js";
+import "@spectrum-web-components/slider/sync/sp-slider.js";
 
 const vscode = acquireVsCodeApi();
 
@@ -26,29 +13,13 @@ function main() {
   if (testButton) {
     testButton.addEventListener("click", handleTestClick);
   }
-
-  applyCurrentTheme();
-
-  provideFASTDesignSystem().register(fastNumberField());
-
-  // const myElement = document.querySelector("fast-number-field") as HTMLElement;
-  // typeRampBaseFontSize.setValueFor(myElement, "20px");
-}
-
-function applyCurrentTheme() {
-  controlCornerRadius.withDefault(0);
-  fillColor.withDefault(SwatchRGB.create(30, 30, 30));
-  neutralColor.withDefault(SwatchRGB.create(204, 204, 204));
-  accentColor.withDefault(SwatchRGB.create(111, 195, 223));
-  typeRampBaseFontSize.withDefault("13px");
-  typeRampBaseLineHeight.withDefault("normal");
 }
 
 function handleTestClick() {
   // const state: any = vscode.getState();
   const testButton = document.getElementById("testButton");
   if (testButton) {
-    testButton.textContent = "Clicked";
+    testButton.textContent = "Aha!";
   }
   // vscode.postMessage({
   //   command: "test",
