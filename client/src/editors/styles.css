@@ -783,16 +783,14 @@ governing permissions and limitations under the License.
     --spectrum-global-dimension-static-font-size-1000: 40px;
 
     /* spectrum-fontGlobals.css */
-    --spectrum-global-font-family-base: adobe-clean, 'Source Sans Pro',
-        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu,
-        'Trebuchet MS', 'Lucida Grande', sans-serif;
+    --spectrum-global-font-family-base: var(--vscode-font-family);
     --spectrum-global-font-family-serif: adobe-clean-serif, 'Source Serif Pro',
         Georgia, serif;
-    --spectrum-global-font-family-code: 'Source Code Pro', Monaco, monospace;
+    --spectrum-global-font-family-code: var(--vscode-editor-font-family)
     --spectrum-global-font-weight-thin: 100;
     --spectrum-global-font-weight-ultra-light: 200;
     --spectrum-global-font-weight-light: 300;
-    --spectrum-global-font-weight-regular: 400;
+    --spectrum-global-font-weight-regular: var(--vscode-font-weight);
     --spectrum-global-font-weight-medium: 500;
     --spectrum-global-font-weight-semi-bold: 600;
     --spectrum-global-font-weight-bold: 700;
@@ -3454,66 +3452,39 @@ governing permissions and limitations under the License.
     --spectrum-global-color-green-700: rgb(
         var(--spectrum-global-color-green-700-rgb)
     );
-    --spectrum-global-color-blue-400-rgb: 52, 143, 244;
-    --spectrum-global-color-blue-400: rgb(
-        var(--spectrum-global-color-blue-400-rgb)
-    );
-    --spectrum-global-color-blue-500-rgb: 84, 163, 246;
-    --spectrum-global-color-blue-500: rgb(
-        var(--spectrum-global-color-blue-500-rgb)
-    );
-    --spectrum-global-color-blue-600-rgb: 114, 183, 249;
-    --spectrum-global-color-blue-600: rgb(
-        var(--spectrum-global-color-blue-600-rgb)
-    );
-    --spectrum-global-color-blue-700-rgb: 143, 202, 252;
-    --spectrum-global-color-blue-700: rgb(
-        var(--spectrum-global-color-blue-700-rgb)
-    );
-    --spectrum-global-color-gray-50-rgb: 29, 29, 29;
-    --spectrum-global-color-gray-50: rgb(
-        var(--spectrum-global-color-gray-50-rgb)
-    );
-    --spectrum-global-color-gray-75-rgb: 38, 38, 38;
-    --spectrum-global-color-gray-75: rgb(
-        var(--spectrum-global-color-gray-75-rgb)
-    );
-    --spectrum-global-color-gray-100-rgb: 50, 50, 50;
-    --spectrum-global-color-gray-100: rgb(
-        var(--spectrum-global-color-gray-100-rgb)
-    );
-    --spectrum-global-color-gray-200-rgb: 63, 63, 63;
-    --spectrum-global-color-gray-200: rgb(
-        var(--spectrum-global-color-gray-200-rgb)
-    );
-    --spectrum-global-color-gray-300-rgb: 84, 84, 84;
-    --spectrum-global-color-gray-300: rgb(
-        var(--spectrum-global-color-gray-300-rgb)
-    );
-    --spectrum-global-color-gray-400-rgb: 112, 112, 112;
-    --spectrum-global-color-gray-400: rgb(
-        var(--spectrum-global-color-gray-400-rgb)
-    );
-    --spectrum-global-color-gray-500-rgb: 144, 144, 144;
-    --spectrum-global-color-gray-500: rgb(
-        var(--spectrum-global-color-gray-500-rgb)
-    );
-    --spectrum-global-color-gray-600-rgb: 178, 178, 178;
-    --spectrum-global-color-gray-600: rgb(
-        var(--spectrum-global-color-gray-600-rgb)
-    );
-    --spectrum-global-color-gray-700-rgb: 209, 209, 209;
-    --spectrum-global-color-gray-700: rgb(
-        var(--spectrum-global-color-gray-700-rgb)
-    );
-    --spectrum-global-color-gray-800-rgb: 235, 235, 235;
-    --spectrum-global-color-gray-800: rgb(
-        var(--spectrum-global-color-gray-800-rgb)
-    );
-    --spectrum-global-color-gray-900-rgb: 255, 255, 255;
-    --spectrum-global-color-gray-900: rgb(
-        var(--spectrum-global-color-gray-900-rgb)
-    );
+    --spectrum-global-color-blue-400: var(--vscode-focusBorder);
+    --spectrum-global-color-blue-500: var(--vscode-focusBorder);
+    --spectrum-global-color-blue-600: var(--vscode-textLink-activeForeground);
+    --spectrum-global-color-blue-700: var(--vscode-textLink-activeForeground);
+    --spectrum-global-color-gray-50: var(--vscode-input-background);
+    --spectrum-global-color-gray-75: green;
+    --spectrum-global-color-gray-100: var(--vscode-editorRuler-foreground);
+    --spectrum-global-color-gray-200: orange;
+    --spectrum-global-color-gray-300: cyan;
+    --spectrum-global-color-gray-400: var(--vscode-input-background);
+    --spectrum-global-color-gray-500: var(--button-secondary-background);
+    --spectrum-global-color-gray-600: magenta;
+    --spectrum-global-color-gray-700: var(--vscode-commandCenter-inactiveForeground);
+    --spectrum-global-color-gray-800: var(--vscode-input-foreground);
+    --spectrum-global-color-gray-900: beige;
+
+    --system-spectrum-actionbutton-background-color-default: blue;
+    --spectrum-actionbutton-background-color-default: var( --system-spectrum-actionbutton-background-color-default );
+    --spectrum-actionbutton-background-color-hover: var( --system-spectrum-actionbutton-background-color-hover );
+    --spectrum-actionbutton-background-color-down: var( --system-spectrum-actionbutton-background-color-down );
+    --spectrum-actionbutton-background-color-focus: var( --system-spectrum-actionbutton-background-color-focus );
+    --spectrum-actionbutton-border-color-default: var( --system-spectrum-actionbutton-border-color-default );
+    --spectrum-actionbutton-border-color-hover: var( --system-spectrum-actionbutton-border-color-hover );
+    --spectrum-actionbutton-border-color-down: var( --system-spectrum-actionbutton-border-color-down );
+    --spectrum-actionbutton-border-color-focus: var( --system-spectrum-actionbutton-border-color-focus );
+    --spectrum-actionbutton-content-color-default: var( --system-spectrum-actionbutton-content-color-default );
+    --spectrum-actionbutton-content-color-hover: var( --system-spectrum-actionbutton-content-color-hover );
+    --spectrum-actionbutton-content-color-down: var( --system-spectrum-actionbutton-content-color-down );
+    --spectrum-actionbutton-content-color-focus: var( --system-spectrum-actionbutton-content-color-focus );
+    --spectrum-actionbutton-background-color-disabled: var( --system-spectrum-actionbutton-background-color-disabled );
+    --spectrum-actionbutton-border-color-disabled: var( --system-spectrum-actionbutton-border-color-disabled );
+    --spectrum-actionbutton-content-color-disabled: var( --system-spectrum-actionbutton-content-color-disabled );
+
     --spectrum-alias-background-color-primary: var(
         --spectrum-global-color-gray-100
     );
@@ -3767,13 +3738,13 @@ governing permissions and limitations under the License.
     --spectrum-global-dimension-size-4600: 368px;
     --spectrum-global-dimension-size-5000: 400px;
     --spectrum-global-dimension-size-6000: 480px;
-    --spectrum-global-dimension-font-size-25: 10px;
-    --spectrum-global-dimension-font-size-50: 11px;
-    --spectrum-global-dimension-font-size-75: 12px;
-    --spectrum-global-dimension-font-size-100: 14px;
-    --spectrum-global-dimension-font-size-150: 15px;
-    --spectrum-global-dimension-font-size-200: 16px;
-    --spectrum-global-dimension-font-size-300: 18px;
+    --spectrum-global-dimension-font-size-25: calc(var(--vscode-font-size) - 3);
+    --spectrum-global-dimension-font-size-50: calc(var(--vscode-font-size) - 2);
+    --spectrum-global-dimension-font-size-75: calc(var(--vscode-font-size) - 1);
+    --spectrum-global-dimension-font-size-100: var(--vscode-font-size);
+    --spectrum-global-dimension-font-size-150: calc(var(--vscode-font-size) + 1);
+    --spectrum-global-dimension-font-size-200: calc(var(--vscode-font-size) + 2);
+    --spectrum-global-dimension-font-size-300: calc(var(--vscode-font-size) + 4);
     --spectrum-global-dimension-font-size-400: 20px;
     --spectrum-global-dimension-font-size-500: 22px;
     --spectrum-global-dimension-font-size-600: 25px;
@@ -4009,7 +3980,7 @@ governing permissions and limitations under the License.
         --spectrum-alias-heading-s-text-size
     );
     --spectrum-dialog-confirm-description-text-size: var(
-        --spectrum-global-dimension-font-size-100
+        --vscode-font-size
     );
     --spectrum-dialog-confirm-padding: var(
         --spectrum-global-dimension-static-size-500
@@ -4046,16 +4017,17 @@ governing permissions and limitations under the License.
 
 :host,
 :root {
-    --spectrum-global-alias-appframe-border-size: 2px;
+    --spectrum-global-alias-appframe-border-size: 0px;
 }
 
 
 
-.dropdown
+
+vscode-dropdown
 {
     width: 300px;
 }
-.listbox
+vscode-dropdown::part(listbox)
 {
     z-index: 2;
 }
@@ -4081,3 +4053,4 @@ governing permissions and limitations under the License.
 {
     width: auto;
 }
+
