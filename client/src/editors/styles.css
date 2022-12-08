@@ -3452,6 +3452,10 @@ governing permissions and limitations under the License.
     --spectrum-global-color-green-700: rgb(
         var(--spectrum-global-color-green-700-rgb)
     );
+
+    /*
+        COLOR CONTROLS
+    */
     --spectrum-global-color-blue-400: var(--vscode-focusBorder);
     --spectrum-global-color-blue-500: var(--vscode-focusBorder);
     --spectrum-global-color-blue-600: var(--vscode-textLink-activeForeground);
@@ -3459,32 +3463,30 @@ governing permissions and limitations under the License.
     --spectrum-global-color-gray-50: var(--vscode-input-background);
     --spectrum-global-color-gray-75: green;
     --spectrum-global-color-gray-100: var(--vscode-editorRuler-foreground);
-    --spectrum-global-color-gray-200: orange;
-    --spectrum-global-color-gray-300: cyan;
+    --spectrum-global-color-gray-200: var(--vscode-editorRuler-foreground);
+    --spectrum-global-color-gray-300: var(--vscode-input-background);
     --spectrum-global-color-gray-400: var(--vscode-input-background);
     --spectrum-global-color-gray-500: var(--button-secondary-background);
-    --spectrum-global-color-gray-600: magenta;
+    --spectrum-global-color-gray-600: var(--vscode-input-foreground);
     --spectrum-global-color-gray-700: var(--vscode-commandCenter-inactiveForeground);
     --spectrum-global-color-gray-800: var(--vscode-input-foreground);
     --spectrum-global-color-gray-900: beige;
 
-    --system-spectrum-actionbutton-background-color-default: blue;
-    --spectrum-actionbutton-background-color-default: var( --system-spectrum-actionbutton-background-color-default );
-    --spectrum-actionbutton-background-color-hover: var( --system-spectrum-actionbutton-background-color-hover );
-    --spectrum-actionbutton-background-color-down: var( --system-spectrum-actionbutton-background-color-down );
-    --spectrum-actionbutton-background-color-focus: var( --system-spectrum-actionbutton-background-color-focus );
-    --spectrum-actionbutton-border-color-default: var( --system-spectrum-actionbutton-border-color-default );
-    --spectrum-actionbutton-border-color-hover: var( --system-spectrum-actionbutton-border-color-hover );
-    --spectrum-actionbutton-border-color-down: var( --system-spectrum-actionbutton-border-color-down );
-    --spectrum-actionbutton-border-color-focus: var( --system-spectrum-actionbutton-border-color-focus );
-    --spectrum-actionbutton-content-color-default: var( --system-spectrum-actionbutton-content-color-default );
-    --spectrum-actionbutton-content-color-hover: var( --system-spectrum-actionbutton-content-color-hover );
-    --spectrum-actionbutton-content-color-down: var( --system-spectrum-actionbutton-content-color-down );
-    --spectrum-actionbutton-content-color-focus: var( --system-spectrum-actionbutton-content-color-focus );
-    --spectrum-actionbutton-background-color-disabled: var( --system-spectrum-actionbutton-background-color-disabled );
-    --spectrum-actionbutton-border-color-disabled: var( --system-spectrum-actionbutton-border-color-disabled );
-    --spectrum-actionbutton-content-color-disabled: var( --system-spectrum-actionbutton-content-color-disabled );
+    --system-spectrum-actionbutton-background-color-default: var(--vscode-input-background);
+    --system-spectrum-actionbutton-background-color-hover: var(--button-secondary-background);
+    --system-spectrum-actionbutton-background-color-down: var(--vscode-input-foreground);
+    --system-spectrum-actionbutton-background-color-focus: var(--vscode-input-foreground);
 
+    --system-spectrum-actionbutton-border-color-default: var(--vscode-input-background);
+    --system-spectrum-actionbutton-border-color-hover: var(--vscode-input-background);
+    --system-spectrum-actionbutton-border-color-down: var(--vscode-input-background);
+    --system-spectrum-actionbutton-border-color-focus: var(--vscode-input-background);
+
+    /*
+        ACCORDION MODIFICATIONS
+        --spectrum-accordion-item-title-padding-y: var( --spectrum-global-dimension-size-150 );
+            font-family: inherit;
+    */
     --spectrum-alias-background-color-primary: var(
         --spectrum-global-color-gray-100
     );
@@ -3700,7 +3702,7 @@ governing permissions and limitations under the License.
     --spectrum-global-dimension-size-115: 9px;
     --spectrum-global-dimension-size-125: 10px;
     --spectrum-global-dimension-size-130: 11px;
-    --spectrum-global-dimension-size-150: 12px;
+    --spectrum-global-dimension-size-150: 7px;
     --spectrum-global-dimension-size-160: 13px;
     --spectrum-global-dimension-size-175: 14px;
     --spectrum-global-dimension-size-185: 15px;
@@ -3739,8 +3741,8 @@ governing permissions and limitations under the License.
     --spectrum-global-dimension-size-5000: 400px;
     --spectrum-global-dimension-size-6000: 480px;
     --spectrum-global-dimension-font-size-25: calc(var(--vscode-font-size) - 3);
-    --spectrum-global-dimension-font-size-50: calc(var(--vscode-font-size) - 2);
-    --spectrum-global-dimension-font-size-75: calc(var(--vscode-font-size) - 1);
+    --spectrum-global-dimension-font-size-50: var(--vscode-font-size);
+    --spectrum-global-dimension-font-size-75: var(--vscode-font-size);
     --spectrum-global-dimension-font-size-100: var(--vscode-font-size);
     --spectrum-global-dimension-font-size-150: calc(var(--vscode-font-size) + 1);
     --spectrum-global-dimension-font-size-200: calc(var(--vscode-font-size) + 2);
