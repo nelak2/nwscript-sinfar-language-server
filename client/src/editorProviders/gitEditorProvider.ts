@@ -89,6 +89,13 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
     const cssUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "styles.css"]);
     const mainUri = getUri(webview, this.context.extensionUri, ["client", "out", "gitEditor.js"]);
     const htmlUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "git", "gitEditor.html"]);
+    const codiconsUri = getUri(webview, this.context.extensionUri, [
+      "client",
+      "node_modules",
+      "@vscode/codicons",
+      "dist",
+      "codicon.css",
+    ]);
 
     const css = fs.readFileSync(cssUri.fsPath, "utf8");
 
@@ -96,6 +103,7 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
       .readFileSync(htmlUri.fsPath, "utf8")
       .replace(/\${toolkitUri}/g, toolkitUri.toString())
       .replace(/\${mainUri}/g, mainUri.toString())
+      .replace(/\${codiconsUri}/g, codiconsUri.toString())
       .replace(/\/\*\${style}\*\//, css);
     return html;
   }
