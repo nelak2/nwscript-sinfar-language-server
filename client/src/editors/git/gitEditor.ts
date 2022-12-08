@@ -1,5 +1,7 @@
 import "@spectrum-web-components/slider/sp-slider.js";
 import "@spectrum-web-components/slider/sync/sp-slider.js";
+import "@spectrum-web-components/accordion/sp-accordion.js";
+import "@spectrum-web-components/accordion/sp-accordion-item.js";
 
 const vscode = acquireVsCodeApi();
 
