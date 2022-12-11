@@ -21,7 +21,7 @@
     "webpack": "yarn clean && webpack --mode production --config ./webpack.config.js",
     "webpack:dev": "yarn clean; yarn webpack --mode none --config ./webpack.config.js",
     "compile": "tsc -b",
-    "clean": "rimraf out/* copyfiles -u 2 ./resources/*.* ./out/resources/"
+    "clean": "rimraf out/* && copyfiles -u 1 ./resources/*.* ./out/resources/"
   },
   "dependencies": {
     "@microsoft/fast-components": "^2.30.6",
@@ -30,6 +30,7 @@
     "@spectrum-web-components/styles": "^0.21.0",
     "@vscode/codicons": "^0.0.32",
     "@vscode/webview-ui-toolkit": "1.2.0",
+    "copyfiles": "^2.4.1",
     "rimraf": "^3.0.2",
     "vscode-languageclient": "^7.0.0",
     "webpack": "^5.75.0"
