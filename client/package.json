@@ -21,7 +21,7 @@
     "webpack": "yarn clean && webpack --mode production --config ./webpack.config.js",
     "webpack:dev": "yarn clean; yarn webpack --mode none --config ./webpack.config.js",
     "compile": "tsc -b",
-    "clean": "rimraf out/*"
+    "clean": "rimraf out/* copyfiles -u 2 ./resources/*.* ./out/resources/"
   },
   "dependencies": {
     "@microsoft/fast-components": "^2.30.6",
