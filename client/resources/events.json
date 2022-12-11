@@ -1,0 +1,6 @@
+[
+  {
+    "resource": "git",
+    "events": ["OnEnter", "OnExit", "OnHeartBeat", "OnUserDefined"]
+  }
+]
