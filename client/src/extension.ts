@@ -10,22 +10,26 @@ import { CookieAuthenticationProvider } from "./providers/authProvider";
 import { SinfarAPI } from "./api/sinfarAPI";
 import { GitEditorProvider } from "./editorProviders/gitEditorProvider";
 import { ERF } from "./api/types";
+import { ResourcesAPI } from "./api/resourcesAPI";
 
 let client: LanguageClient;
 let fs: SinfarFS;
 let remoteAPI: SinfarAPI;
+let resourcesAPI: ResourcesAPI;
 const serverConfig = (serverPath: string) => {
   return { module: serverPath, transport: TransportKind.ipc };
 };
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
   InitSinfar(context);
   InitLSP(context);
-  InitEditors(context);
+  await InitEditors(context);
 }
 
-export function InitEditors(context: ExtensionContext) {
-  context.subscriptions.push(GitEditorProvider.register(context));
+export async function InitEditors(context: ExtensionContext) {
+  resourcesAPI = new ResourcesAPI(context);
+  await resourcesAPI.Initialize();
+  context.subscriptions.push(GitEditorProvider.register(context, resourcesAPI));
 }
 
 export function InitLSP(context: ExtensionContext) {

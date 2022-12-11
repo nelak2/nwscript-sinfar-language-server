@@ -2,18 +2,21 @@
 import * as vscode from "vscode";
 import { getNonce, getUri } from "./utils";
 import fs from "fs";
+import { ResourcesAPI } from "../api/resourcesAPI";
 
 export class GitEditorProvider implements vscode.CustomTextEditorProvider {
-  public static register(context: vscode.ExtensionContext): vscode.Disposable {
-    const provider = new GitEditorProvider(context);
+  public static register(context: vscode.ExtensionContext, resourcesAPI: ResourcesAPI): vscode.Disposable {
+    const provider = new GitEditorProvider(context, resourcesAPI);
     const providerRegistration = vscode.window.registerCustomEditorProvider(GitEditorProvider.viewType, provider);
     return providerRegistration;
   }
 
   private static readonly viewType = "sinfar.areaGitEditor";
   private readonly _context: vscode.ExtensionContext;
+  private readonly _resourcesAPI: ResourcesAPI;
 
-  constructor(private readonly context: vscode.ExtensionContext) {
+  constructor(private readonly context: vscode.ExtensionContext, private readonly resourcesAPI: ResourcesAPI) {
+    this._resourcesAPI = resourcesAPI;
     this._context = context;
   }
 
@@ -65,6 +68,13 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
           void webviewPanel.webview.postMessage({
             type: "update",
             text: document.getText(),
+          });
+          break;
+        case "getScriptFields":
+          void vscode.window.showInformationMessage(e.text);
+          void webviewPanel.webview.postMessage({
+            type: "scriptFields",
+            scriptFields: this._resourcesAPI.getScriptFields(e.text),
           });
           break;
       }
