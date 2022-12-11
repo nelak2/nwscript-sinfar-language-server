@@ -64,14 +64,12 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel.webview.onDidReceiveMessage(async (e) => {
       switch (e.command) {
         case "test":
-          void vscode.window.showInformationMessage(e.text);
           void webviewPanel.webview.postMessage({
             type: "update",
             text: document.getText(),
           });
           break;
         case "getScriptFields":
-          void vscode.window.showInformationMessage(e.text);
           void webviewPanel.webview.postMessage({
             type: "scriptFields",
             scriptFields: this._resourcesAPI.getScriptFields(e.text),
