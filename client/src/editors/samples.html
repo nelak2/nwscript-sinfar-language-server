@@ -1,53 +1,123 @@
 <!-- DROP DOWN -->
 
 <div class="row">
-    <div class="col-label">
-        <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
-    </div>
-    <div class="col-input">
-        <vscode-dropdown id="res_input_AmbientSndDay">
-        </vscode-dropdown>
-    </div>
+  <div class="col-label">
+    <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
+  </div>
+  <div class="col-input">
+    <vscode-dropdown id="res_input_AmbientSndDay">
+      <vscode-option>Cycle Day and Night</vscode-option>
+      <vscode-option>Always Bright</vscode-option>
+      <vscode-option>Always Dark</vscode-option>
+    </vscode-dropdown>
+  </div>
 </div>
 
 <!-- SLIDER -->
 <div class="row">
-    <div class="col-label">
-        <label class="vscode-input-label" for="res_input_AmbientSndDayVol">Day - Ambient Volume:</label>
+  <div class="col-label">
+    <label class="vscode-input-label" for="res_input_AmbientSndDayVol">Day - Ambient Volume:</label>
+  </div>
+  <div class="col-input">
+    <div style="width: 300px">
+      <sp-slider editable="" max="127" min="0" value="64" step="1" variant="ramp"> </sp-slider>
     </div>
-    <div class="col-input">
-        <div style="width: 300px;">
-            <sp-slider editable="" max="127" min="0" value="64" step="1" variant="ramp">
-            </sp-slider>
-        </div>
-        <number-field-defined id="res_input_AmbientSndDayVol"></number-field-defined>
-    </div>
+    <number-field-defined id="res_input_AmbientSndDayVol"></number-field-defined>
+  </div>
 </div>
 
 <!-- TEXT FIELD -->
 <div class="row">
-    <div class="col-label">
-        <label class="vscode-input-label" for="res_input_Name" >Name:</label>
-    </div>
-    <div class="col-input">
-        <vscode-text-field style="width:300px" id="res_input_Name"></vscode-text-field>
-    </div>
+  <div class="col-label">
+    <label class="vscode-input-label" for="res_input_Name">Name:</label>
+  </div>
+  <div class="col-input">
+    <vscode-text-field style="width: 300px" id="res_input_Name"></vscode-text-field>
+  </div>
 </div>
 
-<!-- NUMBER FIELD -->
+<!-- TEXT FIELD WITH BUTTON -->
 <div class="row">
-    <div class="col-label">
-        <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-    </div>
-    <div class="col-input">
-        <sp-number-field
-            id="res_input_MusicDelay"
-            style="width: 100px"
-            value="4"
-            format-options='{
+  <div class="col-label">
+    <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+  </div>
+  <div class="col-input">
+    <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
+      <section slot="end" style="display: flex; align-items: center">
+        <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
+          <span class="codicon codicon-symbol-color"></span>
+        </vscode-button>
+      </section>
+    </vscode-text-field>
+  </div>
+</div>
+
+<!-- COLOR PICKER -->
+<div class="row">
+  <div class="col-label">
+    <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+  </div>
+  <div class="col-input">
+    <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
+      <section slot="end" style="display: flex; align-items: center">
+        <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
+          <span class="codicon codicon-symbol-color"></span>
+        </vscode-button>
+        <sp-popover>
+          <sp-dialog size="medium">
+            <sp-color-area></sp-color-area>
+            <sp-color-slider vertical></sp-color-slider>
+          </sp-dialog>
+        </sp-popover>
+      </section>
+    </vscode-text-field>
+  </div>
+</div>
+
+<!-- NUMBER FIELD ms -->
+<div class="row">
+  <div class="col-label">
+    <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+  </div>
+  <div class="col-input">
+    <sp-number-field
+      id="res_input_MusicDelay"
+      style="width: 100px"
+      value="4"
+      format-options='{
                 "style": "unit",
                 "unit": "ms"
                 }'
-            ></sp-number-field>
-    </div>
+    ></sp-number-field>
+  </div>
+</div>
+
+<!-- NUMBER FIELD percents -->
+<div class="row">
+  <div class="col-label">
+    <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+  </div>
+  <div class="col-input">
+    <sp-number-field
+      id="res_input_MusicDelay"
+      style="width: 100px"
+      value="0"
+      format-options='{
+                "style": "percent"
+                }'
+    ></sp-number-field>
+  </div>
+</div>
+
+<!-- CHECKBOX -->
+<div class="row">
+  <div class="col-label">
+    <label class="vscode-input-label" for="res_input_Flags">Flags:</label>
+  </div>
+  <div class="col-input">
+    <fieldset class="checkbox-set">
+      <vscode-checkbox id="res_input_Flags_SunShadows">Sun Shadows</vscode-checkbox>
+      <vscode-checkbox id="res_input_Flags_MoonShadows">Moon Shadows</vscode-checkbox>
+    </fieldset>
+  </div>
 </div>
