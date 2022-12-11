@@ -98,9 +98,12 @@ export class ResourcesAPI {
   }
 
   public getScriptFields(resourceType: string): string[] {
-    console.log("getscriptfields:" + resourceType);
     const resource = this._events.find((x) => x.resource === resourceType);
-    return resource ? resource.events : [];
+
+    if (resource) {
+      return resource.events;
+    }
+    return [];
   }
 
   public getMusic(): Music[] {
