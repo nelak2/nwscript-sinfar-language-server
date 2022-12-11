@@ -1,169 +1,383 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-        /*${style}*/
+      /*${style}*/
     </style>
     <link href="${codiconsUri}" rel="stylesheet" />
-    <script>var exports = {};</script>
+    <script>
+      var exports = {};
+    </script>
     <script type="module" src="${toolkitUri}"></script>
     <script type="module" src="${mainUri}"></script>
     <title>Edit Git</title>
   </head>
+
   <body>
     <sp-accordion allow-multiple>
-        <sp-accordion-item label="Identification">
+      <sp-accordion-item label="Identification">
+        <nwn-text-field id="res_Name" text="Name"></nwn-text-field>
+        <nwn-text-field id="res_Tag" text="Tag"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Tiles">
+        <nwn-text-field id="res_TilesetReseRef" text="Tileset ResRef" disabled="true"></nwn-text-field>
+        <nwn-text-field id="res_Size" text="Size" disabled="true"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Visual">
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_DayNightCycle">Day/Night Cycle:</label>
+          </div>
+          <div class="col-input">
+            <vscode-dropdown id="res_input_DayNightCycle">
+              <vscode-option>Cycle Day and Night</vscode-option>
+              <vscode-option>Always Bright</vscode-option>
+              <vscode-option>Always Dark</vscode-option>
+            </vscode-dropdown>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_Flags">Flags:</label>
+          </div>
+          <div class="col-input">
+            <fieldset class="checkbox-set">
+              <vscode-checkbox id="res_input_Flags_SunShadows">Sun Shadows</vscode-checkbox>
+              <vscode-checkbox id="res_input_Flags_MoonShadows">Moon Shadows</vscode-checkbox>
+            </fieldset>
+          </div>
+        </div>
 
-        </sp-accordion-item>
-        <sp-accordion-item label="Tiles">
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+          </div>
+          <div class="col-input">
+            <vscode-text-field id="res_input_SunAmbientColor" aria-label="textfield" current-value="" type="text">
+              <section slot="end" style="display: flex; align-items: center">
+                <overlay-trigger placement="top" type="replace" style="display: flex">
+                  <vscode-button
+                    slot="trigger"
+                    id="res_input_SunAmbientColor_button"
+                    appearance="icon"
+                    aria-label="Color Picker"
+                    current-value=""
+                  >
+                    <span class="codicon codicon-symbol-color"></span>
+                  </vscode-button>
+                  <sp-popover slot="click-content" open>
+                    <sp-dialog size="s">
+                      <sp-color-area></sp-color-area>
+                      <sp-color-slider vertical></sp-color-slider>
+                    </sp-dialog>
+                  </sp-popover>
+                </overlay-trigger>
+              </section>
+            </vscode-text-field>
+          </div>
+        </div>
 
-        </sp-accordion-item>
-        <sp-accordion-item label="Visual">
-
-        </sp-accordion-item>
-        <sp-accordion-item open label="Audio">
-            <div id="audio">
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
-                    </div>
-                    <div class="col-input">
-                        <vscode-dropdown id="res_input_AmbientSndDay">
-                        </vscode-dropdown>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_AmbientSndDayVol">Day - Ambient Volume:</label>
-                    </div>
-                    <div class="col-input">
-                        <div style="width: 300px;">
-                            <sp-slider editable="" max="127" min="0" value="64" step="1" variant="ramp">
-                            </sp-slider>
-                        </div>
-                        <number-field-defined id="res_input_AmbientSndDayVol"></number-field-defined>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_MusicDay">Day - Music:</label>
-                    </div>
-                    <div class="col-input">
-                        <vscode-dropdown id="res_input_MusicDay" class="dropdown">
-                        </vscode-dropdown>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_AmbientSndNight">Night - Ambient Sound:</label>
-                    </div>
-                    <div class="col-input">
-                        <vscode-dropdown id="res_input_AmbientSndNight" class="dropdown">
-                        </vscode-dropdown>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_AmbientSndNitVol">Night - Ambient Volume:</label>
-                    </div>
-                    <div class="col-input">
-                        <div style="width: 300px;">
-                            <sp-slider editable="" max="127" min="0" value="64" step="1" variant="ramp">
-                            </sp-slider>
-                        </div>
-                        <number-field-defined id="res_input_AmbientSndNitVol"></number-field-defined>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_MusicNight">Night - Music:</label>
-                    </div>
-                    <div class="col-input">
-                        <vscode-dropdown id="res_input_MusicNight" class="dropdown">
-                        </vscode-dropdown>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_MusicBattle">Battle - Music:</label>
-                    </div>
-                    <div class="col-input">
-                        <vscode-dropdown id="res_input_MusicBattle" class="dropdown">
-                        </vscode-dropdown>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-                    </div>
-                    <div class="col-input">
-                        <sp-number-field
-                            id="res_input_MusicDelay"
-                            style="width: 100px"
-                            value="4"
-                            format-options='{
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+          </div>
+          <div class="col-input">
+            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
+              <section slot="end" style="display: flex; align-items: center">
+                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
+                  <span class="codicon codicon-symbol-color"></span>
+                </vscode-button>
+              </section>
+            </vscode-text-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+          </div>
+          <div class="col-input">
+            <sp-number-field
+              id="res_input_MusicDelay"
+              style="width: 100px"
+              value="0"
+              format-options='{
+                            "style": "percent"
+                            }'
+            ></sp-number-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+          </div>
+          <div class="col-input">
+            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
+              <section slot="end" style="display: flex; align-items: center">
+                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
+                  <span class="codicon codicon-symbol-color"></span>
+                </vscode-button>
+              </section>
+            </vscode-text-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+          </div>
+          <div class="col-input">
+            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
+              <section slot="end" style="display: flex; align-items: center">
+                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
+                  <span class="codicon codicon-symbol-color"></span>
+                </vscode-button>
+              </section>
+            </vscode-text-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+          </div>
+          <div class="col-input">
+            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
+              <section slot="end" style="display: flex; align-items: center">
+                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
+                  <span class="codicon codicon-symbol-color"></span>
+                </vscode-button>
+              </section>
+            </vscode-text-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+          </div>
+          <div class="col-input">
+            <sp-number-field
+              id="res_input_MusicDelay"
+              style="width: 100px"
+              value="0"
+              format-options='{
+                            "style": "percent"
+                            }'
+            ></sp-number-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+          </div>
+          <div class="col-input">
+            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
+              <section slot="end" style="display: flex; align-items: center">
+                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
+                  <span class="codicon codicon-symbol-color"></span>
+                </vscode-button>
+              </section>
+            </vscode-text-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+          </div>
+          <div class="col-input">
+            <sp-number-field
+              id="res_input_MusicDelay"
+              style="width: 100px"
+              value="4"
+              format-options='{
+                            "style": "unit",
+                            "unit": "m"
+                            }'
+            ></sp-number-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+          </div>
+          <div class="col-input">
+            <sp-number-field
+              id="res_input_MusicDelay"
+              style="width: 100px"
+              value="0"
+              format-options='{
+                            "style": "percent"
+                            }'
+            ></sp-number-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
+          </div>
+          <div class="col-input">
+            <vscode-dropdown id="res_input_AmbientSndDay">
+              <vscode-option>Cycle Day and Night</vscode-option>
+              <vscode-option>Always Bright</vscode-option>
+              <vscode-option>Always Dark</vscode-option>
+            </vscode-dropdown>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+          </div>
+          <div class="col-input">
+            <sp-number-field
+              id="res_input_MusicDelay"
+              style="width: 100px"
+              value="0"
+              format-options='{
+                            "style": "percent"
+                            }'
+            ></sp-number-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+          </div>
+          <div class="col-input">
+            <sp-number-field
+              id="res_input_MusicDelay"
+              style="width: 100px"
+              value="0"
+              format-options='{
+                            "style": "percent"
+                            }'
+            ></sp-number-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+          </div>
+          <div class="col-input">
+            <sp-number-field
+              id="res_input_MusicDelay"
+              style="width: 100px"
+              value="0"
+              format-options='{
+                            "style": "percent"
+                            }'
+            ></sp-number-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-label">
+            <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
+          </div>
+          <div class="col-input">
+            <vscode-dropdown id="res_input_AmbientSndDay">
+              <vscode-option>Cycle Day and Night</vscode-option>
+              <vscode-option>Always Bright</vscode-option>
+              <vscode-option>Always Dark</vscode-option>
+            </vscode-dropdown>
+          </div>
+        </div>
+      </sp-accordion-item>
+      <sp-accordion-item open label="Audio">
+        <div id="audio">
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
+            </div>
+            <div class="col-input">
+              <vscode-dropdown id="res_input_AmbientSndDay"> </vscode-dropdown>
+            </div>
+          </div>
+          <nwn-volume-slider id="res_input_AmbientSndDayVol" text="Day - Ambient Volume:"></nwn-volume-slider>
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="res_input_MusicDay">Day - Music:</label>
+            </div>
+            <div class="col-input">
+              <vscode-dropdown id="res_input_MusicDay" class="dropdown"> </vscode-dropdown>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="res_input_AmbientSndNight">Night - Ambient Sound:</label>
+            </div>
+            <div class="col-input">
+              <vscode-dropdown id="res_input_AmbientSndNight" class="dropdown"> </vscode-dropdown>
+            </div>
+          </div>
+          <nwn-volume-slider id="res_input_AmbientSndNitVol" text="Night - Ambient Volume:"></nwn-volume-slider>
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="res_input_MusicNight">Night - Music:</label>
+            </div>
+            <div class="col-input">
+              <vscode-dropdown id="res_input_MusicNight" class="dropdown"> </vscode-dropdown>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="res_input_MusicBattle">Battle - Music:</label>
+            </div>
+            <div class="col-input">
+              <vscode-dropdown id="res_input_MusicBattle" class="dropdown"> </vscode-dropdown>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+            </div>
+            <div class="col-input">
+              <sp-number-field
+                id="res_input_MusicDelay"
+                style="width: 100px"
+                value="4"
+                format-options='{
                                 "style": "unit",
                                 "unit": "ms"
                                 }'
-                            ></sp-number-field>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="res_input_EnvAudio">Environmental Effects:</label>
-                    </div>
-                    <div class="col-input">
-                        <vscode-dropdown id="res_input_EnvAudio" class="dropdown">
-                        </vscode-dropdown>
-                    </div>
-                </div>
+              ></sp-number-field>
             </div>
-        </sp-accordion-item>
-        <sp-accordion-item label="Miscellaneous">
-
-        </sp-accordion-item>
-        <sp-accordion-item label="Scripts">
-            <div id="eventScripts">
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="script_OnEnter">OnEnter:</label>
-                    </div>
-                    <div class="col-input">
-                        <vscode-text-field>
-                            <section slot="end" style="display:flex; align-items: center;">
-                                <vscode-button appearance="icon" aria-label="Goto">
-                                    <span class="codicon codicon-go-to-file"></span>
-                                </vscode-button>
-                            </section>
-                        </vscode-text-field>
-                    </div>
-                </div>
+          </div>
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="res_input_EnvAudio">Environmental Effects:</label>
             </div>
-        </sp-accordion-item>
-        <sp-accordion-item label="Variables">
-            <div id="variables">
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="variablesList">Variables:</label>
-                    </div>
-                    <div class="col-input">
-                        <h1 id="page_title">Edit Git</h1>
-                        <vscode-button id="testButton">Test!</vscode-button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-label">
-                        <label class="vscode-input-label" for="variablesList">Add Variable:</label>
-                    </div>
-                    <div class="col-input">
-                        <h1 id="page_title">Edit Git</h1>
-                        <vscode-button id="testButton">Test!</vscode-button>
-                    </div>
-                </div>
+            <div class="col-input">
+              <vscode-dropdown id="res_input_EnvAudio" class="dropdown"> </vscode-dropdown>
             </div>
-        </sp-accordion-item>
+          </div>
+        </div>
+      </sp-accordion-item>
+      <sp-accordion-item label="Miscellaneous">
+        <nwn-volume-slider id="test" text="Hello world"></nwn-volume-slider>
+      </sp-accordion-item>
+      <sp-accordion-item label="Scripts">
+        <nwn-script-events resourcetype="git"></nwn-script-events>
+      </sp-accordion-item>
+      <sp-accordion-item label="Variables">
+        <div id="variables">
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="variablesList">Variables:</label>
+            </div>
+            <div class="col-input">
+              <h1 id="page_title">Edit Git</h1>
+              <vscode-button id="testButton">Test!</vscode-button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-label">
+              <label class="vscode-input-label" for="variablesList">Add Variable:</label>
+            </div>
+            <div class="col-input">
+              <h1 id="page_title">Edit Git</h1>
+              <vscode-button id="testButton">Test!</vscode-button>
+            </div>
+          </div>
+        </div>
+      </sp-accordion-item>
     </sp-accordion>
   </body>
 </html>
