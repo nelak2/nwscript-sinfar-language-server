@@ -13,16 +13,18 @@ import "@spectrum-web-components/accordion/sp-accordion-item.js";
 import { nwnScriptEvents } from "../../components/nwnScriptEvents";
 import { nwnVolumeSlider } from "../../components/nwnVolumeSlider";
 import { nwnTextField } from "../../components/nwnTextField";
+import { nwnNumberField } from "../../components/nwnNumberField";
+import { nwnColorPicker } from "../../components/nwnColorPicker";
 
 const vscode = acquireVsCodeApi();
 
 let content;
 
-// customElements.define("editor-row", EditorRow, { extends: "div" });
-// customElements.define("color-picker", ColorPicker, { extends: "div" });
 customElements.define("nwn-script-events", nwnScriptEvents);
 customElements.define("nwn-volume-slider", nwnVolumeSlider);
 customElements.define("nwn-text-field", nwnTextField);
+customElements.define("nwn-number-field", nwnNumberField);
+customElements.define("nwn-color-picker", nwnColorPicker);
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);

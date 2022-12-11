@@ -49,234 +49,37 @@
             </fieldset>
           </div>
         </div>
-
+        <nwn-color-picker id="res_SunAmbientColor" text="Sun - Ambient Color"></nwn-color-picker>
+        <nwn-color-picker id="res_SunDiffuseColor" text="Sun - Diffuse Color"></nwn-color-picker>
+        <nwn-number-field id="res_SunFogAmount" text="Sun - Fog Amount" unit="fog"></nwn-number-field>
+        <nwn-color-picker id="res_SunFogColor" text="Sun - Fog Color"></nwn-color-picker>
+        <nwn-color-picker id="res_MoonAmbientColor" text="Moon - Ambient Color"></nwn-color-picker>
+        <nwn-color-picker id="res_MoonDiffuseColor" text="Moon - Diffuse Color"></nwn-color-picker>
+        <nwn-number-field id="res_MoonFogAmount" text="Moon - Fog Amount" unit="fog"></nwn-number-field>
+        <nwn-color-picker id="res_MoonFogColor" text="Moon - Fog Color"></nwn-color-picker>
+        <nwn-number-field id="res_FogClipDistance" text="Fog Clip Distance" unit="distance"></nwn-number-field>
+        <nwn-number-field id="res_ShadowOpacity" text="Shadow Opacity" unit="percent"></nwn-number-field>
         <div class="row">
           <div class="col-label">
-            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
+            <label class="vscode-input-label" for="res_WeatherWindPower">Weather - Wind Power:</label>
           </div>
           <div class="col-input">
-            <vscode-text-field id="res_input_SunAmbientColor" aria-label="textfield" current-value="" type="text">
-              <section slot="end" style="display: flex; align-items: center">
-                <overlay-trigger placement="top" type="replace" style="display: flex">
-                  <vscode-button
-                    slot="trigger"
-                    id="res_input_SunAmbientColor_button"
-                    appearance="icon"
-                    aria-label="Color Picker"
-                    current-value=""
-                  >
-                    <span class="codicon codicon-symbol-color"></span>
-                  </vscode-button>
-                  <sp-popover slot="click-content" open>
-                    <sp-dialog size="s">
-                      <sp-color-area></sp-color-area>
-                      <sp-color-slider vertical></sp-color-slider>
-                    </sp-dialog>
-                  </sp-popover>
-                </overlay-trigger>
-              </section>
-            </vscode-text-field>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
-          </div>
-          <div class="col-input">
-            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
-              <section slot="end" style="display: flex; align-items: center">
-                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
-                  <span class="codicon codicon-symbol-color"></span>
-                </vscode-button>
-              </section>
-            </vscode-text-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-          </div>
-          <div class="col-input">
-            <sp-number-field
-              id="res_input_MusicDelay"
-              style="width: 100px"
-              value="0"
-              format-options='{
-                            "style": "percent"
-                            }'
-            ></sp-number-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
-          </div>
-          <div class="col-input">
-            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
-              <section slot="end" style="display: flex; align-items: center">
-                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
-                  <span class="codicon codicon-symbol-color"></span>
-                </vscode-button>
-              </section>
-            </vscode-text-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
-          </div>
-          <div class="col-input">
-            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
-              <section slot="end" style="display: flex; align-items: center">
-                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
-                  <span class="codicon codicon-symbol-color"></span>
-                </vscode-button>
-              </section>
-            </vscode-text-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
-          </div>
-          <div class="col-input">
-            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
-              <section slot="end" style="display: flex; align-items: center">
-                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
-                  <span class="codicon codicon-symbol-color"></span>
-                </vscode-button>
-              </section>
-            </vscode-text-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-          </div>
-          <div class="col-input">
-            <sp-number-field
-              id="res_input_MusicDelay"
-              style="width: 100px"
-              value="0"
-              format-options='{
-                            "style": "percent"
-                            }'
-            ></sp-number-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_SunAmbientColor">Sun - Ambient Color:</label>
-          </div>
-          <div class="col-input">
-            <vscode-text-field id="res_input_SunAmbientColor" aria-label="Text field" current-value="" type="text">
-              <section slot="end" style="display: flex; align-items: center">
-                <vscode-button id="res_input_SunAmbientColor_button" appearance="icon" aria-label="Color Picker" current-value="">
-                  <span class="codicon codicon-symbol-color"></span>
-                </vscode-button>
-              </section>
-            </vscode-text-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-          </div>
-          <div class="col-input">
-            <sp-number-field
-              id="res_input_MusicDelay"
-              style="width: 100px"
-              value="4"
-              format-options='{
-                            "style": "unit",
-                            "unit": "m"
-                            }'
-            ></sp-number-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-          </div>
-          <div class="col-input">
-            <sp-number-field
-              id="res_input_MusicDelay"
-              style="width: 100px"
-              value="0"
-              format-options='{
-                            "style": "percent"
-                            }'
-            ></sp-number-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
-          </div>
-          <div class="col-input">
-            <vscode-dropdown id="res_input_AmbientSndDay">
-              <vscode-option>Cycle Day and Night</vscode-option>
-              <vscode-option>Always Bright</vscode-option>
-              <vscode-option>Always Dark</vscode-option>
+            <vscode-dropdown id="res_WeatherWindPower">
+              <vscode-option>None</vscode-option>
+              <vscode-option>Weak</vscode-option>
+              <vscode-option>Strong</vscode-option>
             </vscode-dropdown>
           </div>
         </div>
+        <nwn-number-field id="res_WeatherSnowPercentage" text="Weather - Snow %" unit="percent"></nwn-number-field>
+        <nwn-number-field id="res_WeatherRainPercentage" text="Weather - Rain %" unit="percent"></nwn-number-field>
+        <nwn-number-field id="res_WeatherLightningPercentage" text="Weather - Lightning %" unit="percent"></nwn-number-field>
         <div class="row">
           <div class="col-label">
-            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
+            <label class="vscode-input-label" for="res_SkyBox">SkyBox:</label>
           </div>
           <div class="col-input">
-            <sp-number-field
-              id="res_input_MusicDelay"
-              style="width: 100px"
-              value="0"
-              format-options='{
-                            "style": "percent"
-                            }'
-            ></sp-number-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-          </div>
-          <div class="col-input">
-            <sp-number-field
-              id="res_input_MusicDelay"
-              style="width: 100px"
-              value="0"
-              format-options='{
-                            "style": "percent"
-                            }'
-            ></sp-number-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-          </div>
-          <div class="col-input">
-            <sp-number-field
-              id="res_input_MusicDelay"
-              style="width: 100px"
-              value="0"
-              format-options='{
-                            "style": "percent"
-                            }'
-            ></sp-number-field>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
-          </div>
-          <div class="col-input">
-            <vscode-dropdown id="res_input_AmbientSndDay">
-              <vscode-option>Cycle Day and Night</vscode-option>
-              <vscode-option>Always Bright</vscode-option>
-              <vscode-option>Always Dark</vscode-option>
-            </vscode-dropdown>
+            <vscode-dropdown id="res_SkyBox"> </vscode-dropdown>
           </div>
         </div>
       </sp-accordion-item>
@@ -324,22 +127,7 @@
               <vscode-dropdown id="res_input_MusicBattle" class="dropdown"> </vscode-dropdown>
             </div>
           </div>
-          <div class="row">
-            <div class="col-label">
-              <label class="vscode-input-label" for="res_input_MusicDelay">Music Playing Delay:</label>
-            </div>
-            <div class="col-input">
-              <sp-number-field
-                id="res_input_MusicDelay"
-                style="width: 100px"
-                value="4"
-                format-options='{
-                                "style": "unit",
-                                "unit": "ms"
-                                }'
-              ></sp-number-field>
-            </div>
-          </div>
+          <nwn-number-field id="res_MusicDelay" text="Music Playing Delay" unit="miliseconds"></nwn-number-field>
           <div class="row">
             <div class="col-label">
               <label class="vscode-input-label" for="res_input_EnvAudio">Environmental Effects:</label>
