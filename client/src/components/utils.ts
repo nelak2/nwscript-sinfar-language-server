@@ -11,3 +11,16 @@ export function buildDiv(className: string): HTMLDivElement {
   div.className = className;
   return div;
 }
+
+// Build icon buttons using vscode codicons
+export function buildButton(type: string): HTMLElement {
+  const button = document.createElement("vscode-button");
+  button.setAttribute("appearance", "icon");
+  button.setAttribute("aria-label", type);
+
+  const span = document.createElement("span");
+  span.className = "codicon codicon-" + type;
+  button.appendChild(span);
+
+  return button;
+}

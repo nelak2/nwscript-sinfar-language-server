@@ -4064,3 +4064,21 @@ vscode-dropdown::part(listbox)
     padding-block-end: 0px;
     border-style: none;
 }
+
+.variableRow
+{
+    display: flex;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.varTypeDropdown
+{
+    min-width: 80px;
+    width: 80px;
+}
+
+.variableField
+{
+    padding-inline: 5px;
+}

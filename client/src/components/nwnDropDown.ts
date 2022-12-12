@@ -9,6 +9,7 @@ import {
   AmbientSounds,
   Music,
   EnvironmentalEffects,
+  VarType,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -48,6 +49,9 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "EnvironmentalEffects":
         list = EnvironmentalEffects;
+        break;
+      case "VarType":
+        list = VarType;
         break;
       default:
         list = [{ value: "-1", label: "Unknown List" }];

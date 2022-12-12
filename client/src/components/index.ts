@@ -17,6 +17,7 @@ import { nwnScriptEvents } from "./nwnScriptEvents";
 import { nwnTextField } from "./nwnTextField";
 import { nwnVolumeSlider } from "./nwnVolumeSlider";
 import { nwnRow } from "./nwnRow";
+import { nwnVariables } from "./nwnVariables";
 
 export { nwnColorPicker } from "./nwnColorPicker";
 export { nwnDropDown } from "./nwnDropDown";
@@ -34,4 +35,5 @@ export function InitializeNWNControls() {
   customElements.define("nwn-color-picker", nwnColorPicker);
   customElements.define("nwn-drop-down", nwnDropDown);
   customElements.define("nwn-row", nwnRow);
+  customElements.define("nwn-variables", nwnVariables);
 }
