@@ -18,12 +18,12 @@
   <body>
     <sp-accordion allow-multiple>
       <sp-accordion-item label="Identification">
-        <nwn-text-field id="res_Name" text="Name"></nwn-text-field>
-        <nwn-text-field id="res_Tag" text="Tag"></nwn-text-field>
+        <nwn-text-field id="res_Name" label="Name"></nwn-text-field>
+        <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Tiles">
-        <nwn-text-field id="res_TilesetReseRef" text="Tileset ResRef" disabled="true"></nwn-text-field>
-        <nwn-text-field id="res_Size" text="Size" disabled="true"></nwn-text-field>
+        <nwn-text-field id="res_TilesetReseRef" label="Tileset ResRef" disabled="true"></nwn-text-field>
+        <nwn-text-field id="res_Size" label="Size" disabled="true"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Visual">
         <div class="row">
@@ -49,16 +49,16 @@
             </fieldset>
           </div>
         </div>
-        <nwn-color-picker id="res_SunAmbientColor" text="Sun - Ambient Color"></nwn-color-picker>
-        <nwn-color-picker id="res_SunDiffuseColor" text="Sun - Diffuse Color"></nwn-color-picker>
-        <nwn-number-field id="res_SunFogAmount" text="Sun - Fog Amount" unit="fog"></nwn-number-field>
-        <nwn-color-picker id="res_SunFogColor" text="Sun - Fog Color"></nwn-color-picker>
-        <nwn-color-picker id="res_MoonAmbientColor" text="Moon - Ambient Color"></nwn-color-picker>
-        <nwn-color-picker id="res_MoonDiffuseColor" text="Moon - Diffuse Color"></nwn-color-picker>
-        <nwn-number-field id="res_MoonFogAmount" text="Moon - Fog Amount" unit="fog"></nwn-number-field>
-        <nwn-color-picker id="res_MoonFogColor" text="Moon - Fog Color"></nwn-color-picker>
-        <nwn-number-field id="res_FogClipDistance" text="Fog Clip Distance" unit="distance"></nwn-number-field>
-        <nwn-number-field id="res_ShadowOpacity" text="Shadow Opacity" unit="percent"></nwn-number-field>
+        <nwn-color-picker id="res_SunAmbientColor" label="Sun - Ambient Color"></nwn-color-picker>
+        <nwn-color-picker id="res_SunDiffuseColor" label="Sun - Diffuse Color"></nwn-color-picker>
+        <nwn-number-field id="res_SunFogAmount" label="Sun - Fog Amount" unit="fog"></nwn-number-field>
+        <nwn-color-picker id="res_SunFogColor" label="Sun - Fog Color"></nwn-color-picker>
+        <nwn-color-picker id="res_MoonAmbientColor" label="Moon - Ambient Color"></nwn-color-picker>
+        <nwn-color-picker id="res_MoonDiffuseColor" label="Moon - Diffuse Color"></nwn-color-picker>
+        <nwn-number-field id="res_MoonFogAmount" label="Moon - Fog Amount" unit="fog"></nwn-number-field>
+        <nwn-color-picker id="res_MoonFogColor" label="Moon - Fog Color"></nwn-color-picker>
+        <nwn-number-field id="res_FogClipDistance" label="Fog Clip Distance" unit="distance"></nwn-number-field>
+        <nwn-number-field id="res_ShadowOpacity" label="Shadow Opacity" unit="percent"></nwn-number-field>
         <div class="row">
           <div class="col-label">
             <label class="vscode-input-label" for="res_WeatherWindPower">Weather - Wind Power:</label>
@@ -71,9 +71,9 @@
             </vscode-dropdown>
           </div>
         </div>
-        <nwn-number-field id="res_WeatherSnowPercentage" text="Weather - Snow %" unit="percent"></nwn-number-field>
-        <nwn-number-field id="res_WeatherRainPercentage" text="Weather - Rain %" unit="percent"></nwn-number-field>
-        <nwn-number-field id="res_WeatherLightningPercentage" text="Weather - Lightning %" unit="percent"></nwn-number-field>
+        <nwn-number-field id="res_WeatherSnowPercentage" label="Weather - Snow %" unit="percent"></nwn-number-field>
+        <nwn-number-field id="res_WeatherRainPercentage" label="Weather - Rain %" unit="percent"></nwn-number-field>
+        <nwn-number-field id="res_WeatherLightningPercentage" label="Weather - Lightning %" unit="percent"></nwn-number-field>
         <div class="row">
           <div class="col-label">
             <label class="vscode-input-label" for="res_SkyBox">SkyBox:</label>
@@ -93,7 +93,7 @@
               <vscode-dropdown id="res_input_AmbientSndDay"> </vscode-dropdown>
             </div>
           </div>
-          <nwn-volume-slider id="res_input_AmbientSndDayVol" text="Day - Ambient Volume:"></nwn-volume-slider>
+          <nwn-volume-slider id="res_input_AmbientSndDayVol" label="Day - Ambient Volume:"></nwn-volume-slider>
           <div class="row">
             <div class="col-label">
               <label class="vscode-input-label" for="res_input_MusicDay">Day - Music:</label>
@@ -110,7 +110,7 @@
               <vscode-dropdown id="res_input_AmbientSndNight" class="dropdown"> </vscode-dropdown>
             </div>
           </div>
-          <nwn-volume-slider id="res_input_AmbientSndNitVol" text="Night - Ambient Volume:"></nwn-volume-slider>
+          <nwn-volume-slider id="res_input_AmbientSndNitVol" label="Night - Ambient Volume:"></nwn-volume-slider>
           <div class="row">
             <div class="col-label">
               <label class="vscode-input-label" for="res_input_MusicNight">Night - Music:</label>
@@ -127,7 +127,7 @@
               <vscode-dropdown id="res_input_MusicBattle" class="dropdown"> </vscode-dropdown>
             </div>
           </div>
-          <nwn-number-field id="res_MusicDelay" text="Music Playing Delay" unit="miliseconds"></nwn-number-field>
+          <nwn-number-field id="res_MusicDelay" label="Music Playing Delay" unit="miliseconds"></nwn-number-field>
           <div class="row">
             <div class="col-label">
               <label class="vscode-input-label" for="res_input_EnvAudio">Environmental Effects:</label>
@@ -139,7 +139,7 @@
         </div>
       </sp-accordion-item>
       <sp-accordion-item label="Miscellaneous">
-        <nwn-volume-slider id="test" text="Hello world"></nwn-volume-slider>
+        <nwn-volume-slider id="test" label="Hello world"></nwn-volume-slider>
       </sp-accordion-item>
       <sp-accordion-item label="Scripts">
         <nwn-script-events resourcetype="git"></nwn-script-events>

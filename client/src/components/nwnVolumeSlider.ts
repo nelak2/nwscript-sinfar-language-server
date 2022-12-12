@@ -5,17 +5,17 @@ export class nwnVolumeSlider extends HTMLElement {
     super();
 
     const id = this.getAttribute("id");
-    const text = this.getAttribute("text");
+    const label = this.getAttribute("label");
 
-    if (!id || !text) {
+    if (!id || !label) {
       return;
     }
 
-    const label = buildLabel(text, id);
-    label.className = "vscode-input-label";
+    const labelElement = buildLabel(label, id);
+    labelElement.className = "vscode-input-label";
 
     const divColLabel = buildDiv("col-label");
-    divColLabel.appendChild(label);
+    divColLabel.appendChild(labelElement);
 
     const slider = document.createElement("sp-slider");
     slider.id = id;

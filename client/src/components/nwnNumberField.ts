@@ -6,18 +6,18 @@ export class nwnNumberField extends HTMLElement {
     super();
 
     const id = this.getAttribute("id");
-    const text = this.getAttribute("text");
+    const label = this.getAttribute("label");
     const unit = this.getAttribute("unit");
 
-    if (!id || !text || !unit) {
+    if (!id || !label || !unit) {
       return;
     }
 
-    const label = buildLabel(text, id);
-    label.className = "vscode-input-label";
+    const labelElement = buildLabel(label, id);
+    labelElement.className = "vscode-input-label";
 
     const divColLabel = buildDiv("col-label");
-    divColLabel.appendChild(label);
+    divColLabel.appendChild(labelElement);
 
     const numberField = new NumberField();
     numberField.id = id;
