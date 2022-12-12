@@ -17,7 +17,7 @@
 
   <body>
     <sp-accordion allow-multiple>
-      <sp-accordion-item label="Identification">
+      <sp-accordion-item open label="Identification">
         <nwn-text-field id="res_Name" label="Name"></nwn-text-field>
         <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
       </sp-accordion-item>
@@ -26,18 +26,7 @@
         <nwn-text-field id="res_Size" label="Size" disabled="true"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Visual">
-        <nwn-drop-down id="res_input_DayNightCycle" label="Day/Night Cycle:" listRef="DayNightCycle"></nwn-drop-down>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_Flags">Flags:</label>
-          </div>
-          <div class="col-input">
-            <fieldset class="checkbox-set">
-              <vscode-checkbox id="res_input_Flags_SunShadows">Sun Shadows</vscode-checkbox>
-              <vscode-checkbox id="res_input_Flags_MoonShadows">Moon Shadows</vscode-checkbox>
-            </fieldset>
-          </div>
-        </div>
+        <nwn-drop-down id="res_input_DayNightCycle" label="Day/Night Cycle" listRef="DayNightCycle"></nwn-drop-down>
         <nwn-row label="Flags">
           <fieldset class="checkbox-set">
             <vscode-checkbox id="res_input_Flags_SunShadows">Sun Shadows</vscode-checkbox>
@@ -54,92 +43,41 @@
         <nwn-color-picker id="res_MoonFogColor" label="Moon - Fog Color"></nwn-color-picker>
         <nwn-number-field id="res_FogClipDistance" label="Fog Clip Distance" unit="distance"></nwn-number-field>
         <nwn-number-field id="res_ShadowOpacity" label="Shadow Opacity" unit="percent"></nwn-number-field>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_WeatherWindPower">Weather - Wind Power:</label>
-          </div>
-          <div class="col-input">
-            <vscode-dropdown id="res_WeatherWindPower">
-              <vscode-option>None</vscode-option>
-              <vscode-option>Weak</vscode-option>
-              <vscode-option>Strong</vscode-option>
-            </vscode-dropdown>
-          </div>
-        </div>
+        <nwn-drop-down id="res_WeatherWindPower" label="Weather - Wind Power" listRef="WindPower"></nwn-drop-down>
         <nwn-number-field id="res_WeatherSnowPercentage" label="Weather - Snow %" unit="percent"></nwn-number-field>
         <nwn-number-field id="res_WeatherRainPercentage" label="Weather - Rain %" unit="percent"></nwn-number-field>
         <nwn-number-field id="res_WeatherLightningPercentage" label="Weather - Lightning %" unit="percent"></nwn-number-field>
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_SkyBox">SkyBox:</label>
-          </div>
-          <div class="col-input">
-            <vscode-dropdown id="res_SkyBox"> </vscode-dropdown>
-          </div>
-        </div>
+        <nwn-drop-down id="res_SkyBox" label="SkyBox" listRef="SkyBox"></nwn-drop-down>
       </sp-accordion-item>
-      <sp-accordion-item open label="Audio">
-        <div id="audio">
-          <div class="row">
-            <div class="col-label">
-              <label class="vscode-input-label" for="res_input_AmbientSndDay">Day - Ambient Sound:</label>
-            </div>
-            <div class="col-input">
-              <vscode-dropdown id="res_input_AmbientSndDay"> </vscode-dropdown>
-            </div>
-          </div>
-          <nwn-volume-slider id="res_input_AmbientSndDayVol" label="Day - Ambient Volume:"></nwn-volume-slider>
-          <div class="row">
-            <div class="col-label">
-              <label class="vscode-input-label" for="res_input_MusicDay">Day - Music:</label>
-            </div>
-            <div class="col-input">
-              <vscode-dropdown id="res_input_MusicDay" class="dropdown"> </vscode-dropdown>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-label">
-              <label class="vscode-input-label" for="res_input_AmbientSndNight">Night - Ambient Sound:</label>
-            </div>
-            <div class="col-input">
-              <vscode-dropdown id="res_input_AmbientSndNight" class="dropdown"> </vscode-dropdown>
-            </div>
-          </div>
-          <nwn-volume-slider id="res_input_AmbientSndNitVol" label="Night - Ambient Volume:"></nwn-volume-slider>
-          <div class="row">
-            <div class="col-label">
-              <label class="vscode-input-label" for="res_input_MusicNight">Night - Music:</label>
-            </div>
-            <div class="col-input">
-              <vscode-dropdown id="res_input_MusicNight" class="dropdown"> </vscode-dropdown>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-label">
-              <label class="vscode-input-label" for="res_input_MusicBattle">Battle - Music:</label>
-            </div>
-            <div class="col-input">
-              <vscode-dropdown id="res_input_MusicBattle" class="dropdown"> </vscode-dropdown>
-            </div>
-          </div>
-          <nwn-number-field id="res_MusicDelay" label="Music Playing Delay" unit="miliseconds"></nwn-number-field>
-          <div class="row">
-            <div class="col-label">
-              <label class="vscode-input-label" for="res_input_EnvAudio">Environmental Effects:</label>
-            </div>
-            <div class="col-input">
-              <vscode-dropdown id="res_input_EnvAudio" class="dropdown"> </vscode-dropdown>
-            </div>
-          </div>
-        </div>
+      <sp-accordion-item label="Audio">
+        <nwn-drop-down id="res_input_AmbientSndDay" label="Day - Ambient Sound" listRef="AmbientSound"></nwn-drop-down>
+        <nwn-volume-slider id="res_input_AmbientSndDayVol" label="Day - Ambient Volume"></nwn-volume-slider>
+        <nwn-drop-down id="res_input_MusicDay" label="Day - Music" listRef="Music"></nwn-drop-down>
+        <nwn-drop-down id="res_input_AmbientSndNight" label="Night - Ambient Sound" listRef="AmbientSound"></nwn-drop-down>
+        <nwn-volume-slider id="res_input_AmbientSndNitVol" label="Night - Ambient Volume"></nwn-volume-slider>
+        <nwn-drop-down id="res_input_MusicNight" label="Night - Music" listRef="Music"></nwn-drop-down>
+        <nwn-drop-down id="res_input_MusicBattle" label="Battle - Music" listRef="Music"></nwn-drop-down>
+        <nwn-number-field id="res_MusicDelay" label="Music Playing Delay" unit="miliseconds"></nwn-number-field>
+        <nwn-drop-down id="res_input_EnvAudio" label="Environmental Effects" listRef="EnvironmentalEffects"></nwn-drop-down>
       </sp-accordion-item>
       <sp-accordion-item label="Miscellaneous">
-        <nwn-volume-slider id="test" label="Hello world"></nwn-volume-slider>
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set">
+            <vscode-checkbox id="res_input_Flags_NoRest">No Rest</vscode-checkbox>
+            <vscode-checkbox id="res_input_Flags_Interior">Interior</vscode-checkbox>
+            <vscode-checkbox id="res_input_Flags_Underground">Underground</vscode-checkbox>
+            <vscode-checkbox id="res_input_Flags_Natural">Natural</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+        <nwn-number-field id="res_CheckModifierListen" label="Check Modifier - Listen" unit="skill"></nwn-number-field>
+        <nwn-number-field id="res_CheckModifierSpot" label="Check Modifier - Spot" unit="skill"></nwn-number-field>
+        <nwn-drop-down id="res_PvP" label="Player vs. Player" listRef="PvP"></nwn-drop-down>
+        <nwn-drop-down id="res_LoadScreen" label="Load Screen" listRef="LoadScreen"></nwn-drop-down>
       </sp-accordion-item>
-      <sp-accordion-item label="Scripts">
+      <sp-accordion-item open label="Scripts">
         <nwn-script-events resourcetype="git"></nwn-script-events>
       </sp-accordion-item>
-      <sp-accordion-item label="Variables">
+      <sp-accordion-item open label="Variables">
         <div id="variables">
           <div class="row">
             <div class="col-label">
