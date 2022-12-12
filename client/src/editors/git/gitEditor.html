@@ -26,18 +26,7 @@
         <nwn-text-field id="res_Size" label="Size" disabled="true"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Visual">
-        <div class="row">
-          <div class="col-label">
-            <label class="vscode-input-label" for="res_input_DayNightCycle">Day/Night Cycle:</label>
-          </div>
-          <div class="col-input">
-            <vscode-dropdown id="res_input_DayNightCycle">
-              <vscode-option>Cycle Day and Night</vscode-option>
-              <vscode-option>Always Bright</vscode-option>
-              <vscode-option>Always Dark</vscode-option>
-            </vscode-dropdown>
-          </div>
-        </div>
+        <nwn-drop-down id="res_input_DayNightCycle" label="Day/Night Cycle:" listRef="DayNightCycle"></nwn-drop-down>
         <div class="row">
           <div class="col-label">
             <label class="vscode-input-label" for="res_input_Flags">Flags:</label>
@@ -49,6 +38,12 @@
             </fieldset>
           </div>
         </div>
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set">
+            <vscode-checkbox id="res_input_Flags_SunShadows">Sun Shadows</vscode-checkbox>
+            <vscode-checkbox id="res_input_Flags_MoonShadows">Moon Shadows</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
         <nwn-color-picker id="res_SunAmbientColor" label="Sun - Ambient Color"></nwn-color-picker>
         <nwn-color-picker id="res_SunDiffuseColor" label="Sun - Diffuse Color"></nwn-color-picker>
         <nwn-number-field id="res_SunFogAmount" label="Sun - Fog Amount" unit="fog"></nwn-number-field>

@@ -16,6 +16,7 @@ import { nwnNumberField } from "./nwnNumberField";
 import { nwnScriptEvents } from "./nwnScriptEvents";
 import { nwnTextField } from "./nwnTextField";
 import { nwnVolumeSlider } from "./nwnVolumeSlider";
+import { nwnRow } from "./nwnRow";
 
 export { nwnColorPicker } from "./nwnColorPicker";
 export { nwnDropDown } from "./nwnDropDown";
@@ -23,6 +24,7 @@ export { nwnNumberField } from "./nwnNumberField";
 export { nwnScriptEvents } from "./nwnScriptEvents";
 export { nwnTextField } from "./nwnTextField";
 export { nwnVolumeSlider } from "./nwnVolumeSlider";
+export { nwnRow } from "./nwnRow";
 
 export function InitializeNWNControls() {
   customElements.define("nwn-script-events", nwnScriptEvents);
@@ -31,4 +33,5 @@ export function InitializeNWNControls() {
   customElements.define("nwn-number-field", nwnNumberField);
   customElements.define("nwn-color-picker", nwnColorPicker);
   customElements.define("nwn-drop-down", nwnDropDown);
+  customElements.define("nwn-row", nwnRow);
 }
