@@ -22,15 +22,15 @@
         <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Tiles">
-        <nwn-text-field id="res_TilesetReseRef" label="Tileset ResRef" disabled="true"></nwn-text-field>
+        <nwn-text-field id="res_TilesetResRef" label="Tileset ResRef" disabled="true"></nwn-text-field>
         <nwn-text-field id="res_Size" label="Size" disabled="true"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Visual">
-        <nwn-drop-down id="res_input_DayNightCycle" label="Day/Night Cycle" listRef="DayNightCycle"></nwn-drop-down>
+        <nwn-drop-down id="res_DayNightCycle" label="Day/Night Cycle" listRef="DayNightCycle"></nwn-drop-down>
         <nwn-row label="Flags">
           <fieldset class="checkbox-set">
-            <vscode-checkbox id="res_input_Flags_SunShadows">Sun Shadows</vscode-checkbox>
-            <vscode-checkbox id="res_input_Flags_MoonShadows">Moon Shadows</vscode-checkbox>
+            <vscode-checkbox id="res_Flags_SunShadows">Sun Shadows</vscode-checkbox>
+            <vscode-checkbox id="res_Flags_MoonShadows">Moon Shadows</vscode-checkbox>
           </fieldset>
         </nwn-row>
         <nwn-color-picker id="res_SunAmbientColor" label="Sun - Ambient Color"></nwn-color-picker>
@@ -50,23 +50,23 @@
         <nwn-drop-down id="res_SkyBox" label="SkyBox" listRef="SkyBox"></nwn-drop-down>
       </sp-accordion-item>
       <sp-accordion-item label="Audio">
-        <nwn-drop-down id="res_input_AmbientSndDay" label="Day - Ambient Sound" listRef="AmbientSound"></nwn-drop-down>
-        <nwn-volume-slider id="res_input_AmbientSndDayVol" label="Day - Ambient Volume"></nwn-volume-slider>
-        <nwn-drop-down id="res_input_MusicDay" label="Day - Music" listRef="Music"></nwn-drop-down>
-        <nwn-drop-down id="res_input_AmbientSndNight" label="Night - Ambient Sound" listRef="AmbientSound"></nwn-drop-down>
-        <nwn-volume-slider id="res_input_AmbientSndNitVol" label="Night - Ambient Volume"></nwn-volume-slider>
-        <nwn-drop-down id="res_input_MusicNight" label="Night - Music" listRef="Music"></nwn-drop-down>
-        <nwn-drop-down id="res_input_MusicBattle" label="Battle - Music" listRef="Music"></nwn-drop-down>
+        <nwn-drop-down id="res_AmbientSndDay" label="Day - Ambient Sound" listRef="AmbientSound"></nwn-drop-down>
+        <nwn-volume-slider id="res_AmbientSndDayVol" label="Day - Ambient Volume"></nwn-volume-slider>
+        <nwn-drop-down id="res_MusicDay" label="Day - Music" listRef="Music"></nwn-drop-down>
+        <nwn-drop-down id="res_AmbientSndNight" label="Night - Ambient Sound" listRef="AmbientSound"></nwn-drop-down>
+        <nwn-volume-slider id="res_AmbientSndNitVol" label="Night - Ambient Volume"></nwn-volume-slider>
+        <nwn-drop-down id="res_MusicNight" label="Night - Music" listRef="Music"></nwn-drop-down>
+        <nwn-drop-down id="res_MusicBattle" label="Battle - Music" listRef="Music"></nwn-drop-down>
         <nwn-number-field id="res_MusicDelay" label="Music Playing Delay" unit="miliseconds"></nwn-number-field>
-        <nwn-drop-down id="res_input_EnvAudio" label="Environmental Effects" listRef="EnvironmentalEffects"></nwn-drop-down>
+        <nwn-drop-down id="res_EnvAudio" label="Environmental Effects" listRef="EnvironmentalEffects"></nwn-drop-down>
       </sp-accordion-item>
       <sp-accordion-item label="Miscellaneous">
         <nwn-row label="Flags">
           <fieldset class="checkbox-set">
-            <vscode-checkbox id="res_input_Flags_NoRest">No Rest</vscode-checkbox>
-            <vscode-checkbox id="res_input_Flags_Interior">Interior</vscode-checkbox>
-            <vscode-checkbox id="res_input_Flags_Underground">Underground</vscode-checkbox>
-            <vscode-checkbox id="res_input_Flags_Natural">Natural</vscode-checkbox>
+            <vscode-checkbox id="res_Flags_NoRest">No Rest</vscode-checkbox>
+            <vscode-checkbox id="res_Flags_Interior">Interior</vscode-checkbox>
+            <vscode-checkbox id="res_Flags_Underground">Underground</vscode-checkbox>
+            <vscode-checkbox id="res_Flags_Natural">Natural</vscode-checkbox>
           </fieldset>
         </nwn-row>
         <nwn-number-field id="res_CheckModifierListen" label="Check Modifier - Listen" unit="skill"></nwn-number-field>
