@@ -1,5 +1,15 @@
 import { buildLabel, buildDiv } from "./utils";
-import { DropdownListItem, DayNightCycle } from "./lists/index";
+import {
+  DropdownListItem,
+  DayNightCycle,
+  WindPower,
+  SkyBoxes,
+  PvP,
+  LoadScreens,
+  AmbientSounds,
+  Music,
+  EnvironmentalEffects,
+} from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
   constructor() {
@@ -17,6 +27,27 @@ export class nwnDropDown extends HTMLElement {
     switch (listRef) {
       case "DayNightCycle":
         list = DayNightCycle;
+        break;
+      case "WindPower":
+        list = WindPower;
+        break;
+      case "SkyBox":
+        list = SkyBoxes;
+        break;
+      case "PvP":
+        list = PvP;
+        break;
+      case "LoadScreen":
+        list = LoadScreens;
+        break;
+      case "AmbientSound":
+        list = AmbientSounds;
+        break;
+      case "Music":
+        list = Music;
+        break;
+      case "EnvironmentalEffects":
+        list = EnvironmentalEffects;
         break;
       default:
         list = [{ value: "-1", label: "Unknown List" }];

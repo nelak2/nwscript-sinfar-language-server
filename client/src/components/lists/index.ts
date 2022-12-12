@@ -3,8 +3,27 @@ export type DropdownListItem = {
   label: string;
 };
 
+export { SkyBoxes } from "./skyboxes";
+export { LoadScreens } from "./loadscreens";
+export { AmbientSounds } from "./ambientsounds";
+export { Music } from "./music";
+export { EnvironmentalEffects } from "./environmentaleffects";
+
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
   { value: "2", label: "Always Bright" },
   { value: "3", label: "Always Dark" },
+];
+
+export const WindPower: DropdownListItem[] = [
+  { value: "0", label: "None" },
+  { value: "1", label: "Weak" },
+  { value: "2", label: "Strong" },
+];
+
+export const PvP: DropdownListItem[] = [
+  { value: "0", label: "None" },
+  { value: "1", label: "Party" },
+  { value: "2", label: "Full" },
+  { value: "2", label: "Default" },
 ];
