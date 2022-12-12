@@ -1,30 +1,9 @@
-import "@spectrum-web-components/slider/sp-slider.js";
-import "@spectrum-web-components/slider/sync/sp-slider.js";
-import "@spectrum-web-components/accordion/sp-accordion.js";
-import "@spectrum-web-components/accordion/sp-accordion-item.js";
-// import "@spectrum-web-components/color-area/sp-color-area.js";
-// import "@spectrum-web-components/color-slider/sp-color-slider.js";
-// import "@spectrum-web-components/popover/sp-popover.js";
-// import "@spectrum-web-components/overlay/sync/overlay-trigger.js";
-// import "@spectrum-web-components/button/sp-button.js";
-// import "@spectrum-web-components/button/sp-clear-button.js";
-// import "@spectrum-web-components/button/sp-close-button.js";
-
-import { nwnScriptEvents } from "../../components/nwnScriptEvents";
-import { nwnVolumeSlider } from "../../components/nwnVolumeSlider";
-import { nwnTextField } from "../../components/nwnTextField";
-import { nwnNumberField } from "../../components/nwnNumberField";
-import { nwnColorPicker } from "../../components/nwnColorPicker";
+import { InitializeNWNControls } from "../../components";
 
 const vscode = acquireVsCodeApi();
+InitializeNWNControls();
 
 let content;
-
-customElements.define("nwn-script-events", nwnScriptEvents);
-customElements.define("nwn-volume-slider", nwnVolumeSlider);
-customElements.define("nwn-text-field", nwnTextField);
-customElements.define("nwn-number-field", nwnNumberField);
-customElements.define("nwn-color-picker", nwnColorPicker);
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
