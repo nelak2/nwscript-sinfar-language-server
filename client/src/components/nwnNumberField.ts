@@ -48,6 +48,13 @@ export class nwnNumberField extends HTMLElement {
         numberField.style.width = "100px";
         numberField.value = 0;
         numberField.formatOptions = { style: "unit", unit: "m" };
+        break;
+      case "skill":
+        numberField.setAttribute("min", "0");
+        numberField.setAttribute("max", "127");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
     }
 
     const divColInput = buildDiv("col-input");
