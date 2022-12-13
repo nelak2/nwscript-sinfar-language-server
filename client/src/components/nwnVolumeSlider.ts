@@ -5,6 +5,8 @@ export class nwnVolumeSlider extends HTMLElement {
     super();
 
     const id = this.getAttribute("id");
+    // Clear the id so that the div doesn't match the id of the slider
+    this.setAttribute("id", "");
     const label = this.getAttribute("label");
 
     if (!id || !label) {
