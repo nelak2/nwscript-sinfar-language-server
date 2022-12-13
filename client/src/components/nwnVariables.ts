@@ -8,6 +8,12 @@ type Variable = {
 };
 
 export class nwnVariables extends HTMLElement {
+  // Specify observed attributes so that
+  // attributeChangedCallback will work
+  static get observedAttributes() {
+    return ["current-value"];
+  }
+
   _variables: Variable[];
   _variableListDiv: HTMLDivElement;
   constructor() {
@@ -180,18 +186,21 @@ export class nwnVariables extends HTMLElement {
     return dropdown;
   }
 
-  get variables() {
-    return JSON.stringify(this._variables);
-  }
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (name === "current-value") {
+      const variables = JSON.parse(newValue);
+      this._variables = [];
 
-  set variables(value) {
-    if (value) {
-      this.setAttribute("variables", value);
-      this._variables = JSON.parse(value);
-    } else {
-      this.removeAttribute("variables");
+      for (const variable of variables) {
+        this._variables.push({
+          name: variable[1].Name[1],
+          varType: variable[1].Type[1],
+          value: variable[1].Value[1],
+        });
+      }
+
+      this.refreshVariables();
     }
-    this.refreshVariables();
   }
 }
 

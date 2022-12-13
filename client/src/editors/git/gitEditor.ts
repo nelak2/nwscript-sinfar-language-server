@@ -56,49 +56,48 @@ function InboundMessageHandler(event: any) {
   }
 }
 
-type Area = {
-  resName: string;
-  erfId: number;
-  resData: [];
-  langId: string;
-  resResRef: string;
-  editableFields: any;
-  extraData: any;
-};
+function BindFields(content: any) {
+  const AmbientSndDay = content.resData[1].AreaProperties[1][1].AmbientSndDay[1];
+  document.getElementById("res_AmbientSndDay")?.setAttribute("current-value", AmbientSndDay);
 
-type ResData = {
-  AreaProperties: [[AreaProperties]];
-  ["Creature List"]: any;
-  ["Door List"]: any;
-  ["Encounter List"]: any;
-  List: any;
-  ["Placeable List"]: any;
-  SoundList: any;
-  StoreList: any;
-  TriggerList: any;
-  VarTable: any;
-  WaypointList: any;
-};
+  const AmbientSndDayVol = content.resData[1].AreaProperties[1][1].AmbientSndDayVol[1];
+  document.getElementById("res_AmbientSndDayVol")?.setAttribute("value", AmbientSndDayVol);
 
-type AreaProperties = {
-  AmbientSndDay: [];
-  AmbientSndDayVol: [];
-  AmbientSndNight: [];
-  AmbientSndNitVol: [];
-  EnvAudio: [];
-  MusicBattle: [];
-  MusicDay: [];
-  MusicDelay: [];
-  MusicNight: [];
-};
+  const MusicDay = content.resData[1].AreaProperties[1][1].MusicDay[1];
+  document.getElementById("res_MusicDay")?.setAttribute("current-value", MusicDay);
 
-function BindFields(content: Area) {
-  const resdata = content.resData[1] as unknown as ResData;
-  const areaProp = resdata.AreaProperties.at(1)?.at(1) as AreaProperties;
+  const AmbientSndNight = content.resData[1].AreaProperties[1][1].AmbientSndNight[1];
+  document.getElementById("res_AmbientSndNight")?.setAttribute("current-value", AmbientSndNight);
 
-  console.clear();
-  console.log(areaProp.AmbientSndDay[1]);
+  const AmbientSndNightVol = content.resData[1].AreaProperties[1][1].AmbientSndNitVol[1];
+  document.getElementById("res_AmbientSndNitVol")?.setAttribute("value", AmbientSndNightVol);
+
+  const MusicNight = content.resData[1].AreaProperties[1][1].MusicNight[1];
+  document.getElementById("res_MusicNight")?.setAttribute("current-value", MusicNight);
+
+  const MusicBattle = content.resData[1].AreaProperties[1][1].MusicBattle[1];
+  document.getElementById("res_MusicBattle")?.setAttribute("current-value", MusicBattle);
+
+  const MusicDelay = content.resData[1].AreaProperties[1][1].MusicDelay[1];
+  document.getElementById("res_MusicDelay")?.setAttribute("value", MusicDelay);
+
+  const EnvAudio = content.resData[1].AreaProperties[1][1].EnvAudio[1];
+  document.getElementById("res_EnvAudio")?.setAttribute("current-value", EnvAudio);
+
+  const varTable = content.resData[1].VarTable[1];
+  document.getElementById("res_variableTable")?.setAttribute("current-value", JSON.stringify(varTable));
 }
+
+// res_AmbientSndDay
+// res_AmbientSndDayVol
+// res_MusicDay
+// res_AmbientSndNight
+// res_AmbientSndNightVol
+// res_MusicNight
+// res_MusicBattle
+// res_MusicDelay
+// res_EnvAudio
+// SCRIPTS
 
 // res_Name
 // res_Tag
@@ -123,15 +122,6 @@ function BindFields(content: Area) {
 // res_WeatherRainPercentage
 // res_WeatherLightningPercentage
 // res_Skybox
-// res_AmbientSndDay
-// res_AmbientSndDayVol
-// res_MusicDay
-// res_AmbientSndNight
-// res_AmbientSndNightVol
-// res_MusicNight
-// res_MusicBattle
-// res_MusicDelay
-// res_EnvAudio
 // res_Flags_NoRest
 // res_Flags_Interior
 // res_Flags_Underground
@@ -140,5 +130,5 @@ function BindFields(content: Area) {
 // res_CheckModifierSpot
 // res_PvP
 // res_LoadScreen
-// SCRIPTS
+
 // VARIABLES
