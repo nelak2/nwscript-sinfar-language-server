@@ -12,6 +12,7 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
 
   private static readonly viewType = "sinfar.areaGitEditor";
   private readonly _context: vscode.ExtensionContext;
+  private _jsonDoc: any;
 
   constructor(private readonly context: vscode.ExtensionContext) {
     this._context = context;
@@ -30,6 +31,12 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
       enableScripts: true,
     };
     webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
+
+    try {
+      this._jsonDoc = JSON.parse(document.getText());
+    } catch {
+      this._jsonDoc = {};
+    }
 
     async function updateWebview() {
       void webviewPanel.webview.postMessage({
@@ -65,6 +72,9 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
             type: "update",
             text: document.getText(),
           });
+          break;
+        case "update":
+          void this.updateTextDocument(document, e.field, e.value);
           break;
         // case "getScriptFields":
         //   void webviewPanel.webview.postMessage({
@@ -114,30 +124,20 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
   }
 
   /**
-   * Try to get a current document as json text.
-   */
-  private getDocumentAsJson(document: vscode.TextDocument): any {
-    const text = document.getText();
-    if (text.trim().length === 0) {
-      return {};
-    }
-
-    try {
-      return JSON.parse(text);
-    } catch {
-      throw new Error("Could not get document as json. Content is not valid json");
-    }
-  }
-
-  /**
    * Write out the json to a given document.
    */
-  private updateTextDocument(document: vscode.TextDocument, json: any) {
+  private updateTextDocument(_document: vscode.TextDocument, field: string, value: string) {
     const edit = new vscode.WorkspaceEdit();
+
+    if (field !== "SCRIPT") {
+      this._jsonDoc.resData[1].AreaProperties[1][1][field][1] = value;
+    } else {
+      this._jsonDoc.resData[1].VarTable = JSON.parse(value);
+    }
 
     // Just replace the entire document every time for this example extension.
     // A more complete extension should compute minimal edits instead.
-    edit.replace(document.uri, new vscode.Range(0, 0, document.lineCount, 0), JSON.stringify(json, null, 2));
+    edit.replace(_document.uri, new vscode.Range(0, 0, _document.lineCount, 0), JSON.stringify(this._jsonDoc));
 
     return vscode.workspace.applyEdit(edit);
   }

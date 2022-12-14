@@ -1,9 +1,11 @@
 import { InitializeNWNControls } from "../../components";
+import { nwnVariables } from "../../components/nwnVariables";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
 
-let content;
+let content: any;
+let initialized = false;
 
 window.addEventListener("load", main);
 window.addEventListener("save", save);
@@ -11,32 +13,48 @@ window.addEventListener("message", InboundMessageHandler);
 
 function main() {
   // requestScriptFields("git");
-  const testButton = document.getElementById("testButton");
-  if (testButton) {
-    testButton.addEventListener("click", handleTestClick);
+  // const testButton = document.getElementById("testButton");
+  // if (testButton) {
+  //   testButton.addEventListener("click", handleTestClick);
+  // }
+
+  const saveButton = document.getElementById("saveButton");
+  if (saveButton) {
+    saveButton.addEventListener("click", save);
   }
 }
-
-function save() {}
 
 // function requestScriptFields(resourceType: string) {
 //   vscode.postMessage({ command: "getScriptFields", text: resourceType });
 //   console.log("requestScriptFields");
 // }
 
-function handleTestClick() {
-  // const state: any = vscode.getState();
-  const testButton = document.getElementById("testButton");
-  if (testButton) {
-    testButton.textContent = "Aha!";
+// function handleTestClick() {
+//   // const state: any = vscode.getState();
+//   const testButton = document.getElementById("testButton");
+//   if (testButton) {
+//     testButton.textContent = "Aha!";
+//   }
+//   vscode.postMessage({
+//     command: "getScriptFields",
+//     text: "git",
+//   });
+// }
+
+function onEditableFieldChange(e: any) {
+  // content.resData[1].AreaProperties[1][1][field][1]);
+  if (e) {
+    vscode.postMessage({
+      command: "update",
+      field: (<string>e.target.id).substring(4),
+      value: e.target.value,
+    });
+    const testp = document.body.appendChild(document.createElement("p"));
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    testp.innerText = e.target.id + " " + e.target.value;
   }
-  vscode.postMessage({
-    command: "getScriptFields",
-    text: "git",
-  });
 }
 
-// let content: any;
 function InboundMessageHandler(event: any) {
   const message = event.data;
   if (event.type === "message" && message) {
@@ -45,11 +63,16 @@ function InboundMessageHandler(event: any) {
     switch (messageType) {
       case "update":
         try {
+          test3.innerText = "UPDATE RECEIVED";
           content = JSON.parse(message.text);
-          LoadValues(content);
-          test3.innerText = "Data: " + JSON.stringify(content);
+          LoadValues();
+
+          if (!initialized) {
+            BindListeners();
+          }
+          // test3.innerText = "Data: " + JSON.stringify(content);
         } catch {
-          test3.innerText = "Data: failed to parse";
+          // test3.innerText = "Data: failed to parse";
         }
         break;
       // case "scriptFields":
@@ -59,7 +82,58 @@ function InboundMessageHandler(event: any) {
   }
 }
 
-function LoadValues(content: any) {
+function save() {
+  const editableFields = content.extraData.editableFields;
+  for (const field of editableFields) {
+    const element = document.getElementById("res_" + <string>field);
+
+    if (!element) {
+      console.log("Element not found: " + <string>field);
+      return;
+    }
+
+    if (element.tagName.startsWith("VSCODE")) {
+      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
+    } else if (element.tagName.startsWith("SP")) {
+      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
+    } else if (element.tagName.startsWith("NWN")) {
+      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
+    } else {
+      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
+    }
+  }
+  const varTableElement = <nwnVariables>document.getElementById("res_variableTable");
+  if (!varTableElement) {
+    console.log("Element not found: res_variableTable");
+  }
+
+  const varTable = varTableElement.getVarTable();
+  content.resData[1].VarTable = varTable;
+
+  console.log(content);
+
+  vscode.postMessage({
+    command: "save",
+    text: JSON.stringify(content),
+  });
+}
+
+function BindListeners() {
+  const editableFields = content.extraData.editableFields;
+  for (const field of editableFields) {
+    const element = document.getElementById("res_" + <string>field);
+
+    if (!element) {
+      console.log("Element not found: " + <string>field);
+      return;
+    }
+
+    element.addEventListener("change", onEditableFieldChange);
+  }
+  initialized = true;
+}
+
+function LoadValues() {
   // Set simple fields
   const editableFields = content.extraData.editableFields;
   for (const field of editableFields) {
