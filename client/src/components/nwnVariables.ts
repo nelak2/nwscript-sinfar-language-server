@@ -140,6 +140,34 @@ export class nwnVariables extends HTMLElement {
     }
   }
 
+  public getVarTable() {
+    const variableArray = [];
+    for (const variable of this._variables) {
+      const name = [10, variable.name];
+      const varType = [4, variable.varType];
+      const value = [this.getNWNGFFType(variable.varType), variable.value];
+
+      const GFFElement = [0, { Name: name, Type: varType, Value: value }];
+
+      variableArray.push(GFFElement);
+    }
+
+    return [15, variableArray];
+  }
+
+  getNWNGFFType(varType: string): number {
+    // For some reason doing the comparison with === always returns false
+    // Not clear why, but this works for now
+    // eslint-disable-next-line eqeqeq
+    if (varType == "1") return 5; // int
+    // eslint-disable-next-line eqeqeq
+    if (varType == "2") return 8; // float
+    // eslint-disable-next-line eqeqeq
+    if (varType == "3") return 10; // string
+
+    return 10; // default to string
+  }
+
   addRow(variable: Variable) {
     if (!this._variableListDiv) return;
 
