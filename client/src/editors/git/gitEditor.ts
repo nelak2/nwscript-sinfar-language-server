@@ -6,6 +6,7 @@ InitializeNWNControls();
 let content;
 
 window.addEventListener("load", main);
+window.addEventListener("save", save);
 window.addEventListener("message", InboundMessageHandler);
 
 function main() {
@@ -15,6 +16,8 @@ function main() {
     testButton.addEventListener("click", handleTestClick);
   }
 }
+
+function save() {}
 
 // function requestScriptFields(resourceType: string) {
 //   vscode.postMessage({ command: "getScriptFields", text: resourceType });
@@ -43,7 +46,7 @@ function InboundMessageHandler(event: any) {
       case "update":
         try {
           content = JSON.parse(message.text);
-          BindFields(content);
+          LoadValues(content);
           test3.innerText = "Data: " + JSON.stringify(content);
         } catch {
           test3.innerText = "Data: failed to parse";
@@ -56,34 +59,29 @@ function InboundMessageHandler(event: any) {
   }
 }
 
-function BindFields(content: any) {
-  const AmbientSndDay = content.resData[1].AreaProperties[1][1].AmbientSndDay[1];
-  document.getElementById("res_AmbientSndDay")?.setAttribute("current-value", AmbientSndDay);
+function LoadValues(content: any) {
+  // Set simple fields
+  const editableFields = content.extraData.editableFields;
+  for (const field of editableFields) {
+    const element = document.getElementById("res_" + <string>field);
 
-  const AmbientSndDayVol = content.resData[1].AreaProperties[1][1].AmbientSndDayVol[1];
-  document.getElementById("res_AmbientSndDayVol")?.setAttribute("value", AmbientSndDayVol);
+    if (!element) {
+      console.log("Element not found: " + <string>field);
+      return;
+    }
 
-  const MusicDay = content.resData[1].AreaProperties[1][1].MusicDay[1];
-  document.getElementById("res_MusicDay")?.setAttribute("current-value", MusicDay);
+    if (element.tagName.startsWith("VSCODE")) {
+      element.setAttribute("current-value", content.resData[1].AreaProperties[1][1][field][1]);
+    } else if (element.tagName.startsWith("SP")) {
+      element.setAttribute("value", content.resData[1].AreaProperties[1][1][field][1]);
+    } else if (element.tagName.startsWith("NWN")) {
+      element.setAttribute("current-value", content.resData[1].AreaProperties[1][1][field][1]);
+    } else {
+      element.setAttribute("value", content.resData[1].AreaProperties[1][1][field][1]);
+    }
+  }
 
-  const AmbientSndNight = content.resData[1].AreaProperties[1][1].AmbientSndNight[1];
-  document.getElementById("res_AmbientSndNight")?.setAttribute("current-value", AmbientSndNight);
-
-  const AmbientSndNightVol = content.resData[1].AreaProperties[1][1].AmbientSndNitVol[1];
-  document.getElementById("res_AmbientSndNitVol")?.setAttribute("value", AmbientSndNightVol);
-
-  const MusicNight = content.resData[1].AreaProperties[1][1].MusicNight[1];
-  document.getElementById("res_MusicNight")?.setAttribute("current-value", MusicNight);
-
-  const MusicBattle = content.resData[1].AreaProperties[1][1].MusicBattle[1];
-  document.getElementById("res_MusicBattle")?.setAttribute("current-value", MusicBattle);
-
-  const MusicDelay = content.resData[1].AreaProperties[1][1].MusicDelay[1];
-  document.getElementById("res_MusicDelay")?.setAttribute("value", MusicDelay);
-
-  const EnvAudio = content.resData[1].AreaProperties[1][1].EnvAudio[1];
-  document.getElementById("res_EnvAudio")?.setAttribute("current-value", EnvAudio);
-
+  // Set variable table
   const varTable = content.resData[1].VarTable[1];
   document.getElementById("res_variableTable")?.setAttribute("current-value", JSON.stringify(varTable));
 }
