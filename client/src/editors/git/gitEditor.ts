@@ -63,7 +63,8 @@ function InboundMessageHandler(event: any) {
     switch (messageType) {
       case "update":
         try {
-          test3.innerText = "UPDATE RECEIVED";
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+          test3.innerText = "UPDATE RECEIVED:" + message.text;
           content = JSON.parse(message.text);
           LoadValues();
 

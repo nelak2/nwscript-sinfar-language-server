@@ -38,11 +38,19 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
       this._jsonDoc = {};
     }
 
-    async function updateWebview() {
-      void webviewPanel.webview.postMessage({
-        type: "update",
-        text: document.getText(),
-      });
+    async function updateWebview(e: any, init: boolean = false) {
+      if (init) {
+        void webviewPanel.webview.postMessage({
+          type: "update",
+          text: document.getText(),
+        });
+      } else {
+        void webviewPanel.webview.postMessage({
+          type: "update",
+          field: e.field,
+          value: e.value,
+        });
+      }
     }
 
     // Hook up event handlers so that we can synchronize the webview with the text document.
@@ -55,7 +63,7 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
 
     const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(async (e) => {
       if (e.document.uri.toString() === document.uri.toString()) {
-        void updateWebview();
+        void updateWebview(e);
       }
     });
 
@@ -85,8 +93,10 @@ export class GitEditorProvider implements vscode.CustomTextEditorProvider {
       }
     });
 
-    void updateWebview();
+    void updateWebview(undefined, true);
   }
+
+  private updateWebview() {}
 
   /**
    * Get the static html used for the editor webviews.
