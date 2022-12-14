@@ -1,4 +1,5 @@
 import { buildLabel, buildDiv } from "./utils";
+import { scriptEvents } from "./lists/scriptevents";
 
 export class nwnScriptEvents extends HTMLElement {
   constructor() {
@@ -10,7 +11,7 @@ export class nwnScriptEvents extends HTMLElement {
       return;
     }
 
-    const fieldList = events.find((e) => e.resource === resType)?.events;
+    const fieldList = scriptEvents.find((e) => e.resource === resType)?.events;
 
     if (!fieldList) {
       return;
@@ -67,10 +68,3 @@ export class nwnScriptEvents extends HTMLElement {
     }
   }
 }
-
-const events = [
-  {
-    resource: "git",
-    events: ["OnEnter", "OnExit", "OnHeartBeat", "OnUserDefined"],
-  },
-];
