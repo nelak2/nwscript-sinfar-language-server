@@ -47,6 +47,7 @@ export class nwnNumberField extends HTMLElement {
       case "distance":
         numberField.setAttribute("min", "0");
         numberField.setAttribute("max", "1000");
+        numberField.setAttribute("step", "0.1");
         numberField.style.width = "100px";
         numberField.value = 0;
         numberField.formatOptions = { style: "unit", unit: "m" };
@@ -54,6 +55,43 @@ export class nwnNumberField extends HTMLElement {
       case "skill":
         numberField.setAttribute("min", "0");
         numberField.setAttribute("max", "127");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
+      case "byte":
+        numberField.setAttribute("min", "0");
+        numberField.setAttribute("max", "255");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
+      case "char":
+        numberField.setAttribute("min", "0");
+        numberField.setAttribute("max", "127");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
+      case "short":
+        numberField.setAttribute("min", "0");
+        numberField.setAttribute("max", "32767");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
+      case "int":
+        numberField.setAttribute("min", "0");
+        numberField.setAttribute("max", "999999999");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
+      case "word":
+        numberField.setAttribute("min", "0");
+        numberField.setAttribute("max", "65535");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
+      case "float":
+        numberField.setAttribute("min", "-999999999");
+        numberField.setAttribute("max", "999999999");
+        numberField.setAttribute("step", "0.01");
         numberField.style.width = "100px";
         numberField.value = 0;
         break;
