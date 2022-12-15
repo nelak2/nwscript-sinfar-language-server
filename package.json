@@ -176,6 +176,10 @@
       {
         "command": "sinfar.editGit",
         "title": "Edit Area - GIT"
+      },
+      {
+        "command": "sinfar.git.new",
+        "title": "New Area - GIT"
       }
     ],
     "menus": {
