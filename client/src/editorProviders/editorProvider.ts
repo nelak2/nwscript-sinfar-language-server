@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { disposeAll } from "./disposable";
-import { NWNDocument, NWNEdit } from "./nwnDocument";
+import { NWNDocument } from "./nwnDocument";
 import { getUri } from "./utils";
 import { WebviewCollection } from "./webviewCollection";
 import fs from "fs";
@@ -41,13 +41,7 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
   ): Promise<NWNDocument> {
     const document: NWNDocument = await NWNDocument.create(uri, openContext.backupId, {
       getFileData: async () => {
-        const webviewsForDocument = Array.from(this.webviews.get(document.uri));
-        if (!webviewsForDocument.length) {
-          throw new Error("Could not find webview to save for");
-        }
-        const panel = webviewsForDocument[0];
-        const response = await this.postMessageWithResponse<any>(panel, "getFileData", {});
-        return response;
+        return document.documentData;
       },
     });
 
@@ -67,9 +61,11 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
       document.onDidChangeContent((e) => {
         // Update all webviews when the document changes
         for (const webviewPanel of this.webviews.get(document.uri)) {
-          this.postMessage(webviewPanel, "update", {
-            edits: e.edits,
-            content: e.content,
+          void webviewPanel.webview.postMessage({
+            type: "update",
+            field: e.field,
+            newValue: e.newValue,
+            oldValue: e.oldValue,
           });
         }
       }),
@@ -94,22 +90,15 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
     };
     webviewPanel.webview.html = await this.getHtmlForWebview(webviewPanel.webview);
 
-    webviewPanel.webview.onDidReceiveMessage((e) => this.onMessage(document, e));
-
     // Wait for the webview to be properly ready before we init
-    webviewPanel.webview.onDidReceiveMessage((e) => {
-      if (e.type === "ready") {
-        if (document.uri.scheme === "untitled") {
-          this.postMessage(webviewPanel, "init", {
-            untitled: true,
-            editable: true,
-          });
-        } else {
-          this.postMessage(webviewPanel, "init", {
-            value: document.documentData,
-            editable: true,
-          });
-        }
+    webviewPanel.webview.onDidReceiveMessage((message) => {
+      switch (message.type) {
+        case "ready":
+          void webviewPanel.webview.postMessage({ type: "init", content: document.documentData });
+          break;
+        case "update":
+          document.makeEdit({ field: message.field, newValue: message.newValue, oldValue: message.oldValue });
+          break;
       }
     });
   }
@@ -188,21 +177,24 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
     return await p;
   }
 
-  private postMessage(panel: vscode.WebviewPanel, type: string, body: any): void {
-    void panel.webview.postMessage({ type, body });
-  }
+  //   private onMessage(document: NWNDocument, message: any) {
+  //     switch (message.type) {
+  //       case "update":
+  //         document.makeEdit(message as NWNEdit);
+  //         return;
 
-  private onMessage(document: NWNDocument, message: any) {
-    switch (message.type) {
-      case "update":
-        document.makeEdit(message as NWNEdit);
-        return;
-
-      case "response": {
-        const callback = this._callbacks.get(message.requestId);
-        callback?.(message.body);
-        return;
-      }
-    }
-  }
+  //       case "response": {
+  //         const callback = this._callbacks.get(message.requestId);
+  //         callback?.(message.body);
+  //         return;
+  //       }
+  //     }
+  //   }
 }
+
+/// /////////////////////
+// TODO RESTORE THE GET DOCUMENT DATA METHOD FROM THE VIEWS
+// This will ensure the editorProvider and nwnDocument classes don't
+// actually need to know anything about the specific nwn resources
+// That all stays contained in the views
+/// /////////////////////

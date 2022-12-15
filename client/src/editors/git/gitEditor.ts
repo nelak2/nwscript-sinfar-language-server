@@ -8,7 +8,7 @@ let content: any;
 let initialized = false;
 
 window.addEventListener("load", main);
-window.addEventListener("save", save);
+// window.addEventListener("save", save);
 window.addEventListener("message", InboundMessageHandler);
 
 function main() {
@@ -18,40 +18,38 @@ function main() {
   //   testButton.addEventListener("click", handleTestClick);
   // }
 
-  const saveButton = document.getElementById("saveButton");
-  if (saveButton) {
-    saveButton.addEventListener("click", save);
-  }
+  // const saveButton = document.getElementById("saveButton");
+  // if (saveButton) {
+  //   saveButton.addEventListener("click", save);
+  // }
+
+  // let vscode know that we are ready
+  vscode.postMessage({ type: "ready" });
 }
 
-// function requestScriptFields(resourceType: string) {
-//   vscode.postMessage({ command: "getScriptFields", text: resourceType });
-//   console.log("requestScriptFields");
-// }
-
-// function handleTestClick() {
-//   // const state: any = vscode.getState();
-//   const testButton = document.getElementById("testButton");
-//   if (testButton) {
-//     testButton.textContent = "Aha!";
-//   }
-//   vscode.postMessage({
-//     command: "getScriptFields",
-//     text: "git",
-//   });
-// }
-
 function onEditableFieldChange(e: any) {
-  // content.resData[1].AreaProperties[1][1][field][1]);
-  if (e) {
-    vscode.postMessage({
-      command: "update",
-      field: (<string>e.target.id).substring(4),
-      value: e.target.value,
-    });
-    const testp = document.body.appendChild(document.createElement("p"));
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    testp.innerText = e.target.id + " " + e.target.value;
+  const field = (<string>e.target.id).substring(4);
+  const newValue = e.target.value;
+
+  const testp = document.body.appendChild(document.createElement("p"));
+  try {
+    const oldValue = content.resData[1].AreaProperties[1][1][field][1];
+    content.resData[1].AreaProperties[1][1][field][1] = newValue;
+
+    if (e) {
+      vscode.postMessage({
+        type: "update",
+        field,
+        newValue,
+        oldValue,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
+      testp.innerText = `Field: ${field} Old: ${oldValue} New: ${newValue}`;
+    }
+  } catch {
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
+    testp.innerText = `ERROR: Field: ${field} New: ${newValue}`;
   }
 }
 
@@ -61,59 +59,75 @@ function InboundMessageHandler(event: any) {
     const messageType = message.type;
     const test3 = document.body.appendChild(document.createElement("p"));
     switch (messageType) {
-      case "update":
-        try {
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-          test3.innerText = "UPDATE RECEIVED:" + message.text;
-          content = JSON.parse(message.text);
-          LoadValues();
+      case "init":
+        test3.innerText = "UPDATE RECEIVED:" + JSON.stringify(message);
+        content = message.content;
+        InitHTMLElements();
 
-          if (!initialized) {
-            BindListeners();
-          }
-          // test3.innerText = "Data: " + JSON.stringify(content);
-        } catch {
-          // test3.innerText = "Data: failed to parse";
+        if (!initialized) {
+          BindListeners();
         }
         break;
-      // case "scriptFields":
-      //   generateScriptFields(message.scriptFields);
-      //   break;
+      case "update":
+        content.resData[1].AreaProperties[1][1][message.field][1] = message.newValue;
+        UpdateHTMLElementValue(message.field, message.newValue);
+        test3.innerText = "UPDATE RECEIVED:" + JSON.stringify(message);
+        break;
     }
   }
 }
 
-function save() {
-  const editableFields = content.extraData.editableFields;
-  for (const field of editableFields) {
-    const element = document.getElementById("res_" + <string>field);
+function UpdateHTMLElementValue(field: string, newValue: string) {
+  const element = document.getElementById("res_" + field);
 
-    if (!element) {
-      console.log("Element not found: " + <string>field);
-      return;
-    }
+  if (element) {
+    // Make sure the event listener doesn't fire when we update the value and create an infinite loop
+    element.removeEventListener("change", onEditableFieldChange);
 
     if (element.tagName.startsWith("VSCODE")) {
-      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
+      element.setAttribute("current-value", newValue);
     } else if (element.tagName.startsWith("SP")) {
-      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
+      element.setAttribute("value", newValue);
     }
+
+    // Rebind the event listener
+    element.addEventListener("change", onEditableFieldChange);
+  } else {
+    console.log("Element not found: " + field);
   }
-  const varTableElement = <nwnVariables>document.getElementById("res_variableTable");
-  if (!varTableElement) {
-    console.log("Element not found: res_variableTable");
-  }
-
-  const varTable = varTableElement.getVarTable();
-  content.resData[1].VarTable = varTable;
-
-  console.log(content);
-
-  vscode.postMessage({
-    command: "save",
-    text: JSON.stringify(content),
-  });
 }
+
+// function save() {
+//   const editableFields = content.extraData.editableFields;
+//   for (const field of editableFields) {
+//     const element = document.getElementById("res_" + <string>field);
+
+//     if (!element) {
+//       console.log("Element not found: " + <string>field);
+//       return;
+//     }
+
+//     if (element.tagName.startsWith("VSCODE")) {
+//       content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
+//     } else if (element.tagName.startsWith("SP")) {
+//       content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
+//     }
+//   }
+//   const varTableElement = <nwnVariables>document.getElementById("res_variableTable");
+//   if (!varTableElement) {
+//     console.log("Element not found: res_variableTable");
+//   }
+
+//   const varTable = varTableElement.getVarTable();
+//   content.resData[1].VarTable = varTable;
+
+//   console.log(content);
+
+//   vscode.postMessage({
+//     command: "type",
+//     text: JSON.stringify(content),
+//   });
+// }
 
 function BindListeners() {
   const editableFields = content.extraData.editableFields;
@@ -130,26 +144,11 @@ function BindListeners() {
   initialized = true;
 }
 
-function LoadValues() {
+function InitHTMLElements() {
   // Set simple fields
   const editableFields = content.extraData.editableFields;
   for (const field of editableFields) {
-    const element = document.getElementById("res_" + <string>field);
-
-    if (!element) {
-      console.log("Element not found: " + <string>field);
-      return;
-    }
-
-    if (element.tagName.startsWith("VSCODE")) {
-      element.setAttribute("current-value", content.resData[1].AreaProperties[1][1][field][1]);
-    } else if (element.tagName.startsWith("SP")) {
-      element.setAttribute("value", content.resData[1].AreaProperties[1][1][field][1]);
-    } else if (element.tagName.startsWith("NWN")) {
-      element.setAttribute("current-value", content.resData[1].AreaProperties[1][1][field][1]);
-    } else {
-      element.setAttribute("value", content.resData[1].AreaProperties[1][1][field][1]);
-    }
+    UpdateHTMLElementValue(field, content.resData[1].AreaProperties[1][1][field][1]);
   }
 
   // Set variable table

@@ -6,7 +6,8 @@ import { ERF } from "../api/types";
 
 export type NWNEdit = {
   readonly field: string;
-  readonly value: string;
+  readonly newValue: string;
+  readonly oldValue: string;
 };
 
 type NWNDocumentDelegate = {
@@ -80,8 +81,9 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
    */
   private readonly _onDidChangeDocument = this._register(
     new vscode.EventEmitter<{
-      readonly content?: string;
-      readonly edits: readonly NWNEdit[];
+      readonly field: string;
+      readonly newValue: string;
+      readonly oldValue: string;
     }>(),
   );
 
@@ -103,15 +105,20 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
     this._onDidChange.fire({
       label: "Edit",
       undo: async () => {
-        this._edits.pop();
+        const previous = this._edits.pop();
+        if (!previous) return;
         this._onDidChangeDocument.fire({
-          edits: this._edits,
+          field: previous.field,
+          newValue: previous.oldValue,
+          oldValue: previous.newValue,
         });
       },
       redo: async () => {
         this._edits.push(edit);
         this._onDidChangeDocument.fire({
-          edits: this._edits,
+          field: edit.field,
+          newValue: edit.newValue,
+          oldValue: edit.oldValue,
         });
       },
     });
@@ -146,19 +153,8 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
     });
   }
 
-  // backup the edited document
-  // used by vscode to implement hot exit (exiting without saving)
   async backup(destination: vscode.Uri, cancellation: vscode.CancellationToken): Promise<vscode.CustomDocumentBackup> {
-    // save file locally rather than to the server
-    const extensionPath = vscode.extensions.getExtension("NelaK.nwscript-sinfar-scripters-extension")?.extensionPath;
-    if (!extensionPath) {
-      console.log("Extension path not found");
-      return { id: destination.toString(), delete: async () => {} };
-    }
-
-    const localCachePath = vscode.Uri.file(`${extensionPath}/localCache/${path.parse(destination.fsPath).base}`);
-
-    await this.saveAs(localCachePath, cancellation);
+    await this.saveAs(destination, cancellation);
 
     return {
       id: destination.toString(),
