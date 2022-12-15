@@ -97,10 +97,6 @@ function save() {
       content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
     } else if (element.tagName.startsWith("SP")) {
       content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
-    } else if (element.tagName.startsWith("NWN")) {
-      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
-    } else {
-      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
     }
   }
   const varTableElement = <nwnVariables>document.getElementById("res_variableTable");
