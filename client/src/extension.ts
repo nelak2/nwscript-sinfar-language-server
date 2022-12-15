@@ -8,7 +8,8 @@ import { ExtensionContext } from "vscode";
 import { SinfarFS } from "./providers/fileSystemProvider";
 import { CookieAuthenticationProvider } from "./providers/authProvider";
 import { SinfarAPI } from "./api/sinfarAPI";
-import { GitEditorProvider } from "./editorProviders/gitEditorProvider";
+// import { GitEditorProvider } from "./editorProviders/gitEditorProvider";
+import { EditorProvider } from "./editorProviders/editorProvider";
 import { ERF } from "./api/types";
 
 let client: LanguageClient;
@@ -25,7 +26,8 @@ export async function activate(context: ExtensionContext) {
 }
 
 export async function InitEditors(context: ExtensionContext) {
-  context.subscriptions.push(GitEditorProvider.register(context));
+  // context.subscriptions.push(GitEditorProvider.register(context));
+  context.subscriptions.push(EditorProvider.register(context));
 }
 
 export function InitLSP(context: ExtensionContext) {
