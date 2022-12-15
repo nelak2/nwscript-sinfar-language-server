@@ -3,11 +3,11 @@ export type DropdownListItem = {
   label: string;
 };
 
-export { SkyBoxes } from "./skyboxes";
-export { LoadScreens } from "./loadscreens";
-export { AmbientSounds } from "./ambientsounds";
+export { SkyBoxes } from "./skyBoxes";
+export { LoadScreens } from "./loadScreens";
+export { AmbientSounds } from "./ambientSounds";
 export { Music } from "./music";
-export { EnvironmentalEffects } from "./environmentaleffects";
+export { EnvironmentalEffects } from "./environmentalEffects";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
