@@ -45,7 +45,7 @@ function onEditableFieldChange(e: any) {
       });
 
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-      testp.innerText = `Field: ${field} Old: ${oldValue} New: ${newValue}`;
+      testp.innerText = `SENT Field: ${field} Old: ${oldValue} New: ${newValue}`;
     }
   } catch {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
@@ -60,9 +60,17 @@ function InboundMessageHandler(event: any) {
     const test3 = document.body.appendChild(document.createElement("p"));
     switch (messageType) {
       case "init":
-        test3.innerText = "UPDATE RECEIVED:" + JSON.stringify(message);
+        test3.innerText = ("INIT:" + JSON.stringify(message)).substring(0, 100);
         content = message.content;
         InitHTMLElements();
+
+        if (message.edits) {
+          for (const edit of message.edits) {
+            const test4 = document.body.appendChild(document.createElement("p"));
+            UpdateHTMLElementValue(edit.field, edit.newValue);
+            test4.innerText = ("UPDATE RECEIVED:" + JSON.stringify(edit)).substring(0, 100);
+          }
+        }
 
         if (!initialized) {
           BindListeners();
@@ -73,6 +81,12 @@ function InboundMessageHandler(event: any) {
         UpdateHTMLElementValue(message.field, message.newValue);
         test3.innerText = "UPDATE RECEIVED:" + JSON.stringify(message);
         break;
+      case "getFileData": {
+        const test4 = document.body.appendChild(document.createElement("p"));
+        test4.innerText = "SENT getFileData:" + JSON.stringify(message).substring(0, 100);
+        getFileData(message.requestId);
+        break;
+      }
     }
   }
 }
@@ -97,37 +111,38 @@ function UpdateHTMLElementValue(field: string, newValue: string) {
   }
 }
 
-// function save() {
-//   const editableFields = content.extraData.editableFields;
-//   for (const field of editableFields) {
-//     const element = document.getElementById("res_" + <string>field);
+function getFileData(requestId: number = -1) {
+  const editableFields = content.extraData.editableFields;
+  for (const field of editableFields) {
+    const element = document.getElementById("res_" + <string>field);
 
-//     if (!element) {
-//       console.log("Element not found: " + <string>field);
-//       return;
-//     }
+    if (!element) {
+      console.log("Element not found: " + <string>field);
+      return;
+    }
 
-//     if (element.tagName.startsWith("VSCODE")) {
-//       content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
-//     } else if (element.tagName.startsWith("SP")) {
-//       content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
-//     }
-//   }
-//   const varTableElement = <nwnVariables>document.getElementById("res_variableTable");
-//   if (!varTableElement) {
-//     console.log("Element not found: res_variableTable");
-//   }
+    if (element.tagName.startsWith("VSCODE")) {
+      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
+    } else if (element.tagName.startsWith("SP")) {
+      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
+    }
+  }
+  const varTableElement = <nwnVariables>document.getElementById("res_variableTable");
+  if (!varTableElement) {
+    console.log("Element not found: res_variableTable");
+  }
 
-//   const varTable = varTableElement.getVarTable();
-//   content.resData[1].VarTable = varTable;
+  const varTable = varTableElement.getVarTable();
+  content.resData[1].VarTable = varTable;
 
-//   console.log(content);
+  console.log(content);
 
-//   vscode.postMessage({
-//     command: "type",
-//     text: JSON.stringify(content),
-//   });
-// }
+  vscode.postMessage({
+    type: "getFileData",
+    content,
+    requestId,
+  });
+}
 
 function BindListeners() {
   const editableFields = content.extraData.editableFields;

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import * as vscode from "vscode";
 import { Disposable } from "./disposable";
-import * as path from "path";
 import { ERF } from "../api/types";
 
 export type NWNEdit = {
@@ -63,6 +62,10 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
     return this._documentData;
   }
 
+  public get edits(): Array<NWNEdit> {
+    return this._edits;
+  }
+
   /**
    * Handle disposal events
    */
@@ -78,12 +81,23 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
 
   /**
    * Handle document change events
+   * @param type is the type of change
+   * @param field is the field that was changed
+   * @param newValue is the new value of the field
+   * @param oldValue is the old value of the field
+   * @param content is the entire document (only used for revert)
+   * @param edits is the list of edits (only used for revert)
+   * @param origin is the originating webview (to prevent infinite loops)
    */
   private readonly _onDidChangeDocument = this._register(
     new vscode.EventEmitter<{
-      readonly field: string;
-      readonly newValue: string;
-      readonly oldValue: string;
+      readonly type: string;
+      readonly field?: string;
+      readonly newValue?: string;
+      readonly oldValue?: string;
+      readonly edits?: Array<NWNEdit>;
+      readonly origin?: vscode.Webview;
+      readonly content?: any;
     }>(),
   );
 
@@ -99,8 +113,23 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
 
   public readonly onDidChange = this._onDidChange.event;
 
-  makeEdit(edit: NWNEdit) {
+  /**
+   * Apply edits to the document and trigger events
+   * @param edit is the edit to make
+   * @param origin originating webpanel to prevent infinite loops
+   */
+  makeEdit(edit: NWNEdit, origin?: vscode.Webview): void {
     this._edits.push(edit);
+
+    if (origin) {
+      this._onDidChangeDocument.fire({
+        type: "update",
+        field: edit.field,
+        newValue: edit.newValue,
+        oldValue: edit.oldValue,
+        origin,
+      });
+    }
 
     this._onDidChange.fire({
       label: "Edit",
@@ -108,6 +137,7 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
         const previous = this._edits.pop();
         if (!previous) return;
         this._onDidChangeDocument.fire({
+          type: "undo",
           field: previous.field,
           newValue: previous.oldValue,
           oldValue: previous.newValue,
@@ -116,6 +146,7 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
       redo: async () => {
         this._edits.push(edit);
         this._onDidChangeDocument.fire({
+          type: "redo",
           field: edit.field,
           newValue: edit.newValue,
           oldValue: edit.oldValue,
@@ -148,6 +179,7 @@ export class NWNDocument extends Disposable implements vscode.CustomDocument {
     this._documentData = diskContent;
     this._edits = this._savedEdits;
     this._onDidChangeDocument.fire({
+      type: "revert",
       content: diskContent,
       edits: this._edits,
     });

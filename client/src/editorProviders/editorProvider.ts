@@ -21,14 +21,11 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
     });
 
     return vscode.window.registerCustomEditorProvider(EditorProvider.viewType, new EditorProvider(context), {
-      // For this demo extension, we enable `retainContextWhenHidden` which keeps the
-      // webview alive even when it is not visible. You should avoid using this setting
-      // unless is absolutely required as it does have memory overhead.
       webviewOptions: {
-        retainContextWhenHidden: true,
+        retainContextWhenHidden: false,
+        enableFindWidget: true,
       },
-      // TODO set to true when we support multiple editors per document
-      supportsMultipleEditorsPerDocument: false,
+      supportsMultipleEditorsPerDocument: true,
     });
   }
 
@@ -41,7 +38,14 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
   ): Promise<NWNDocument> {
     const document: NWNDocument = await NWNDocument.create(uri, openContext.backupId, {
       getFileData: async () => {
-        return document.documentData;
+        const webviewsForDocument = Array.from(this.webviews.get(document.uri));
+        if (!webviewsForDocument.length) {
+          throw new Error("Could not find webview for document");
+        }
+
+        const panel = webviewsForDocument[0];
+        const response = await this.postMessageWithResponse<any>(panel, "getFileData", {});
+        return response;
       },
     });
 
@@ -59,10 +63,14 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
 
     listeners.push(
       document.onDidChangeContent((e) => {
-        // Update all webviews when the document changes
+        // Update all webviews when we receive a undo/redo event
         for (const webviewPanel of this.webviews.get(document.uri)) {
+          if (e.origin && e.origin === webviewPanel.webview) {
+            // skip the origin of the event
+            continue;
+          }
           void webviewPanel.webview.postMessage({
-            type: "update",
+            type: e.type,
             field: e.field,
             newValue: e.newValue,
             oldValue: e.oldValue,
@@ -90,14 +98,29 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
     };
     webviewPanel.webview.html = await this.getHtmlForWebview(webviewPanel.webview);
 
+    // callback used for getFileData
+    let callback: any;
+
     // Wait for the webview to be properly ready before we init
     webviewPanel.webview.onDidReceiveMessage((message) => {
       switch (message.type) {
         case "ready":
-          void webviewPanel.webview.postMessage({ type: "init", content: document.documentData });
+          void webviewPanel.webview.postMessage({ type: "init", content: document.documentData, edits: document.edits });
           break;
         case "update":
-          document.makeEdit({ field: message.field, newValue: message.newValue, oldValue: message.oldValue });
+          // update document and edits array
+          document.makeEdit(
+            {
+              field: message.field,
+              newValue: message.newValue,
+              oldValue: message.oldValue,
+            },
+            webviewPanel.webview,
+          );
+          break;
+        case "getFileData":
+          callback = this._callbacks.get(message.requestId);
+          callback?.(message.content);
           break;
       }
     });
@@ -176,25 +199,4 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
     void panel.webview.postMessage({ type, requestId, body });
     return await p;
   }
-
-  //   private onMessage(document: NWNDocument, message: any) {
-  //     switch (message.type) {
-  //       case "update":
-  //         document.makeEdit(message as NWNEdit);
-  //         return;
-
-  //       case "response": {
-  //         const callback = this._callbacks.get(message.requestId);
-  //         callback?.(message.body);
-  //         return;
-  //       }
-  //     }
-  //   }
 }
-
-/// /////////////////////
-// TODO RESTORE THE GET DOCUMENT DATA METHOD FROM THE VIEWS
-// This will ensure the editorProvider and nwnDocument classes don't
-// actually need to know anything about the specific nwn resources
-// That all stays contained in the views
-/// /////////////////////
