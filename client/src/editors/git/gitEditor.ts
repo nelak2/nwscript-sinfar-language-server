@@ -1,4 +1,4 @@
-import { InitializeNWNControls } from "../../components";
+import { InitializeNWNControls, nwnScriptEvents } from "../../components";
 import { nwnVariables } from "../../components/nwnVariables";
 
 const vscode = acquireVsCodeApi();
@@ -8,7 +8,6 @@ let content: any;
 let initialized = false;
 
 window.addEventListener("load", main);
-// window.addEventListener("save", save);
 window.addEventListener("message", InboundMessageHandler);
 
 function main() {
@@ -28,28 +27,68 @@ function main() {
 }
 
 function onEditableFieldChange(e: any) {
+  const fieldtype = (<string>e.target.id).substring(0, 3);
   const field = (<string>e.target.id).substring(4);
   const newValue = e.target.value;
 
   const testp = document.body.appendChild(document.createElement("p"));
   try {
-    const oldValue = content.resData[1].AreaProperties[1][1][field][1];
-    content.resData[1].AreaProperties[1][1][field][1] = newValue;
+    switch (fieldtype) {
+      case "res": {
+        const oldValue = content.resData[1].AreaProperties[1][1][field][1];
+        content.resData[1].AreaProperties[1][1][field][1] = newValue;
 
-    if (e) {
-      vscode.postMessage({
-        type: "update",
-        field,
-        newValue,
-        oldValue,
-      });
+        if (e) {
+          vscode.postMessage({
+            type: "update",
+            field,
+            newValue,
+            oldValue,
+          });
 
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-      testp.innerText = `SENT Field: ${field} Old: ${oldValue} New: ${newValue}`;
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
+          testp.innerText = `SENT Field: ${field} Old: ${oldValue} New: ${newValue}`;
+        }
+        break;
+      }
+      case "evt": {
+        const oldValue = content.resData[1][field][1];
+        content.resData[1][field][1] = newValue;
+
+        if (e) {
+          vscode.postMessage({
+            type: "update",
+            field,
+            newValue,
+            oldValue,
+          });
+
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
+          testp.innerText = `SENT Field: ${field} Old: ${oldValue} New: ${newValue}`;
+        }
+        break;
+      }
+      case "var": {
+        if (e.target instanceof nwnVariables) {
+          const oldValue = content.resData[1].VarTable;
+          content.resData[1].VarTable = e.getVarTable();
+
+          vscode.postMessage({
+            type: "update_var_table",
+            field,
+            newValue,
+            oldValue,
+          });
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
+          testp.innerText = `SENT VarTable: ${field} Old: ${oldValue} New: ${newValue}`;
+        }
+        break;
+      }
     }
   } catch {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
     testp.innerText = `ERROR: Field: ${field} New: ${newValue}`;
+    console.log(content.resData);
   }
 }
 
@@ -156,6 +195,18 @@ function BindListeners() {
 
     element.addEventListener("change", onEditableFieldChange);
   }
+
+  // Bind the script event fields
+  const scriptEventElement = document.getElementById("ScriptEvents");
+  if (scriptEventElement && scriptEventElement instanceof nwnScriptEvents) {
+    scriptEventElement.onTextFieldChanged(onEditableFieldChange);
+  }
+  // Bind the variable table
+  const varTableElement = document.getElementById("VarTable");
+  if (varTableElement) {
+    varTableElement.addEventListener("change", onEditableFieldChange);
+  }
+
   initialized = true;
 }
 

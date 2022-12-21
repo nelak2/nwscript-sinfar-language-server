@@ -2,6 +2,10 @@ import { buildLabel, buildDiv } from "./utils";
 import { scriptEvents } from "./lists/scriptevents";
 
 export class nwnScriptEvents extends HTMLElement {
+  private readonly _fields: Array<HTMLElement> = [];
+  private readonly _buttons: Array<HTMLElement> = [];
+  prefix = "evt_";
+
   constructor() {
     super();
 
@@ -18,7 +22,7 @@ export class nwnScriptEvents extends HTMLElement {
     }
 
     for (const field of fieldList) {
-      const label = buildLabel(field, field + "_text");
+      const label = buildLabel(field, this.prefix + field);
       const divColLabel = buildDiv("col-label");
       divColLabel.appendChild(label);
 
@@ -39,7 +43,7 @@ export class nwnScriptEvents extends HTMLElement {
     span.className = "codicon codicon-go-to-file";
 
     const button = document.createElement("vscode-button");
-    button.id = id + "_button";
+    button.id = this.prefix + id + "_btn";
     button.setAttribute("appearance", "icon");
     button.setAttribute("aria-label", "Goto File");
     button.appendChild(span);
@@ -50,10 +54,25 @@ export class nwnScriptEvents extends HTMLElement {
     section.appendChild(button);
 
     const textField = document.createElement("vscode-text-field");
-    textField.id = id + "_text";
+    textField.id = this.prefix + id;
     textField.appendChild(section);
 
+    this._fields.push(textField);
+    this._buttons.push(button);
+
     return textField;
+  }
+
+  public onTextFieldChanged(listener: (e: any) => void) {
+    for (const field of this._fields) {
+      field.addEventListener("change", listener);
+    }
+  }
+
+  public onGotoButtonClicked(listener: (e: any) => void) {
+    for (const button of this._buttons) {
+      button.addEventListener("click", listener);
+    }
   }
 
   get resourceType() {
