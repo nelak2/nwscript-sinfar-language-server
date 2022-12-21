@@ -70,6 +70,10 @@ export class nwnVariables extends HTMLElement {
     this.refreshVariables();
   }
 
+  onChildChanged(e: Event) {
+    this.dispatchEvent(new CustomEvent("varTableChanged", { bubbles: true, composed: true, cancelable: true }));
+  }
+
   addVariable(textFieldName: HTMLElement, dropdownType: HTMLElement, textFieldValue: HTMLElement) {
     // check if variable already exists
     const name = textFieldName.getAttribute("current-value") || "";
