@@ -55,6 +55,36 @@ export class ResData {
   public get data() {
     return this._data;
   }
+
+  public static getEditorType(resName: string): EditorTypes {
+    const resType = resName.split(".")[1];
+    switch (resType) {
+      case "are":
+        return EditorTypes.ARE;
+      case "git":
+        return EditorTypes.GIT;
+      case "utc":
+        return EditorTypes.UTC;
+      case "utd":
+        return EditorTypes.UTD;
+      case "utp":
+        return EditorTypes.UTP;
+      case "utt":
+        return EditorTypes.UTT;
+      case "utw":
+        return EditorTypes.UTW;
+      case "uts":
+        return EditorTypes.UTS;
+      case "ute":
+        return EditorTypes.UTE;
+      case "utm":
+        return EditorTypes.UTM;
+      case "uti":
+        return EditorTypes.UTI;
+    }
+
+    throw new Error("Unknown Editor Type");
+  }
 }
 
 class Are {
