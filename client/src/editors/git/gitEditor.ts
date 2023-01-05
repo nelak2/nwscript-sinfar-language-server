@@ -9,6 +9,10 @@ let initialized = false;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
+window.addEventListener("alert", (e: Event) => {
+  const message = (e as CustomEvent).detail;
+  vscode.postMessage({ type: "alert", message });
+});
 
 function main() {
   // requestScriptFields("git");
@@ -32,6 +36,11 @@ function onEditableFieldChange(e: any) {
   const newValue = e.target.value;
 
   const testp = document.body.appendChild(document.createElement("p"));
+
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  console.log(`Event on Field: ${field} New Value: ${newValue} Field Type: ${fieldtype}`);
+  // console.log(e);
+
   try {
     switch (fieldtype) {
       case "res": {
@@ -69,19 +78,51 @@ function onEditableFieldChange(e: any) {
         break;
       }
       case "var": {
-        if (e.target instanceof nwnVariables) {
-          const oldValue = content.resData[1].VarTable;
-          content.resData[1].VarTable = e.getVarTable();
-
-          vscode.postMessage({
-            type: "update_var_table",
-            field,
-            newValue,
-            oldValue,
-          });
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-          testp.innerText = `SENT VarTable: ${field} Old: ${oldValue} New: ${newValue}`;
+        const varTable = <nwnVariables>document.getElementById("VarTable");
+        if (!varTable) {
+          console.log("No VarTable found!");
+          return;
         }
+
+        const varTableUpdateType = (<string>e.target.id).split("_")[1];
+        console.log(`VarTable Update Type: ${varTableUpdateType}`);
+
+        switch (varTableUpdateType) {
+          case "name": {
+            console.log("Update Name");
+            break;
+          }
+          case "type": {
+            console.log("Update Type");
+            break;
+          }
+          case "value": {
+            console.log("Update Value");
+            break;
+          }
+          case "add": {
+            console.log("Add Variable");
+            break;
+          }
+          case "del": {
+            console.log("Delete Variable");
+            break;
+          }
+        }
+
+        const oldValue = content.resData[1].VarTable;
+        const newVarTable = varTable.getVarTable();
+        content.resData[1].VarTable = newVarTable;
+
+        vscode.postMessage({
+          type: "update_var_table",
+          field,
+          newVarTable,
+          oldValue,
+        });
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
+        testp.innerText = `SENT VarTable: ${newVarTable} Old: ${oldValue}`;
+
         break;
       }
     }
@@ -166,9 +207,10 @@ function getFileData(requestId: number = -1) {
       content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
     }
   }
-  const varTableElement = <nwnVariables>document.getElementById("res_variableTable");
+  const varTableElement = <nwnVariables>document.getElementById("VarTable");
   if (!varTableElement) {
-    console.log("Element not found: res_variableTable");
+    console.log("Element not found: VarTable");
+    return;
   }
 
   const varTable = varTableElement.getVarTable();
@@ -219,7 +261,7 @@ function InitHTMLElements() {
 
   // Set variable table
   const varTable = content.resData[1].VarTable[1];
-  document.getElementById("res_variableTable")?.setAttribute("current-value", JSON.stringify(varTable));
+  document.getElementById("VarTable")?.setAttribute("current-value", JSON.stringify(varTable));
 }
 
 // res_AmbientSndDay

@@ -122,6 +122,9 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
           callback = this._callbacks.get(message.requestId);
           callback?.(message.content);
           break;
+        case "alert":
+          void vscode.window.showErrorMessage(message.content);
+          break;
       }
     });
   }
