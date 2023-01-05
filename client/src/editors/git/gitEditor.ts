@@ -39,7 +39,6 @@ function onEditableFieldChange(e: any) {
 
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   console.log(`Event on Field: ${field} New Value: ${newValue} Field Type: ${fieldtype}`);
-  // console.log(e);
 
   try {
     switch (fieldtype) {
@@ -171,7 +170,7 @@ function InboundMessageHandler(event: any) {
           UpdateVarTable(message.field, message.newValue);
         } else if (updateType === "evt") {
           UpdateEventTable(message.field, message.newValue);
-        } else if (updateType === "res") {
+        } else {
           content.resData[1].AreaProperties[1][1][message.field][1] = message.newValue;
           UpdateHTMLElementValue(message.field, message.newValue);
         }
