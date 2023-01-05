@@ -190,6 +190,11 @@ export class nwnVariables extends HTMLElement {
 
     // Dispatch event to notify parent that variable table has changed
     e.target?.dispatchEvent(new Event("change", { bubbles: true, composed: true, cancelable: true }));
+
+    // Reset fields
+    textFieldName.setAttribute("current-value", "");
+    dropdownType.setAttribute("current-value", "3");
+    textFieldValue.setAttribute("current-value", "");
   }
 
   deleteVariable(e: Event, variableRow: HTMLElement) {
