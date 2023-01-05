@@ -4,7 +4,7 @@ import { scriptEvents } from "./lists/scriptevents";
 export class nwnScriptEvents extends HTMLElement {
   private readonly _fields: Array<HTMLElement> = [];
   private readonly _buttons: Array<HTMLElement> = [];
-  prefix = "evt_";
+  prefix = "res_";
 
   constructor() {
     super();
