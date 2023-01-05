@@ -135,7 +135,6 @@ function onEditableFieldChange(e: any) {
   } catch (e: any) {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
     testp.innerText = `ERROR: Field: ${field} New: ${newValue}`;
-    console.log(content.resData);
     console.log(e);
   }
 }
@@ -145,45 +144,40 @@ function InboundMessageHandler(event: any) {
   if (event.type === "message" && message) {
     const messageType = message.type;
     const test3 = document.body.appendChild(document.createElement("p"));
-    switch (messageType) {
-      case "init":
-        test3.innerText = ("INIT:" + JSON.stringify(message)).substring(0, 100);
-        content = message.content;
-        InitHTMLElements();
 
-        if (message.edits) {
-          for (const edit of message.edits) {
-            const test4 = document.body.appendChild(document.createElement("p"));
-            UpdateHTMLElementValue(edit.field, edit.newValue);
-            test4.innerText = ("UPDATE RECEIVED:" + JSON.stringify(edit)).substring(0, 100);
-          }
-        }
+    if (messageType === "update" || messageType === "undo" || messageType === "redo") {
+      const updateType = message.field.split("_")[0];
 
-        if (!initialized) {
-          BindListeners();
-        }
-        break;
-      case "update": {
-        const updateType = message.field.split("_")[0];
-
-        if (updateType === "var") {
-          UpdateVarTable(message.field, message.newValue);
-        } else if (updateType === "evt") {
-          UpdateEventTable(message.field, message.newValue);
-        } else {
-          content.resData[1].AreaProperties[1][1][message.field][1] = message.newValue;
-          UpdateHTMLElementValue(message.field, message.newValue);
-        }
-
-        test3.innerText = "UPDATE RECEIVED:" + JSON.stringify(message);
-        break;
+      if (updateType === "var") {
+        UpdateVarTable(message.field, message.newValue);
+      } else if (updateType === "evt") {
+        UpdateEventTable(message.field, message.newValue);
+      } else {
+        content.resData[1].AreaProperties[1][1][message.field][1] = message.newValue;
+        UpdateHTMLElementValue(message.field, message.newValue);
       }
-      case "getFileData": {
-        const test4 = document.body.appendChild(document.createElement("p"));
-        test4.innerText = "SENT getFileData:" + JSON.stringify(message).substring(0, 100);
-        getFileData(message.requestId);
-        break;
+
+      test3.innerText = "UPDATE RECEIVED:" + JSON.stringify(message);
+    } else if (messageType === "init") {
+      test3.innerText = ("INIT:" + JSON.stringify(message)).substring(0, 100);
+      content = message.content;
+      InitHTMLElements();
+
+      if (message.edits) {
+        for (const edit of message.edits) {
+          const test4 = document.body.appendChild(document.createElement("p"));
+          UpdateHTMLElementValue(edit.field, edit.newValue);
+          test4.innerText = ("UPDATE RECEIVED:" + JSON.stringify(edit)).substring(0, 100);
+        }
       }
+
+      if (!initialized) {
+        BindListeners();
+      }
+    } else if (messageType === "getFileData") {
+      const test4 = document.body.appendChild(document.createElement("p"));
+      test4.innerText = "SENT getFileData:" + JSON.stringify(message).substring(0, 100);
+      getFileData(message.requestId);
     }
   }
 }
