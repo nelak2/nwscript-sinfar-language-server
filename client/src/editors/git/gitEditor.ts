@@ -84,52 +84,60 @@ function onEditableFieldChange(e: any) {
           return;
         }
 
-        const varTableUpdateType = (<string>e.target.id).split("_")[1];
-        console.log(`VarTable Update Type: ${varTableUpdateType}`);
+        const varFieldFullId = (<string>e.target.id).split("_");
+        const varTableUpdateType = varFieldFullId[1];
+        const varFieldId = varFieldFullId[2];
 
-        switch (varTableUpdateType) {
-          case "name": {
-            console.log("Update Name");
-            break;
-          }
-          case "type": {
-            console.log("Update Type");
-            break;
-          }
-          case "value": {
-            console.log("Update Value");
-            break;
-          }
-          case "add": {
-            console.log("Add Variable");
-            break;
-          }
-          case "del": {
-            console.log("Delete Variable");
-            break;
-          }
+        let newVarTable: any;
+        let oldValue: any;
+
+        if (varTableUpdateType === "name") {
+          oldValue = content.resData[1].VarTable[1][varFieldId][1].Name[1];
+          content.resData[1].VarTable[1][varFieldId][1].Name[1] = newValue;
+        } else if (varTableUpdateType === "type") {
+          oldValue = content.resData[1].VarTable[1][varFieldId][1].Type[1];
+          content.resData[1].VarTable[1][varFieldId][1].Type[1] = newValue;
+        } else if (varTableUpdateType === "value") {
+          oldValue = content.resData[1].VarTable[1][varFieldId][1].Value[1];
+          content.resData[1].VarTable[1][varFieldId][1].Value[1] = newValue;
+        } else if (varTableUpdateType === "add" || varTableUpdateType === "del") {
+          oldValue = content.resData[1].VarTable;
+
+          newVarTable = varTable.getVarTable();
+          content.resData[1].VarTable = newVarTable;
         }
 
-        const oldValue = content.resData[1].VarTable;
-        const newVarTable = varTable.getVarTable();
-        content.resData[1].VarTable = newVarTable;
+        if (varTableUpdateType === "name" || varTableUpdateType === "type" || varTableUpdateType === "value") {
+          // Don't send update if nothing changed
+          if (newValue.toString() === oldValue.toString()) {
+            return;
+          }
 
-        vscode.postMessage({
-          type: "update_var_table",
-          field,
-          newVarTable,
-          oldValue,
-        });
+          vscode.postMessage({
+            type: "update",
+            field: e.target.id,
+            newValue,
+            oldValue,
+          });
+        } else if (varTableUpdateType === "add" || varTableUpdateType === "del") {
+          vscode.postMessage({
+            type: "update",
+            field: "var_adddel",
+            newValue: newVarTable,
+            oldValue,
+          });
+        }
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
         testp.innerText = `SENT VarTable: ${newVarTable} Old: ${oldValue}`;
 
         break;
       }
     }
-  } catch {
+  } catch (e: any) {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
     testp.innerText = `ERROR: Field: ${field} New: ${newValue}`;
     console.log(content.resData);
+    console.log(e);
   }
 }
 
@@ -156,11 +164,21 @@ function InboundMessageHandler(event: any) {
           BindListeners();
         }
         break;
-      case "update":
-        content.resData[1].AreaProperties[1][1][message.field][1] = message.newValue;
-        UpdateHTMLElementValue(message.field, message.newValue);
+      case "update": {
+        const updateType = message.field.split("_")[0];
+
+        if (updateType === "var") {
+          UpdateVarTable(message.field, message.newValue);
+        } else if (updateType === "evt") {
+          UpdateEventTable(message.field, message.newValue);
+        } else if (updateType === "res") {
+          content.resData[1].AreaProperties[1][1][message.field][1] = message.newValue;
+          UpdateHTMLElementValue(message.field, message.newValue);
+        }
+
         test3.innerText = "UPDATE RECEIVED:" + JSON.stringify(message);
         break;
+      }
       case "getFileData": {
         const test4 = document.body.appendChild(document.createElement("p"));
         test4.innerText = "SENT getFileData:" + JSON.stringify(message).substring(0, 100);
@@ -170,6 +188,35 @@ function InboundMessageHandler(event: any) {
     }
   }
 }
+
+function UpdateVarTable(field: string, newValue: any) {
+  const varFieldFullId = field.split("_");
+  const varTableUpdateType = varFieldFullId[1];
+  const varFieldId = varFieldFullId[2];
+
+  // get reference to var table
+  const varTable = <nwnVariables>document.getElementById("VarTable");
+
+  // update content
+  if (varTableUpdateType === "name") {
+    content.resData[1].VarTable[1][varFieldId][1].Name[1] = newValue;
+  } else if (varTableUpdateType === "type") {
+    content.resData[1].VarTable[1][varFieldId][1].Type[1] = newValue;
+  } else if (varTableUpdateType === "value") {
+    content.resData[1].VarTable[1][varFieldId][1].Value[1] = newValue;
+  } else if (varTableUpdateType === "adddel") {
+    content.resData[1].VarTable = newValue;
+  }
+
+  // update var table
+  if (varTableUpdateType === "name" || varTableUpdateType === "type" || varTableUpdateType === "value") {
+    varTable.updateVarTable(parseInt(varFieldId), varTableUpdateType, newValue);
+  } else if (varTableUpdateType === "adddel") {
+    varTable.SetVarTable(newValue);
+  }
+}
+
+function UpdateEventTable(field: string, newValue: any) {}
 
 function UpdateHTMLElementValue(field: string, newValue: string) {
   const element = document.getElementById("res_" + field);
@@ -198,7 +245,7 @@ function getFileData(requestId: number = -1) {
 
     if (!element) {
       console.log("Element not found: " + <string>field);
-      return;
+      continue;
     }
 
     if (element.tagName.startsWith("VSCODE")) {
@@ -210,7 +257,6 @@ function getFileData(requestId: number = -1) {
   const varTableElement = <nwnVariables>document.getElementById("VarTable");
   if (!varTableElement) {
     console.log("Element not found: VarTable");
-    return;
   }
 
   const varTable = varTableElement.getVarTable();

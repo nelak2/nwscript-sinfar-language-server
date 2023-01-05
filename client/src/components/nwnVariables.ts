@@ -193,11 +193,13 @@ export class nwnVariables extends HTMLElement {
   }
 
   deleteVariable(e: Event, variableRow: HTMLElement) {
+    const name = variableRow.children[0].getAttribute("current-value") || "";
+
+    this._variables = this._variables.filter((variable) => variable.name !== name);
+
     // Dispatch event to notify parent that variable table has changed
     e.target?.dispatchEvent(new Event("change", { bubbles: true, composed: true, cancelable: true }));
 
-    const name = variableRow.children[0].getAttribute("current-value") || "";
-    this._variables = this._variables.filter((variable) => variable.name !== name);
     this.refreshVariables();
   }
 
@@ -223,6 +225,46 @@ export class nwnVariables extends HTMLElement {
     }
 
     return [15, variableArray];
+  }
+
+  public updateVarTable(varFieldId: number, varTableUpdateType: string, newValue: any) {
+    const updateField = document.getElementById(`var_${varTableUpdateType}_${varFieldId}`) as HTMLInputElement;
+    updateField.setAttribute("current-value", newValue);
+    switch (varTableUpdateType) {
+      case "name":
+        this._variables[varFieldId].name = newValue;
+        break;
+      case "type": {
+        this._variables[varFieldId].varType = newValue;
+
+        // make sure the value field in our variable array is properly formatted when the type changes
+        const formattedValue = this.formatValue(this._variables[varFieldId].value.toString(), parseInt(newValue));
+
+        this._variables[varFieldId].value = formattedValue;
+
+        // make sure the value field in the UI is properly formatted when the type changes
+        const valueField = document.getElementById(`var_value_${varFieldId}`) as HTMLInputElement;
+        valueField.setAttribute("current-value", formattedValue);
+        break;
+      }
+      case "value":
+        this._variables[varFieldId].value = newValue;
+        break;
+    }
+  }
+
+  SetVarTable(newValue: any) {
+    this._variables = [];
+
+    for (const variable of newValue[1]) {
+      this._variables.push({
+        name: variable[1].Name[1],
+        varType: variable[1].Type[1],
+        value: variable[1].Value[1],
+      });
+    }
+
+    this.refreshVariables();
   }
 
   getNWNGFFType(varType: number): number {
