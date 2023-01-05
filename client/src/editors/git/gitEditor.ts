@@ -1,11 +1,14 @@
-import { InitializeNWNControls, nwnScriptEvents } from "../../components";
+import { EditorTypes } from "../../api/types";
+import { InitializeNWNControls } from "../../components";
 import { nwnVariables } from "../../components/nwnVariables";
+import { ResData } from "../../editorProviders/resData/resdataProvider";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
 
-let content: any;
+let content: ResData;
 let initialized = false;
+let _varTable: nwnVariables;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -15,17 +18,6 @@ window.addEventListener("alert", (e: Event) => {
 });
 
 function main() {
-  // requestScriptFields("git");
-  // const testButton = document.getElementById("testButton");
-  // if (testButton) {
-  //   testButton.addEventListener("click", handleTestClick);
-  // }
-
-  // const saveButton = document.getElementById("saveButton");
-  // if (saveButton) {
-  //   saveButton.addEventListener("click", save);
-  // }
-
   // let vscode know that we are ready
   vscode.postMessage({ type: "ready" });
 }
@@ -33,35 +25,19 @@ function main() {
 function onEditableFieldChange(e: any) {
   const fieldtype = (<string>e.target.id).substring(0, 3);
   const field = (<string>e.target.id).substring(4);
-  const newValue = e.target.value;
 
   const testp = document.body.appendChild(document.createElement("p"));
 
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  console.log(`Event on Field: ${field} New Value: ${newValue} Field Type: ${fieldtype}`);
+  console.log(`Event on Field: ${field} New Value: ${e.target.value} Field Type: ${fieldtype}`);
 
   try {
     switch (fieldtype) {
       case "res": {
-        const oldValue = content.resData[1].AreaProperties[1][1][field][1];
-        content.resData[1].AreaProperties[1][1][field][1] = newValue;
+        const newValue = e.target.value;
 
-        if (e) {
-          vscode.postMessage({
-            type: "update",
-            field,
-            newValue,
-            oldValue,
-          });
-
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-          testp.innerText = `SENT Field: ${field} Old: ${oldValue} New: ${newValue}`;
-        }
-        break;
-      }
-      case "evt": {
-        const oldValue = content.resData[1][field][1];
-        content.resData[1][field][1] = newValue;
+        const oldValue = content.getField(field);
+        content.setField(field, newValue);
 
         if (e) {
           vscode.postMessage({
@@ -77,64 +53,21 @@ function onEditableFieldChange(e: any) {
         break;
       }
       case "var": {
-        const varTable = <nwnVariables>document.getElementById("VarTable");
-        if (!varTable) {
-          console.log("No VarTable found!");
-          return;
-        }
-
-        const varFieldFullId = (<string>e.target.id).split("_");
-        const varTableUpdateType = varFieldFullId[1];
-        const varFieldId = varFieldFullId[2];
-
-        let newVarTable: any;
-        let oldValue: any;
-
-        if (varTableUpdateType === "name") {
-          oldValue = content.resData[1].VarTable[1][varFieldId][1].Name[1];
-          content.resData[1].VarTable[1][varFieldId][1].Name[1] = newValue;
-        } else if (varTableUpdateType === "type") {
-          oldValue = content.resData[1].VarTable[1][varFieldId][1].Type[1];
-          content.resData[1].VarTable[1][varFieldId][1].Type[1] = newValue;
-        } else if (varTableUpdateType === "value") {
-          oldValue = content.resData[1].VarTable[1][varFieldId][1].Value[1];
-          content.resData[1].VarTable[1][varFieldId][1].Value[1] = newValue;
-        } else if (varTableUpdateType === "add" || varTableUpdateType === "del") {
-          oldValue = content.resData[1].VarTable;
-
-          newVarTable = varTable.getVarTable();
-          content.resData[1].VarTable = newVarTable;
-        }
-
-        if (varTableUpdateType === "name" || varTableUpdateType === "type" || varTableUpdateType === "value") {
-          // Don't send update if nothing changed
-          if (newValue.toString() === oldValue.toString()) {
-            return;
-          }
-
-          vscode.postMessage({
-            type: "update",
-            field: e.target.id,
-            newValue,
-            oldValue,
-          });
-        } else if (varTableUpdateType === "add" || varTableUpdateType === "del") {
-          vscode.postMessage({
-            type: "update",
-            field: "var_adddel",
-            newValue: newVarTable,
-            oldValue,
-          });
-        }
+        vscode.postMessage({
+          type: "update",
+          field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-        testp.innerText = `SENT VarTable: ${newVarTable} Old: ${oldValue}`;
+        testp.innerText = `SENT VarTable: ${e.detail.newValue} Old: ${e.detail.oldValue}`;
 
         break;
       }
     }
   } catch (e: any) {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-    testp.innerText = `ERROR: Field: ${field} New: ${newValue}`;
+    testp.innerText = `ERROR: Field: ${field} New: ${e.target.value}`;
     console.log(e);
   }
 }
@@ -145,36 +78,28 @@ function InboundMessageHandler(event: any) {
     const messageType = message.type;
     const test3 = document.body.appendChild(document.createElement("p"));
 
+    // Handle update undo and redo messages
     if (messageType === "update" || messageType === "undo" || messageType === "redo") {
-      const updateType = message.field.split("_")[0];
-
-      if (updateType === "var") {
-        UpdateVarTable(message.field, message.newValue);
-      } else if (updateType === "evt") {
-        UpdateEventTable(message.field, message.newValue);
-      } else {
-        content.resData[1].AreaProperties[1][1][message.field][1] = message.newValue;
-        UpdateHTMLElementValue(message.field, message.newValue);
-      }
-
-      test3.innerText = "UPDATE RECEIVED:" + JSON.stringify(message);
-    } else if (messageType === "init") {
+      ProcessUpdateMessage(message.field, message.newValue);
+    }
+    // Handle init message
+    else if (messageType === "init") {
       test3.innerText = ("INIT:" + JSON.stringify(message)).substring(0, 100);
-      content = message.content;
+      content = new ResData(message.content, ResData.getEditorType(message.content.resName));
       InitHTMLElements();
 
       if (message.edits) {
         for (const edit of message.edits) {
-          const test4 = document.body.appendChild(document.createElement("p"));
-          UpdateHTMLElementValue(edit.field, edit.newValue);
-          test4.innerText = ("UPDATE RECEIVED:" + JSON.stringify(edit)).substring(0, 100);
+          ProcessUpdateMessage(edit.field, edit.newValue);
         }
       }
 
       if (!initialized) {
         BindListeners();
       }
-    } else if (messageType === "getFileData") {
+    }
+    // Handle file data message
+    else if (messageType === "getFileData") {
       const test4 = document.body.appendChild(document.createElement("p"));
       test4.innerText = "SENT getFileData:" + JSON.stringify(message).substring(0, 100);
       getFileData(message.requestId);
@@ -182,34 +107,30 @@ function InboundMessageHandler(event: any) {
   }
 }
 
-function UpdateVarTable(field: string, newValue: any) {
-  const varFieldFullId = field.split("_");
-  const varTableUpdateType = varFieldFullId[1];
-  const varFieldId = varFieldFullId[2];
+function ProcessUpdateMessage(field: string, newValue: any) {
+  const test4 = document.body.appendChild(document.createElement("p"));
 
-  // get reference to var table
-  const varTable = <nwnVariables>document.getElementById("VarTable");
+  const updateType = field.split("_")[0];
 
-  // update content
-  if (varTableUpdateType === "name") {
-    content.resData[1].VarTable[1][varFieldId][1].Name[1] = newValue;
-  } else if (varTableUpdateType === "type") {
-    content.resData[1].VarTable[1][varFieldId][1].Type[1] = newValue;
-  } else if (varTableUpdateType === "value") {
-    content.resData[1].VarTable[1][varFieldId][1].Value[1] = newValue;
-  } else if (varTableUpdateType === "adddel") {
-    content.resData[1].VarTable = newValue;
+  if (updateType === "var") {
+    UpdateVarTable(field, newValue);
+  } else {
+    content.setField(field, newValue);
+    UpdateHTMLElementValue(field, newValue);
   }
 
-  // update var table
-  if (varTableUpdateType === "name" || varTableUpdateType === "type" || varTableUpdateType === "value") {
-    varTable.updateVarTable(parseInt(varFieldId), varTableUpdateType, newValue);
-  } else if (varTableUpdateType === "adddel") {
-    varTable.SetVarTable(newValue);
-  }
+  test4.innerText = ("UPDATE RECEIVED:" + JSON.stringify(newValue)).substring(0, 100);
 }
 
-function UpdateEventTable(field: string, newValue: any) {}
+function UpdateVarTable(field: string, newValue: any) {
+  const varFieldFullId = field.split("_");
+  const varFieldId = varFieldFullId[2];
+
+  if (!_varTable) return;
+
+  // update content
+  _varTable.Update(parseInt(varFieldId), newValue);
+}
 
 function UpdateHTMLElementValue(field: string, newValue: string) {
   const element = document.getElementById("res_" + field);
@@ -232,40 +153,15 @@ function UpdateHTMLElementValue(field: string, newValue: string) {
 }
 
 function getFileData(requestId: number = -1) {
-  const editableFields = content.extraData.editableFields;
-  for (const field of editableFields) {
-    const element = document.getElementById("res_" + <string>field);
-
-    if (!element) {
-      console.log("Element not found: " + <string>field);
-      continue;
-    }
-
-    if (element.tagName.startsWith("VSCODE")) {
-      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("current-value");
-    } else if (element.tagName.startsWith("SP")) {
-      content.resData[1].AreaProperties[1][1][field][1] = element.getAttribute("value");
-    }
-  }
-  const varTableElement = <nwnVariables>document.getElementById("VarTable");
-  if (!varTableElement) {
-    console.log("Element not found: VarTable");
-  }
-
-  const varTable = varTableElement.getVarTable();
-  content.resData[1].VarTable = varTable;
-
-  console.log(content);
-
   vscode.postMessage({
     type: "getFileData",
-    content,
+    content: content.data,
     requestId,
   });
 }
 
 function BindListeners() {
-  const editableFields = content.extraData.editableFields;
+  const editableFields = content.editableFields;
   for (const field of editableFields) {
     const element = document.getElementById("res_" + <string>field);
 
@@ -277,15 +173,9 @@ function BindListeners() {
     element.addEventListener("change", onEditableFieldChange);
   }
 
-  // Bind the script event fields
-  const scriptEventElement = document.getElementById("ScriptEvents");
-  if (scriptEventElement && scriptEventElement instanceof nwnScriptEvents) {
-    scriptEventElement.onTextFieldChanged(onEditableFieldChange);
-  }
   // Bind the variable table
-  const varTableElement = document.getElementById("VarTable");
-  if (varTableElement) {
-    varTableElement.addEventListener("change", onEditableFieldChange);
+  if (_varTable) {
+    _varTable.addEventListener("vartable_change", onEditableFieldChange);
   }
 
   initialized = true;
@@ -293,14 +183,14 @@ function BindListeners() {
 
 function InitHTMLElements() {
   // Set simple fields
-  const editableFields = content.extraData.editableFields;
+  const editableFields = content.editableFields;
   for (const field of editableFields) {
-    UpdateHTMLElementValue(field, content.resData[1].AreaProperties[1][1][field][1]);
+    UpdateHTMLElementValue(field, content.getField(field));
   }
 
   // Set variable table
-  const varTable = content.resData[1].VarTable[1];
-  document.getElementById("VarTable")?.setAttribute("current-value", JSON.stringify(varTable));
+  _varTable = <nwnVariables>document.getElementById("VarTable");
+  _varTable.Init(content);
 }
 
 // res_AmbientSndDay
