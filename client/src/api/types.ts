@@ -18,6 +18,7 @@ export type ERF = {
   permissions: number;
   resources?: Resources | null;
 };
+
 export type Resources = {
   utc?: string[] | null;
   uti?: string[] | null;
@@ -35,12 +36,20 @@ export type Resources = {
   utt?: string[] | null;
   ifo?: string[] | null;
 };
+
 export type Resource = {
   erfId: number;
   resName: string;
   resType: ResourceType;
   resData: any;
 };
+
+export type CompilerReturn = {
+  location: vscode.Uri;
+  diagnostics: vscode.Diagnostic[];
+};
+
+// All possible resource types
 export enum ResourceType {
   UTC = "utc",
   UTI = "uti",
@@ -51,14 +60,39 @@ export enum ResourceType {
   DLG = "dlg",
   ARE = "are",
   GIT = "git",
-  _2DA = "2da",
+  _2DA = "_2da",
   UTD = "utd",
   NSS = "nss",
   UTS = "uts",
   UTT = "utt",
   IFO = "ifo",
 }
-export type CompilerReturn = {
-  location: vscode.Uri;
-  diagnostics: vscode.Diagnostic[];
+
+// Path: client\src\api\resdata.ts
+// Used to define the structure of the resdata object
+export enum EditorTypes {
+  UTC = "utc",
+  UTI = "uti",
+  UTM = "utm",
+  UTW = "utw",
+  UTP = "utp",
+  UTE = "ute",
+  ARE = "are",
+  GIT = "git",
+  UTD = "utd",
+  UTS = "uts",
+  UTT = "utt",
+}
+
+// Used to define NWN variables and their types
+export type Variable = {
+  Name: string;
+  Type: VariableType;
+  Value: string | number;
 };
+
+export enum VariableType {
+  Int = 1,
+  Float = 2,
+  String = 3,
+}
