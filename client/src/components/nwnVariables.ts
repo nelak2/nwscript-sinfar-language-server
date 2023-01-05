@@ -193,7 +193,6 @@ export class nwnVariables extends HTMLElement {
 
     // Reset fields
     textFieldName.setAttribute("current-value", "");
-    dropdownType.setAttribute("current-value", "3");
     textFieldValue.setAttribute("current-value", "");
   }
 
