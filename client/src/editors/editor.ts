@@ -33,7 +33,16 @@ function onEditableFieldChange(e: any) {
   try {
     switch (fieldtype) {
       case "res": {
-        const newValue = e.target.value;
+        let newValue;
+        if (e.target.tagName === "VSCODE-CHECKBOX") {
+          if (e.target.checked) {
+            newValue = 1;
+          } else {
+            newValue = 0;
+          }
+        } else {
+          newValue = e.target.value;
+        }
 
         const oldValue = content.getField(field);
         content.setField(field, newValue);
@@ -139,7 +148,11 @@ function UpdateHTMLElementValue(field: string, newValue: string) {
     element.removeEventListener("change", onEditableFieldChange);
 
     if (element.tagName.startsWith("VSCODE")) {
-      element.setAttribute("current-value", newValue);
+      if (element.tagName === "VSCODE-CHECKBOX") {
+        (element as HTMLInputElement).checked = parseInt(newValue) > 0;
+      } else {
+        element.setAttribute("current-value", newValue);
+      }
     } else if (element.tagName.startsWith("SP")) {
       element.setAttribute("value", newValue);
     }
