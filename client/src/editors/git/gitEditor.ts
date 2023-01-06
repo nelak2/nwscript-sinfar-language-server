@@ -1,4 +1,3 @@
-import { EditorTypes } from "../../api/types";
 import { InitializeNWNControls } from "../../components";
 import { nwnVariables } from "../../components/nwnVariables";
 import { ResData } from "../../editorProviders/resData/resdataProvider";
@@ -52,10 +51,10 @@ function onEditableFieldChange(e: any) {
         }
         break;
       }
-      case "var": {
+      case "Var": {
         vscode.postMessage({
           type: "update",
-          field,
+          field: e.detail.field,
           newValue: e.detail.newValue,
           oldValue: e.detail.oldValue,
         });

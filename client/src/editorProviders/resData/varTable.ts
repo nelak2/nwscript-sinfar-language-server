@@ -7,19 +7,16 @@ export class VarTable {
   }
 
   public get VarTable() {
-    return this._data[1].VarTable;
+    return this._data.resData[1].VarTable;
   }
 
   public set VarTable(value) {
-    this._data[1].VarTable = value;
+    this._data.resData[1].VarTable = value;
   }
 
   // Get the raw entry from the VarTable
   private getVarTableEntry(index: number): any {
-    if (index < 0 || index >= this._data[1].VarTable.length) {
-      throw new Error(`Index ${index} is out of bounds`);
-    }
-    return this._data[1].VarTable[index];
+    return this._data.resData[1].VarTable[1][index];
   }
 
   // Get the variable object from the VarTable
@@ -29,7 +26,7 @@ export class VarTable {
       const entry = this.getVarTableEntry(index);
       return {
         Name: entry[1].Name[1],
-        Type: VarTable.getNWNVariableType(entry[1].Type[1]),
+        Type: entry[1].Type[1],
         Value: entry[1].Value[1],
       };
     } catch (e) {
@@ -51,7 +48,8 @@ export class VarTable {
       }
 
       entry[1].Name[1] = variable.Name;
-      entry[1].Type[1] = VarTable.getNWNGFFType(variable.Type);
+      entry[1].Type[1] = variable.Type;
+      entry[1].Value[0] = VarTable.getNWNGFFType(variable.Type);
       entry[1].Value[1] = VarTable.formatValue(variable.Value, variable.Type);
 
       return oldValue;
@@ -61,7 +59,13 @@ export class VarTable {
   }
 
   public addVariable(variable: Variable) {
-    throw new Error("Not implemented");
+    const name = [10, variable.Name];
+    const varType = [4, variable.Type];
+    const value = [VarTable.getNWNGFFType(variable.Type), VarTable.formatValue(variable.Value, variable.Type)];
+
+    const GFFElement = [0, { Name: name, Type: varType, Value: value }];
+
+    this.VarTable[1].push(GFFElement);
   }
 
   // Deletes the variable with the given name from the VarTable
@@ -104,9 +108,6 @@ export class VarTable {
   private validateVariable(variable: Variable, checkNameExists = false) {
     if (variable.Name === "") {
       throw new Error("Variable name cannot be empty");
-    }
-    if (variable.Value === "") {
-      throw new Error("Variable value cannot be empty");
     }
 
     // check variable name is valid
@@ -163,26 +164,15 @@ export class VarTable {
       return value;
     }
 
+    if ((Type === VariableType.Int || Type === VariableType.Float) && value === "") {
+      value = "0";
+    }
+
     if (Type === VariableType.Int) {
-      return parseInt(value).toString();
+      return parseInt(value);
     } else if (Type === VariableType.Float) {
-      return parseFloat(value).toString();
+      return parseFloat(value);
     }
     return value;
   }
 }
-
-// public getVarTable() {
-//   const variableArray = [];
-//   for (const variable of this._variables) {
-//     const name = [10, variable.Name];
-//     const varType = [4, variable.Type];
-//     const value = [this.getNWNGFFType(variable.Type), variable.Value];
-
-//     const GFFElement = [0, { Name: name, Type: varType, Value: value }];
-
-//     variableArray.push(GFFElement);
-//   }
-
-//   return [15, variableArray];
-// }

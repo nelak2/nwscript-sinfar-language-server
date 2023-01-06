@@ -41,7 +41,7 @@ export class nwnVariables extends HTMLElement {
     const textFieldName = buildTextField("", "nwnvartable_add_name");
     const dropdownType = buildDropdown(VarType[0].value, "nwnvartable_add_type");
     const textFieldValue = buildTextField("", "nwnvartable_add_value");
-    const buttonAdd = buildButton("add", "vartable_add_btn");
+    const buttonAdd = buildButton("add", "var_add_btn");
     variableAddRow.appendChild(textFieldName);
     variableAddRow.appendChild(dropdownType);
     variableAddRow.appendChild(textFieldValue);
@@ -50,7 +50,7 @@ export class nwnVariables extends HTMLElement {
 
     // add event listeners
     buttonAdd.addEventListener("click", (e) => {
-      this.addVariable(e, { NameField: textFieldName, TypeField: dropdownType, ValueField: textFieldValue });
+      this.addVariableEvent(e, { NameField: textFieldName, TypeField: dropdownType, ValueField: textFieldValue });
     });
   }
 
@@ -65,13 +65,31 @@ export class nwnVariables extends HTMLElement {
   // Does not fire a change event
   public Update(fieldID: number, newValue: Variable) {
     let result: any;
+    const row = this.getVariableRowElements(fieldID);
+
+    // If newValue is undefined that means we want to delete the variable
+    if (newValue === undefined) {
+      const name = row.NameField.getAttribute("current-value");
+      if (!name) return;
+
+      this.deleteVariable(name);
+      this.refreshVariables();
+      return;
+    }
+
+    // If the variable doesn't exist, we want to add it
+    if (this._content.variables.getVariable(fieldID) === undefined) {
+      this.addVariable(newValue);
+      return;
+    }
+
+    // Else update an existing variable
     try {
       result = this.updateVarTable(fieldID, newValue);
     } catch (error: any) {
       window.dispatchEvent(new CustomEvent("alert", { detail: error.message }));
     }
 
-    const row = this.getVariableRowElements(fieldID);
     this.setVariableToRowElements(row, result.newValue);
   }
 
@@ -83,49 +101,62 @@ export class nwnVariables extends HTMLElement {
       result = this.updateVarTable(fieldId, newValue);
     } catch (error: any) {
       window.dispatchEvent(new CustomEvent("alert", { detail: error.message }));
-    }
 
-    if (result.oldValue && result.newValue) {
-      this.setVariableToRowElements(row, result.newValue);
-
-      this.dispatchEvent(
-        new CustomEvent(this.CHANGE_EVENT, { detail: { oldValue: result.oldValue, newValue: result.newValue } }),
-      );
       // If we failed to update the variable, revert to the old value
-    } else if (result.oldValue) {
-      this.setVariableToRowElements(row, result.oldValue);
+      const oldValue = this._content.variables.getVariable(fieldId);
+      if (oldValue) {
+        this.setVariableToRowElements(row, oldValue);
+      }
+      return;
     }
+
+    this.setVariableToRowElements(row, result.newValue);
+    this.dispatchEvent(
+      new CustomEvent(this.CHANGE_EVENT, {
+        detail: { field: (e.target as HTMLElement).id, oldValue: result.oldValue, newValue: result.newValue },
+      }),
+    );
   }
 
   // Add new variable to table
+  private addVariable(variable: Variable) {
+    this._content.variables.addVariable(variable);
+    this.refreshVariables();
+  }
+
+  // Handle add variable event
   // Fires a change event to notify parent that variable table has changed
-  private addVariable(e: Event, row: VariableRowElements) {
+  private addVariableEvent(e: Event, row: VariableRowElements) {
     let newValue: Variable = this.getVariableFromRowElements(row);
 
     try {
       newValue = this._content.variables.validateAndFormatVariable(newValue, true);
-      this._content.variables.addVariable(newValue);
+      this.addVariable(newValue);
     } catch (error: any) {
       window.dispatchEvent(new CustomEvent("alert", { detail: error.message }));
       return;
     }
 
-    this.refreshVariables();
-
     // Dispatch event to notify parent that variable table has changed
-    e.target?.dispatchEvent(new CustomEvent(this.CHANGE_EVENT, { detail: { oldValue: undefined, newValue } }));
+    this.dispatchEvent(
+      new CustomEvent(this.CHANGE_EVENT, { detail: { field: (e.target as HTMLElement).id, oldValue: undefined, newValue } }),
+    );
 
     // Reset fields
     row.NameField.setAttribute("current-value", "");
     row.ValueField.setAttribute("current-value", "");
   }
 
-  // Deletes a variable from the list
+  private deleteVariable(name: string) {
+    return this._content.variables.deleteVariable(name);
+  }
+
+  // Handles delete variable event
   // Fires a change event to notify parent that variable table has changed
-  private deleteVariable(e: Event, variableRow: HTMLElement) {
+  private deleteVariableEvent(e: Event, variableRow: HTMLElement) {
     const name = variableRow.children[0].getAttribute("current-value") || "";
 
-    const oldValue = this._content.variables.deleteVariable(name);
+    const oldValue = this.deleteVariable(name);
 
     // If variable was not found, do nothing
     if (!oldValue) {
@@ -133,7 +164,9 @@ export class nwnVariables extends HTMLElement {
     }
 
     // Dispatch event to notify parent that variable table has changed
-    e.target?.dispatchEvent(new CustomEvent(this.CHANGE_EVENT, { detail: { oldValue, newValue: undefined } }));
+    this.dispatchEvent(
+      new CustomEvent(this.CHANGE_EVENT, { detail: { field: (e.target as HTMLElement).id, oldValue, newValue: undefined } }),
+    );
 
     this.refreshVariables();
   }
@@ -183,7 +216,7 @@ export class nwnVariables extends HTMLElement {
 
     // add event listeners
     buttonDelete.addEventListener("click", (e) => {
-      this.deleteVariable(e, variableRow);
+      this.deleteVariableEvent(e, variableRow);
     });
     textFieldName.addEventListener("change", (e) => {
       this.onFieldChanged(Number.parseInt(fieldId), VariableRowElements, e);
@@ -213,9 +246,9 @@ export class nwnVariables extends HTMLElement {
   // Get variable object from html row elements
   private getVariableFromRowElements(row: VariableRowElements) {
     return {
-      Name: row.NameField.getAttribute("current-value") || "",
-      Type: parseInt(row.TypeField.getAttribute("current-value") || "0"),
-      Value: row.ValueField.getAttribute("current-value") || "",
+      Name: (row.NameField as any).currentValue || "",
+      Type: parseInt((row.TypeField as any).currentValue || "0"),
+      Value: (row.ValueField as any).currentValue || "",
     };
   }
 }
