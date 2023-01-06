@@ -19,13 +19,7 @@ export class nwnColorPicker extends HTMLElement {
     const divColLabel = buildDiv("col-label");
     divColLabel.appendChild(labelElement);
 
-    const textField = document.createElement("vscode-text-field");
-    textField.id = id;
-    textField.setAttribute("style", "width: 300px");
-    const disabled = this.getAttribute("disabled");
-    if (disabled === "true") {
-      textField.setAttribute("disabled", "true");
-    }
+    const textField = this.buildColorPicker(id);
 
     const divColInput = buildDiv("col-input");
     divColInput.appendChild(textField);
@@ -35,5 +29,25 @@ export class nwnColorPicker extends HTMLElement {
     rowDiv.appendChild(divColInput);
 
     this.appendChild(rowDiv);
+  }
+
+  private buildTextField(id: string): HTMLElement {
+    const textField = document.createElement("vscode-text-field");
+    textField.id = id;
+    textField.setAttribute("style", "width: 300px");
+    const disabled = this.getAttribute("disabled");
+    if (disabled === "true") {
+      textField.setAttribute("disabled", "true");
+    }
+    return textField;
+  }
+
+  private buildColorPicker(id: string): HTMLElement {
+    const colorPicker = document.createElement("input");
+    colorPicker.id = id;
+    colorPicker.setAttribute("type", "color");
+    colorPicker.setAttribute("name", id);
+    colorPicker.setAttribute("style", "width: 100px; background-color: var(--vscode-input-background);");
+    return colorPicker;
   }
 }

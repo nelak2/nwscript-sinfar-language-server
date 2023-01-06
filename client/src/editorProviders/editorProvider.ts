@@ -205,6 +205,20 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
       "toolkit.js",
     ]);
 
+    const jqueryUri = getUri(webview, this.context.extensionUri, ["client", "node_modules", "jquery", "dist", "jquery.min.js"]);
+    const colorPickerUri = getUri(webview, this.context.extensionUri, [
+      "client",
+      "node_modules",
+      "spectrum-colorpicker",
+      "spectrum.js",
+    ]);
+    const colorPickerCssUri = getUri(webview, this.context.extensionUri, [
+      "client",
+      "node_modules",
+      "spectrum-colorpicker",
+      "spectrum.css",
+    ]);
+
     const cssUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "styles.css"]);
     const mainUri = getUri(webview, this.context.extensionUri, ["client", "out", "editor.js"]);
 
@@ -224,6 +238,9 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
       .replace(/\${toolkitUri}/g, toolkitUri.toString())
       .replace(/\${mainUri}/g, mainUri.toString())
       .replace(/\${codiconsUri}/g, codiconsUri.toString())
+      .replace(/\${colorPickerUri}/g, colorPickerUri.toString())
+      .replace(/\${colorPickerCssUri}/g, colorPickerCssUri.toString())
+      .replace(/\${jqueryUri}/g, jqueryUri.toString())
       .replace(/\/\*\${style}\*\//, css);
     return html;
   }
