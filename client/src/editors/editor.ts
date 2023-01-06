@@ -25,8 +25,6 @@ function onEditableFieldChange(e: any) {
   const fieldtype = (<string>e.target.id).substring(0, 3);
   const field = (<string>e.target.id).substring(4);
 
-  const testp = document.body.appendChild(document.createElement("p"));
-
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   console.log(`Event on Field: ${field} New Value: ${e.target.value} Field Type: ${fieldtype}`);
 
@@ -54,9 +52,6 @@ function onEditableFieldChange(e: any) {
             newValue,
             oldValue,
           });
-
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-          testp.innerText = `SENT Field: ${field} Old: ${oldValue} New: ${newValue}`;
         }
         break;
       }
@@ -67,15 +62,10 @@ function onEditableFieldChange(e: any) {
           newValue: e.detail.newValue,
           oldValue: e.detail.oldValue,
         });
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-        testp.innerText = `SENT VarTable: ${e.detail.newValue} Old: ${e.detail.oldValue}`;
-
         break;
       }
     }
   } catch (e: any) {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
-    testp.innerText = `ERROR: Field: ${field} New: ${e.target.value}`;
     console.log(e);
   }
 }
@@ -84,7 +74,6 @@ function InboundMessageHandler(event: any) {
   const message = event.data;
   if (event.type === "message" && message) {
     const messageType = message.type;
-    const test3 = document.body.appendChild(document.createElement("p"));
 
     // Handle update undo and redo messages
     if (messageType === "update" || messageType === "undo" || messageType === "redo") {
@@ -92,7 +81,6 @@ function InboundMessageHandler(event: any) {
     }
     // Handle init message
     else if (messageType === "init") {
-      test3.innerText = ("INIT:" + JSON.stringify(message)).substring(0, 100);
       content = new ResData(message.content, ResData.getEditorType(message.content.resName));
       InitHTMLElements();
 
@@ -108,16 +96,12 @@ function InboundMessageHandler(event: any) {
     }
     // Handle file data message
     else if (messageType === "getFileData") {
-      const test4 = document.body.appendChild(document.createElement("p"));
-      test4.innerText = "SENT getFileData:" + JSON.stringify(message).substring(0, 100);
       getFileData(message.requestId);
     }
   }
 }
 
 function ProcessUpdateMessage(field: string, newValue: any) {
-  const test4 = document.body.appendChild(document.createElement("p"));
-
   const updateType = field.split("_")[0];
 
   if (updateType === "var") {
@@ -126,8 +110,6 @@ function ProcessUpdateMessage(field: string, newValue: any) {
     content.setField(field, newValue);
     UpdateHTMLElementValue(field, newValue);
   }
-
-  test4.innerText = ("UPDATE RECEIVED:" + JSON.stringify(newValue)).substring(0, 100);
 }
 
 function UpdateVarTable(field: string, newValue: any) {
@@ -155,6 +137,10 @@ function UpdateHTMLElementValue(field: string, newValue: string) {
       }
     } else if (element.tagName.startsWith("SP")) {
       element.setAttribute("value", newValue);
+    }
+    // Handle color pickers
+    else if (element.tagName === "INPUT") {
+      (element as HTMLInputElement).value = newValue;
     }
 
     // Rebind the event listener
