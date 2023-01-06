@@ -26,7 +26,7 @@ export const PvP: DropdownListItem[] = [
   { value: "0", label: "None" },
   { value: "1", label: "Party" },
   { value: "2", label: "Full" },
-  { value: "2", label: "Default" },
+  { value: "3", label: "Default" },
 ];
 
 export const VarType: DropdownListItem[] = [
