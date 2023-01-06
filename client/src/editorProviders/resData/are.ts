@@ -6,32 +6,83 @@ export class Are {
     this._data = resdata;
   }
 
+  // We return the fields as GFF fields so resData provider can handle some general cases
+  // that would apply to all resources
   public getField(field: string) {
-    if (field === "Size") {
-      const width = this._data.resData[1].Width[1];
-      const height = this._data.resData[1].Height[1];
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      return [10, width.toString() + "x" + height.toString()];
-    }
-    if (field === "Tileset") {
-      const resref = this._data.resData[1].Tileset[1];
-      const tileset = Tilesets.find((t) => t.value === resref);
+    switch (field) {
+      case "Size": {
+        const width = this._data.resData[1].Width[1];
+        const height = this._data.resData[1].Height[1];
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        return [10, width.toString() + "x" + height.toString()];
+      }
+      case "Tileset": {
+        const resref = this._data.resData[1].Tileset[1];
+        const tileset = Tilesets.find((t) => t.value === resref);
 
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      return [10, resref + " - " + tileset?.label];
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        return [10, resref + " - " + tileset?.label];
+      }
+      case "Interior": {
+        return [4, this._data.resData[1].Flags[1] & 1];
+      }
+      case "Underground": {
+        return [4, this._data.resData[1].Flags[1] & 2];
+      }
+      case "Natural": {
+        return [4, this._data.resData[1].Flags[1] & 4];
+      }
+      case "DayNightCycle": {
+        return [0, this._data.resData[1].DayNightCycle[1] ? 1 : this._data.resData[1].IsNight[1] ? 3 : 2];
+      }
+      default:
+        return this._data.resData[1][field];
     }
-
-    return this._data.resData[1][field];
   }
 
   public setField(field: string, value: string) {
-    this._data.resData[1][field][1] = value;
+    switch (field) {
+      case "Interior": {
+        if (value) {
+          this._data.resData[1].Flags[1] |= 1;
+        } else {
+          this._data.resData[1].Flags[1] &= ~1;
+        }
+        break;
+      }
+      case "Underground": {
+        if (value) {
+          this._data.resData[1].Flags[1] |= 2;
+        } else {
+          this._data.resData[1].Flags[1] &= ~2;
+        }
+        break;
+      }
+      case "Natural": {
+        if (value) {
+          this._data.resData[1].Flags[1] |= 4;
+        } else {
+          this._data.resData[1].Flags[1] &= ~4;
+        }
+        break;
+      }
+      default: {
+        this._data.resData[1][field][1] = value;
+      }
+    }
   }
 
   public get editableFields() {
     const fields = this._data.extraData.colorFields.concat(this._data.editableFields);
     fields.push("Tileset");
     fields.push("Size");
+    fields.push("Interior");
+    fields.push("Underground");
+    fields.push("Natural");
+    fields.push("DayNightCycle");
+    fields.push("SunShadows");
+    fields.push("MoonShadows");
+    fields.push("NoRest");
     return fields;
   }
 }
