@@ -36,7 +36,7 @@ export class nwnNumberField extends HTMLElement {
         numberField.setAttribute("max", "100");
         numberField.style.width = "100px";
         numberField.value = 0;
-        numberField.formatOptions = { style: "percent" };
+        numberField.formatOptions = { style: "unit", unit: "%" };
         break;
       case "fog":
         numberField.setAttribute("min", "0");
