@@ -35,6 +35,16 @@ export class Are {
       case "DayNightCycle": {
         return [0, this._data.resData[1].DayNightCycle[1] ? 1 : this._data.resData[1].IsNight[1] ? 3 : 2];
       }
+      case "SunAmbientColor":
+      case "SunDiffuseColor":
+      case "SunFogColor":
+      case "MoonAmbientColor":
+      case "MoonDiffuseColor":
+      case "MoonFogColor": {
+        const bgr: number = this._data.resData[1][field][1];
+
+        return [4, this.BGRtoRGB(bgr)];
+      }
       default:
         return this._data.resData[1][field];
     }
@@ -66,6 +76,15 @@ export class Are {
         }
         break;
       }
+      case "SunAmbientColor":
+      case "SunDiffuseColor":
+      case "SunFogColor":
+      case "MoonAmbientColor":
+      case "MoonDiffuseColor":
+      case "MoonFogColor": {
+        this._data.resData[1][field][1] = this.RGBtoBGR(value);
+        break;
+      }
       default: {
         this._data.resData[1][field][1] = value;
       }
@@ -84,6 +103,21 @@ export class Are {
     fields.push("MoonShadows");
     fields.push("NoRest");
     return fields;
+  }
+
+  private BGRtoRGB(bgr: number): string {
+    const hex = bgr.toString(16).padStart(6, "0");
+    const r = hex.substr(4, 2);
+    const g = hex.substr(2, 2);
+    const b = hex.substr(0, 2);
+    return "#" + r + g + b;
+  }
+
+  private RGBtoBGR(rgb: string): number {
+    const r = parseInt(rgb.substr(1, 2), 16);
+    const g = parseInt(rgb.substr(3, 2), 16);
+    const b = parseInt(rgb.substr(5, 2), 16);
+    return b * 256 * 256 + g * 256 + r;
   }
 }
 
