@@ -8,6 +8,7 @@ export { LoadScreens } from "./loadScreens";
 export { AmbientSounds } from "./ambientSounds";
 export { Music } from "./music";
 export { EnvironmentalEffects } from "./environmentalEffects";
+export { Tilesets } from "./tilesets";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },

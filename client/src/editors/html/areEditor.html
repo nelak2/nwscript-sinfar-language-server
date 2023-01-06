@@ -12,7 +12,7 @@
     </script>
     <script type="module" src="${toolkitUri}"></script>
     <script type="module" src="${mainUri}"></script>
-    <title>Edit Git</title>
+    <title>Edit Are</title>
   </head>
 
   <body>
@@ -22,7 +22,7 @@
         <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Tiles">
-        <nwn-text-field id="res_TilesetResRef" label="Tileset ResRef" disabled="true"></nwn-text-field>
+        <nwn-text-field id="res_Tileset" label="Tileset ResRef" disabled="true"></nwn-text-field>
         <nwn-text-field id="res_Size" label="Size" disabled="true"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Visual">
@@ -41,24 +41,13 @@
         <nwn-color-picker id="res_MoonDiffuseColor" label="Moon - Diffuse Color"></nwn-color-picker>
         <nwn-number-field id="res_MoonFogAmount" label="Moon - Fog Amount" unit="fog"></nwn-number-field>
         <nwn-color-picker id="res_MoonFogColor" label="Moon - Fog Color"></nwn-color-picker>
-        <nwn-number-field id="res_FogClipDistance" label="Fog Clip Distance" unit="distance"></nwn-number-field>
+        <nwn-number-field id="res_FogClipDist" label="Fog Clip Distance" unit="distance"></nwn-number-field>
         <nwn-number-field id="res_ShadowOpacity" label="Shadow Opacity" unit="percent"></nwn-number-field>
-        <nwn-drop-down id="res_WeatherWindPower" label="Weather - Wind Power" listRef="WindPower"></nwn-drop-down>
-        <nwn-number-field id="res_WeatherSnowPercentage" label="Weather - Snow %" unit="percent"></nwn-number-field>
-        <nwn-number-field id="res_WeatherRainPercentage" label="Weather - Rain %" unit="percent"></nwn-number-field>
-        <nwn-number-field id="res_WeatherLightningPercentage" label="Weather - Lightning %" unit="percent"></nwn-number-field>
+        <nwn-drop-down id="res_WindPower" label="Weather - Wind Power" listRef="WindPower"></nwn-drop-down>
+        <nwn-number-field id="res_ChanceSnow" label="Weather - Snow %" unit="percent"></nwn-number-field>
+        <nwn-number-field id="res_ChanceRain" label="Weather - Rain %" unit="percent"></nwn-number-field>
+        <nwn-number-field id="res_ChanceLightning" label="Weather - Lightning %" unit="percent"></nwn-number-field>
         <nwn-drop-down id="res_SkyBox" label="SkyBox" listRef="SkyBox"></nwn-drop-down>
-      </sp-accordion-item>
-      <sp-accordion-item label="Audio">
-        <nwn-drop-down id="res_AmbientSndDay" label="Day - Ambient Sound" listRef="AmbientSound"></nwn-drop-down>
-        <nwn-volume-slider id="res_AmbientSndDayVol" label="Day - Ambient Volume"></nwn-volume-slider>
-        <nwn-drop-down id="res_MusicDay" label="Day - Music" listRef="Music"></nwn-drop-down>
-        <nwn-drop-down id="res_AmbientSndNight" label="Night - Ambient Sound" listRef="AmbientSound"></nwn-drop-down>
-        <nwn-volume-slider id="res_AmbientSndNitVol" label="Night - Ambient Volume"></nwn-volume-slider>
-        <nwn-drop-down id="res_MusicNight" label="Night - Music" listRef="Music"></nwn-drop-down>
-        <nwn-drop-down id="res_MusicBattle" label="Battle - Music" listRef="Music"></nwn-drop-down>
-        <nwn-number-field id="res_MusicDelay" label="Music Playing Delay" unit="miliseconds"></nwn-number-field>
-        <nwn-drop-down id="res_EnvAudio" label="Environmental Effects" listRef="EnvironmentalEffects"></nwn-drop-down>
       </sp-accordion-item>
       <sp-accordion-item label="Miscellaneous">
         <nwn-row label="Flags">
@@ -69,21 +58,14 @@
             <vscode-checkbox id="res_Flags_Natural">Natural</vscode-checkbox>
           </fieldset>
         </nwn-row>
-        <nwn-number-field id="res_CheckModifierListen" label="Check Modifier - Listen" unit="skill"></nwn-number-field>
-        <nwn-number-field id="res_CheckModifierSpot" label="Check Modifier - Spot" unit="skill"></nwn-number-field>
-        <nwn-drop-down id="res_PvP" label="Player vs. Player" listRef="PvP"></nwn-drop-down>
-        <nwn-drop-down id="res_LoadScreen" label="Load Screen" listRef="LoadScreen"></nwn-drop-down>
+        <nwn-number-field id="res_ModListenCheck" label="Check Modifier - Listen" unit="skill"></nwn-number-field>
+        <nwn-number-field id="res_ModSpotCheck" label="Check Modifier - Spot" unit="skill"></nwn-number-field>
+        <nwn-drop-down id="res_PlayerVsPlayer" label="Player vs. Player" listRef="PvP"></nwn-drop-down>
+        <nwn-drop-down id="res_LoadScreenID" label="Load Screen" listRef="LoadScreen"></nwn-drop-down>
       </sp-accordion-item>
       <sp-accordion-item open label="Scripts">
-        <nwn-script-events id="ScriptEvents" resourcetype="git"></nwn-script-events>
-      </sp-accordion-item>
-      <sp-accordion-item open label="Variables">
-        <nwn-variables id="VarTable"></nwn-variables>
+        <nwn-script-events id="ScriptEvents" resourcetype="are"></nwn-script-events>
       </sp-accordion-item>
     </sp-accordion>
-    <h1 id="page_title">Edit Git</h1>
-    <vscode-button id="testButton">Test!</vscode-button>
-    <h1 id="page_title">Save Git</h1>
-    <vscode-button id="saveButton">Test!</vscode-button>
   </body>
 </html>

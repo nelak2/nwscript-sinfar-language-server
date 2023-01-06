@@ -1,6 +1,6 @@
 export const scriptEvents = [
   {
-    resource: "git",
-    events: ["OnEnter", "OnExit", "OnHeartBeat", "OnUserDefined"],
+    resource: "are",
+    events: ["OnEnter", "OnExit", "OnHeartbeat", "OnUserDefined"],
   },
 ];

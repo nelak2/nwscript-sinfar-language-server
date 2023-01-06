@@ -96,3 +96,14 @@ export enum VariableType {
   Float = 2,
   String = 3,
 }
+
+export enum GFFType {
+  Byte = 0,
+  Color = 4,
+  Int = 5,
+  Float = 8,
+  String = 10,
+  Resref = 11,
+  StringArray = 12,
+  ObjectArray = 15,
+}

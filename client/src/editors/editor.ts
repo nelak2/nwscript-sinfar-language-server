@@ -1,6 +1,6 @@
-import { InitializeNWNControls } from "../../components";
-import { nwnVariables } from "../../components/nwnVariables";
-import { ResData } from "../../editorProviders/resData/resdataProvider";
+import { InitializeNWNControls } from "../components";
+import { nwnVariables } from "../components/nwnVariables";
+import { ResData } from "../editorProviders/resData/resdataProvider";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
@@ -189,50 +189,7 @@ function InitHTMLElements() {
 
   // Set variable table
   _varTable = <nwnVariables>document.getElementById("VarTable");
-  _varTable.Init(content);
+  if (_varTable) {
+    _varTable.Init(content);
+  }
 }
-
-// res_AmbientSndDay
-// res_AmbientSndDayVol
-// res_MusicDay
-// res_AmbientSndNight
-// res_AmbientSndNightVol
-// res_MusicNight
-// res_MusicBattle
-// res_MusicDelay
-// res_EnvAudio
-// SCRIPTS
-
-// res_Name
-// res_Tag
-// res_TilesetResRef
-// res_Size
-// res_DayNightCycle
-// res_Flags_SunShadows
-// res_Flags_MoonShadows
-// res_SunAmbientColor
-// res_SunDiffuseColor
-// res_SunFogAmount
-// res_SunFogColor
-// res_MoonAmbientColor
-// res_MoonDiffuseColor
-// res_MoonFogAmount
-// res_MoonFogColor
-// res_FogClipDistance
-// res_ShadowOp
-// res_ShadowOpacity
-// res_WeatherWindPower
-// res_WeatherSnowPercentage
-// res_WeatherRainPercentage
-// res_WeatherLightningPercentage
-// res_Skybox
-// res_Flags_NoRest
-// res_Flags_Interior
-// res_Flags_Underground
-// res_Flags_Natural
-// res_CheckModifierListen
-// res_CheckModifierSpot
-// res_PvP
-// res_LoadScreen
-
-// VARIABLES

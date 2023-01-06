@@ -1,4 +1,5 @@
-import { EditorTypes } from "../../api/types";
+import { EditorTypes, GFFType } from "../../api/types";
+import { Are } from "./are";
 import { Git } from "./git";
 import { VarTable } from "./varTable";
 
@@ -41,15 +42,25 @@ export class ResData {
   }
 
   public get editableFields() {
-    return this._data.extraData.editableFields;
+    return this[this.type].editableFields;
   }
 
   public setField(field: string, value: string) {
     this[this.type].setField(field, value);
   }
 
-  public getField(field: string) {
-    return this[this.type].getField(field);
+  public getField(field: string): string {
+    // should return the entire gff field (not just the value)
+    const value = this[this.type].getField(field);
+
+    this.debugLog(field, value);
+
+    // special handling for gff string array types
+    if (value[0] === 12) {
+      return value[1].s0;
+    }
+
+    return value[1];
   }
 
   public get data() {
@@ -85,27 +96,23 @@ export class ResData {
 
     throw new Error("Unknown Editor Type");
   }
-}
 
-class Are {
-  private readonly data: any;
-  constructor(resdata: any) {
-    this.data = resdata;
-  }
+  private debugLog(field: string, value: any) {
+    const type: string = GFFType[value[0]];
 
-  public getField(field: string) {
-    throw new Error("Not implemented");
-  }
-
-  public setField(field: string, value: string) {
-    throw new Error("Not implemented");
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    console.log("Field: " + field + " Type: " + type + " Value: " + value[1]);
   }
 }
 
 class Uti {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {
@@ -118,9 +125,13 @@ class Uti {
 }
 
 class Utc {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {
@@ -133,9 +144,13 @@ class Utc {
 }
 
 class Utp {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {
@@ -148,9 +163,13 @@ class Utp {
 }
 
 class Ute {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {
@@ -163,9 +182,13 @@ class Ute {
 }
 
 class Utt {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {
@@ -178,9 +201,13 @@ class Utt {
 }
 
 class Utm {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {
@@ -193,9 +220,13 @@ class Utm {
 }
 
 class Utd {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {
@@ -208,9 +239,13 @@ class Utd {
 }
 
 class Utw {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {
@@ -223,9 +258,13 @@ class Utw {
 }
 
 class Uts {
-  private readonly data: any;
+  private readonly _data: any;
   constructor(resdata: any) {
-    this.data = resdata;
+    this._data = resdata;
+  }
+
+  public get editableFields() {
+    throw new Error("Not implemented");
   }
 
   public getField(field: string) {

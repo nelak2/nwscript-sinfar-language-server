@@ -216,6 +216,10 @@
           {
             "filenamePattern": "*.git",
             "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.are",
+            "resourceScheme": "sinfar"
           }
         ]
       }
@@ -230,7 +234,7 @@
     "lint": "eslint ./client/src ./server/src --ext .ts",
     "postinstall": "cd client && yarn install && cd ../server && yarn install && cd ..",
     "clean": "rimraf client/out/* && rimraf server/out/* && copyfiles -u 2 ./server/resources/*.* ./server/out/resources/",
-    "buildClient": "esbuild extension=./client/src/extension.ts gitEditor=./client/src/editors/git/gitEditor.ts --sourcemap --bundle --external:vscode --platform=node --outdir=./client/out/",
+    "buildClient": "esbuild extension=./client/src/extension.ts editor=./client/src/editors/editor.ts --sourcemap --bundle --external:vscode --platform=node --outdir=./client/out/",
     "buildServer": "esbuild server=./server/src/server.ts --sourcemap --bundle --external:vscode --platform=node --outdir=./server/out/",
     "build": "yarn clean && yarn buildClient && yarn buildServer"
   },

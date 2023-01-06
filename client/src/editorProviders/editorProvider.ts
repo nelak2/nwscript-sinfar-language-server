@@ -4,6 +4,7 @@ import { NWNDocument } from "./nwnDocument";
 import { getUri } from "./utils";
 import { WebviewCollection } from "./webviewCollection";
 import fs from "fs";
+import { EditorTypes } from "../api/types";
 
 export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> {
   private static readonly viewType = "sinfar.areaGitEditor";
@@ -31,11 +32,44 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
 
   // #region CustomEditorProvider
 
+  private EditorType: EditorTypes | undefined;
+
+  private GetEditorType(uri: vscode.Uri): EditorTypes {
+    const ext = uri.path.split(".").pop();
+    switch (ext) {
+      case "are":
+        return EditorTypes.ARE;
+      case "git":
+        return EditorTypes.GIT;
+      case "utc":
+        return EditorTypes.UTC;
+      case "utd":
+        return EditorTypes.UTD;
+      case "utp":
+        return EditorTypes.UTP;
+      case "uts":
+        return EditorTypes.UTS;
+      case "ute":
+        return EditorTypes.UTE;
+      case "utt":
+        return EditorTypes.UTT;
+      case "utw":
+        return EditorTypes.UTW;
+      case "utm":
+        return EditorTypes.UTM;
+      case "uti":
+        return EditorTypes.UTI;
+    }
+    throw new Error("Unknown editor type");
+  }
+
   async openCustomDocument(
     uri: vscode.Uri,
     openContext: { backupId?: string },
     _token: vscode.CancellationToken,
   ): Promise<NWNDocument> {
+    this.EditorType = this.GetEditorType(uri);
+
     const document: NWNDocument = await NWNDocument.create(uri, openContext.backupId, {
       getFileData: async () => {
         const webviewsForDocument = Array.from(this.webviews.get(document.uri));
@@ -172,8 +206,9 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
     ]);
 
     const cssUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "styles.css"]);
-    const mainUri = getUri(webview, this.context.extensionUri, ["client", "out", "gitEditor.js"]);
-    const htmlUri = getUri(webview, this.context.extensionUri, ["client", "src", "editors", "git", "gitEditor.html"]);
+    const mainUri = getUri(webview, this.context.extensionUri, ["client", "out", "editor.js"]);
+
+    const htmlUri = this.getHTMLUri(webview);
     const codiconsUri = getUri(webview, this.context.extensionUri, [
       "client",
       "node_modules",
@@ -191,6 +226,34 @@ export class EditorProvider implements vscode.CustomEditorProvider<NWNDocument> 
       .replace(/\${codiconsUri}/g, codiconsUri.toString())
       .replace(/\/\*\${style}\*\//, css);
     return html;
+  }
+
+  private getHTMLUri(webview: vscode.Webview): vscode.Uri {
+    switch (this.EditorType) {
+      case EditorTypes.GIT:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "gitEditor.html"]);
+      case EditorTypes.ARE:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "areEditor.html"]);
+      case EditorTypes.UTC:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "utcEditor.html"]);
+      case EditorTypes.UTI:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "utiEditor.html"]);
+      case EditorTypes.UTM:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "utmEditor.html"]);
+      case EditorTypes.UTW:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "utwEditor.html"]);
+      case EditorTypes.UTP:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "utpEditor.html"]);
+      case EditorTypes.UTE:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "uteEditor.html"]);
+      case EditorTypes.UTD:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "utdEditor.html"]);
+      case EditorTypes.UTS:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "utsEditor.html"]);
+      case EditorTypes.UTT:
+        return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "uttEditor.html"]);
+    }
+    return getUri(webview, this.context.extensionUri, ["client", "src", "editors", "html", "gitEditor.html"]);
   }
 
   private _requestId = 1;
