@@ -17,6 +17,7 @@ import {
   TrapTypes,
   DoorAppearanceType,
   DoorInitialState,
+  WaypointAppearance,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -82,6 +83,9 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "DoorInitialState":
         list = DoorInitialState;
+        break;
+      case "WaypointAppearance":
+        list = WaypointAppearance;
         break;
       default:
         list = [{ value: "-1", label: "Unknown List" }];

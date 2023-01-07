@@ -82,3 +82,10 @@ export const DoorInitialState: DropdownListItem[] = [
   { value: "1", label: "Open 1" },
   { value: "2", label: "Open 2" },
 ];
+
+export const WaypointAppearance: DropdownListItem[] = [
+  { value: "1", label: "Blue" },
+  { value: "2", label: "Red" },
+  { value: "3", label: "Green" },
+  { value: "4", label: "Yellow" },
+];
