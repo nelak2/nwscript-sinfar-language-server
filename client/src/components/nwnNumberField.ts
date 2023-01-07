@@ -95,6 +95,13 @@ export class nwnNumberField extends HTMLElement {
         numberField.style.width = "100px";
         numberField.value = 0;
         break;
+      case "pitch":
+        numberField.setAttribute("min", "0");
+        numberField.setAttribute("max", "1.0");
+        numberField.setAttribute("step", "0.1");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
     }
 
     const divColInput = buildDiv("col-input");
