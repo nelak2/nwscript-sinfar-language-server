@@ -8,6 +8,7 @@ export class nwnTextField extends HTMLElement {
     // Clear the id so that the div doesn't match the id of the field
     this.setAttribute("id", "");
     const label = this.getAttribute("label");
+    const type = this.getAttribute("type");
 
     if (!id || !label) {
       return;
@@ -19,12 +20,15 @@ export class nwnTextField extends HTMLElement {
     const divColLabel = buildDiv("col-label");
     divColLabel.appendChild(labelElement);
 
-    const textField = document.createElement("vscode-text-field");
-    textField.id = id;
-    textField.setAttribute("style", "width: 300px");
-    const disabled = this.getAttribute("disabled");
-    if (disabled === "true") {
-      textField.setAttribute("disabled", "true");
+    let textField: HTMLElement;
+    switch (type) {
+      case "script": {
+        textField = this.buildScriptTextField(id);
+        break;
+      }
+      default: {
+        textField = this.buildBasicTextField(id);
+      }
     }
 
     const divColInput = buildDiv("col-input");
@@ -36,13 +40,37 @@ export class nwnTextField extends HTMLElement {
 
     this.appendChild(rowDiv);
   }
-}
 
-// <div class="row">
-// <div class="col-label">
-//   <label class="vscode-input-label" for="res_input_Name">Name:</label>
-// </div>
-// <div class="col-input">
-//   <vscode-text-field style="width: 300px" id="res_input_Name"></vscode-text-field>
-// </div>
-// </div>
+  buildScriptTextField(id: string): HTMLElement {
+    const span = document.createElement("span");
+    span.className = "codicon codicon-go-to-file";
+
+    const button = document.createElement("vscode-button");
+    button.id = id + "_btn";
+    button.setAttribute("appearance", "icon");
+    button.setAttribute("aria-label", "Goto File");
+    button.appendChild(span);
+
+    const section = document.createElement("section");
+    section.setAttribute("slot", "end");
+    section.setAttribute("style", "display:flex; align-items: center;");
+    section.appendChild(button);
+
+    const textField = document.createElement("vscode-text-field");
+    textField.id = id;
+    textField.appendChild(section);
+
+    return textField;
+  }
+
+  buildBasicTextField(id: string): HTMLElement {
+    const textField = document.createElement("vscode-text-field");
+    textField.id = id;
+    textField.setAttribute("style", "width: 300px");
+    const disabled = this.getAttribute("disabled");
+    if (disabled === "true") {
+      textField.setAttribute("disabled", "true");
+    }
+    return textField;
+  }
+}
