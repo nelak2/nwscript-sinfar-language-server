@@ -55,5 +55,5 @@ export function InitializeNWNControls() {
   customElements.define("nwn-merchant-inventory", nwnMerchantInventory);
   customElements.define("nwn-merchant-restrictions", nwnMerchantRestrictions);
   customElements.define("nwn-plc-inventory", nwnPLCInventory);
-  customElements.define("nwn-sounds-list", nwnSoundsList);
+  customElements.define("nwn-sound-list", nwnSoundsList);
 }
