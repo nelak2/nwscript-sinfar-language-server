@@ -15,6 +15,8 @@ import {
   Cursor,
   LinkedToFlags,
   TrapTypes,
+  DoorAppearanceType,
+  DoorInitialState,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -74,6 +76,12 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "TrapType":
         list = TrapTypes;
+        break;
+      case "DoorAppearanceType":
+        list = DoorAppearanceType;
+        break;
+      case "DoorInitialState":
+        list = DoorInitialState;
         break;
       default:
         list = [{ value: "-1", label: "Unknown List" }];
