@@ -16,15 +16,3 @@ export class Git {
     return this._data.extraData.editableFields;
   }
 }
-
-// res_AmbientSndDay
-// res_AmbientSndDayVol
-// res_MusicDay
-// res_AmbientSndNight
-// res_AmbientSndNightVol
-// res_MusicNight
-// res_MusicBattle
-// res_MusicDelay
-// res_EnvAudio
-
-// VARIABLES
