@@ -4,6 +4,7 @@ import { Git } from "./git";
 import { Utt } from "./utt";
 import { Utd } from "./utd";
 import { VarTable } from "./varTable";
+import { Utw } from "./utw";
 
 // Wrapper class for the resdata object
 // Provides access to the different parts of the resdata object
@@ -114,15 +115,15 @@ class Uti {
   }
 
   public get editableFields() {
-    throw new Error("Not implemented");
+    return this._data.editableFields;
   }
 
   public getField(field: string) {
-    throw new Error("Not implemented");
+    return this._data.resData[1][field];
   }
 
   public setField(field: string, value: string) {
-    throw new Error("Not implemented");
+    this._data.resData[1][field][1] = value;
   }
 }
 
@@ -133,15 +134,15 @@ class Utc {
   }
 
   public get editableFields() {
-    throw new Error("Not implemented");
+    return this._data.editableFields;
   }
 
   public getField(field: string) {
-    throw new Error("Not implemented");
+    return this._data.resData[1][field];
   }
 
   public setField(field: string, value: string) {
-    throw new Error("Not implemented");
+    this._data.resData[1][field][1] = value;
   }
 }
 
@@ -152,15 +153,15 @@ class Utp {
   }
 
   public get editableFields() {
-    throw new Error("Not implemented");
+    return this._data.editableFields;
   }
 
   public getField(field: string) {
-    throw new Error("Not implemented");
+    return this._data.resData[1][field];
   }
 
   public setField(field: string, value: string) {
-    throw new Error("Not implemented");
+    this._data.resData[1][field][1] = value;
   }
 }
 
@@ -171,15 +172,15 @@ class Ute {
   }
 
   public get editableFields() {
-    throw new Error("Not implemented");
+    return this._data.editableFields;
   }
 
   public getField(field: string) {
-    throw new Error("Not implemented");
+    return this._data.resData[1][field];
   }
 
   public setField(field: string, value: string) {
-    throw new Error("Not implemented");
+    this._data.resData[1][field][1] = value;
   }
 }
 
@@ -190,34 +191,15 @@ class Utm {
   }
 
   public get editableFields() {
-    throw new Error("Not implemented");
+    return this._data.editableFields;
   }
 
   public getField(field: string) {
-    throw new Error("Not implemented");
+    return this._data.resData[1][field];
   }
 
   public setField(field: string, value: string) {
-    throw new Error("Not implemented");
-  }
-}
-
-class Utw {
-  private readonly _data: any;
-  constructor(resdata: any) {
-    this._data = resdata;
-  }
-
-  public get editableFields() {
-    throw new Error("Not implemented");
-  }
-
-  public getField(field: string) {
-    throw new Error("Not implemented");
-  }
-
-  public setField(field: string, value: string) {
-    throw new Error("Not implemented");
+    this._data.resData[1][field][1] = value;
   }
 }
 
@@ -228,14 +210,14 @@ class Uts {
   }
 
   public get editableFields() {
-    throw new Error("Not implemented");
+    return this._data.editableFields;
   }
 
   public getField(field: string) {
-    throw new Error("Not implemented");
+    return this._data.resData[1][field];
   }
 
   public setField(field: string, value: string) {
-    throw new Error("Not implemented");
+    this._data.resData[1][field][1] = value;
   }
 }

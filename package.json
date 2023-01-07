@@ -228,6 +228,10 @@
           {
             "filenamePattern": "*.utd",
             "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.utw",
+            "resourceScheme": "sinfar"
           }
         ]
       }

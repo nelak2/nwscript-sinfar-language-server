@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /*${style}*/
+    </style>
+    <link href="${codiconsUri}" rel="stylesheet" />
+    <script>
+      var exports = {};
+    </script>
+    <script type="module" src="${toolkitUri}"></script>
+    <script type="module" src="${mainUri}"></script>
+    <title>Edit Utw</title>
+  </head>
+
+  <body>
+    <sp-accordion allow-multiple>
+      <sp-accordion-item open label="Identification">
+        <nwn-text-field id="res_LocalizedName" label="Name"></nwn-text-field>
+        <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Classification">
+        <nwn-drop-down id="res_Appearance" label="Appearance" listRef="WaypointAppearance"></nwn-drop-down>
+        <nwn-number-field id="res_PaletteID" label="Palette ID" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Map Note">
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set-vertical">
+            <vscode-checkbox id="res_HasMapNote">Has Map Note</vscode-checkbox>
+            <vscode-checkbox id="res_MapNoteEnabled">Map Note Enabled</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+        <nwn-text-field id="res_MapNote" label="Map Note" type="textarea"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Variables">
+        <nwn-variables id="VarTable"></nwn-variables>
+      </sp-accordion-item>
+      <sp-accordion-item label="Comment">
+        <nwn-text-field id="res_Comment" type="comment"></nwn-text-field>
+      </sp-accordion-item>
+    </sp-accordion>
+  </body>
+</html>
