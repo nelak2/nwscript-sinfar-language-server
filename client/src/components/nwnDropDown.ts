@@ -10,6 +10,11 @@ import {
   Music,
   EnvironmentalEffects,
   VarType,
+  Faction,
+  TriggerType,
+  Cursor,
+  LinkedToFlags,
+  TrapTypes,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -54,6 +59,21 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "VarType":
         list = VarType;
+        break;
+      case "Faction":
+        list = Faction;
+        break;
+      case "TriggerType":
+        list = TriggerType;
+        break;
+      case "Cursor":
+        list = Cursor;
+        break;
+      case "LinkedToFlags":
+        list = LinkedToFlags;
+        break;
+      case "TrapType":
+        list = TrapTypes;
         break;
       default:
         list = [{ value: "-1", label: "Unknown List" }];
