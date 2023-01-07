@@ -10,9 +10,15 @@ export class nwnTextField extends HTMLElement {
     const label = this.getAttribute("label");
     const type = this.getAttribute("type");
 
-    if (!id || !label) {
+    if (!id) return;
+
+    if (type === "comment") {
+      const comment = this.buildCommentField(id);
+      this.appendChild(comment);
       return;
     }
+
+    if (!label) return;
 
     const labelElement = buildLabel(label, id);
     labelElement.className = "vscode-input-label";
@@ -22,8 +28,15 @@ export class nwnTextField extends HTMLElement {
 
     let textField: HTMLElement;
     switch (type) {
-      case "script": {
-        textField = this.buildScriptTextField(id);
+      case "script":
+      case "dialog":
+      case "item":
+      case "creature": {
+        textField = this.buildResrefTextField(id);
+        break;
+      }
+      case "textarea": {
+        textField = this.buildTextAreaField(id);
         break;
       }
       default: {
@@ -41,7 +54,25 @@ export class nwnTextField extends HTMLElement {
     this.appendChild(rowDiv);
   }
 
-  buildScriptTextField(id: string): HTMLElement {
+  buildCommentField(id: string): HTMLElement {
+    const comment = document.createElement("vscode-text-area");
+    comment.id = id;
+    comment.setAttribute("cols", "70");
+    comment.setAttribute("rows", "10");
+    comment.setAttribute("resize", "vertical");
+    return comment;
+  }
+
+  buildTextAreaField(id: string): HTMLElement {
+    const textField = document.createElement("vscode-text-area");
+    textField.id = id;
+    textField.setAttribute("style", "width: 300px");
+    textField.setAttribute("rows", "6");
+    textField.setAttribute("resize", "vertical");
+    return textField;
+  }
+
+  buildResrefTextField(id: string): HTMLElement {
     const span = document.createElement("span");
     span.className = "codicon codicon-go-to-file";
 
