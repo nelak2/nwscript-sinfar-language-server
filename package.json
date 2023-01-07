@@ -232,6 +232,10 @@
           {
             "filenamePattern": "*.utw",
             "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.uts",
+            "resourceScheme": "sinfar"
           }
         ]
       }
