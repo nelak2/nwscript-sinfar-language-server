@@ -89,3 +89,35 @@ export const WaypointAppearance: DropdownListItem[] = [
   { value: "3", label: "Green" },
   { value: "4", label: "Yellow" },
 ];
+
+export const PlayTimeType: DropdownListItem[] = [
+  { value: "0", label: "Specific Hours" },
+  { value: "1", label: "Day" },
+  { value: "2", label: "Night" },
+  { value: "3", label: "Always" },
+];
+
+export const SoundPriority: DropdownListItem[] = [
+  { value: "0", label: "0 (Unmaskable_Sound)" },
+  { value: "1", label: "1 (Music_Stingers)" },
+  { value: "2", label: "2 (Looping_AreaWide_Ambients)" },
+  { value: "3", label: "3 (Looping_Positional_Ambients)" },
+  { value: "4", label: "4 (Looping_Player)" },
+  { value: "5", label: "5 (Looping_NonPlayer)" },
+  { value: "6", label: "7 (Player_Chat)" },
+  { value: "7", label: "7 (Non_Player_Chat)" },
+  { value: "8", label: "8 (Scripted_PlaySound)" },
+  { value: "9", label: "9 (GUI)" },
+  { value: "10", label: "10 (Area_Spell_Effects)" },
+  { value: "11", label: "11 (Normal_Spell_Effects)" },
+  { value: "12", label: "12 (Projectile)" },
+  { value: "13", label: "13 (Combat)" },
+  { value: "14", label: "14 (Large_Creature_Vocalizations)" },
+  { value: "15", label: "15 (Medium_and_Small_Creature_Voclizations)" },
+  { value: "16", label: "16 (Large_Creature_Footsteps)" },
+  { value: "17", label: "17 (Player_Footsteps)" },
+  { value: "18", label: "18 (Medium_and_Small_Creature_Footsteps)" },
+  { value: "19", label: "19 (Single_Shot_Global)" },
+  { value: "20", label: "20 (Single_Shot_Positional)" },
+  { value: "21", label: "255 (Default)" },
+];

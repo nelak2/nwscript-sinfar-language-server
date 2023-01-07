@@ -18,6 +18,8 @@ import {
   DoorAppearanceType,
   DoorInitialState,
   WaypointAppearance,
+  PlayTimeType,
+  SoundPriority,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -86,6 +88,12 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "WaypointAppearance":
         list = WaypointAppearance;
+        break;
+      case "PlayTimeType":
+        list = PlayTimeType;
+        break;
+      case "SoundPriority":
+        list = SoundPriority;
         break;
       default:
         list = [{ value: "-1", label: "Unknown List" }];
