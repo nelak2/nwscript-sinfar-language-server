@@ -89,6 +89,7 @@ export class nwnTextField extends HTMLElement {
 
     const textField = document.createElement("vscode-text-field");
     textField.id = id;
+    textField.setAttribute("maxlength", "16");
     textField.appendChild(section);
 
     return textField;
