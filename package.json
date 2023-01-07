@@ -224,6 +224,10 @@
           {
             "filenamePattern": "*.utt",
             "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.utd",
+            "resourceScheme": "sinfar"
           }
         ]
       }
