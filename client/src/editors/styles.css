@@ -4063,6 +4063,7 @@ vscode-dropdown::part(listbox)
     padding-block-start: 0px;
     padding-block-end: 0px;
     border-style: none;
+    width: 300px;
 }
 
 .variableRow
