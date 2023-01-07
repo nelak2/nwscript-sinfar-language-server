@@ -71,3 +71,14 @@ export const Faction: DropdownListItem[] = [
   { value: "6", label: "PCKiller" },
   { value: "7", label: "PCAngel" },
 ];
+
+export const DoorAppearanceType: DropdownListItem[] = [
+  { value: "0", label: "doortypes.2da" },
+  { value: "1", label: "genericdoors.2da" },
+];
+
+export const DoorInitialState: DropdownListItem[] = [
+  { value: "0", label: "Closed" },
+  { value: "1", label: "Open 1" },
+  { value: "2", label: "Open 2" },
+];
