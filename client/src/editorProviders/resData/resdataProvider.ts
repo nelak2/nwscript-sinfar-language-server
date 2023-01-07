@@ -1,6 +1,7 @@
 import { EditorTypes, GFFType } from "../../api/types";
 import { Are } from "./are";
 import { Git } from "./git";
+import { Utt } from "./utt";
 import { VarTable } from "./varTable";
 
 // Wrapper class for the resdata object
@@ -163,25 +164,6 @@ class Utp {
 }
 
 class Ute {
-  private readonly _data: any;
-  constructor(resdata: any) {
-    this._data = resdata;
-  }
-
-  public get editableFields() {
-    throw new Error("Not implemented");
-  }
-
-  public getField(field: string) {
-    throw new Error("Not implemented");
-  }
-
-  public setField(field: string, value: string) {
-    throw new Error("Not implemented");
-  }
-}
-
-class Utt {
   private readonly _data: any;
   constructor(resdata: any) {
     this._data = resdata;

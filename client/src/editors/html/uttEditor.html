@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /*${style}*/
+    </style>
+    <link href="${codiconsUri}" rel="stylesheet" />
+    <script>
+      var exports = {};
+    </script>
+    <script type="module" src="${toolkitUri}"></script>
+    <script type="module" src="${mainUri}"></script>
+    <title>Edit Utt</title>
+  </head>
+
+  <body>
+    <sp-accordion allow-multiple>
+      <sp-accordion-item open label="Identification">
+        <nwn-text-field id="res_LocalizedName" label="Name"></nwn-text-field>
+        <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Classification">
+        <nwn-number-field id="res_PaletteID" label="Palette ID" unit="byte"></nwn-number-field>
+        <nwn-drop-down id="res_Faction" label="Faction" listRef="Faction"></nwn-drop-down>
+        <nwn-drop-down id="res_Type" label="Trigger Type" listRef="TriggerType"></nwn-drop-down>
+      </sp-accordion-item>
+      <sp-accordion-item label="Highlight">
+        <nwn-number-field id="res_HighlightHeight" label="Height" unit="distance"></nwn-number-field>
+        <nwn-drop-down id="res_Cursor" label="Cursor" listRef="Cursor"></nwn-drop-down>
+      </sp-accordion-item>
+      <sp-accordion-item label="Area Transition">
+        <nwn-drop-down id="res_LinkedToFlags" label="Linked To Type" listRef="LinkedToFlags"></nwn-drop-down>
+        <nwn-text-field id="res_LinkedTo" label="Linked To Tag"></nwn-text-field>
+        <nwn-drop-down id="res_LoadScreenID" label="Load Screen" listRef="LoadScreen"></nwn-drop-down>
+      </sp-accordion-item>
+      <sp-accordion-item label="Trap">
+        <nwn-drop-down id="res_TrapType" label="Type" listRef="TrapType"></nwn-drop-down>
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set">
+            <vscode-checkbox id="res_TrapFlag">Is Trapped</vscode-checkbox>
+            <vscode-checkbox id="res_TrapOneShot">One Shot</vscode-checkbox>
+            <vscode-checkbox id="res_TrapDetectable">Detectable</vscode-checkbox>
+            <vscode-checkbox id="res_TrapDisarmable">Disarmable</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+        <nwn-number-field id="res_TrapDetectDC" label="Detection DC" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_DisarmDC" label="Disarm DC" unit="byte"></nwn-number-field>
+        <nwn-text-field id="res_OnTrapTriggered" label="OnTrapTriggered" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnDisarm" label="OnDisarm" type="script"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item open label="Scripts">
+        <nwn-text-field id="res_OnClick" label="OnClick" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptOnEnter" label="OnEnter" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptOnExit" label="OnExit" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptHeartbeat" label="OnHeartbeat" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptUserDefine" label="OnUserDefined" type="script"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Variables">
+        <nwn-variables id="VarTable"></nwn-variables>
+      </sp-accordion-item>
+      <sp-accordion-item label="Comment">
+        <vscode-text-area id="res_Comment" cols="70" rows="12"></vscode-text-area>
+      </sp-accordion-item>
+    </sp-accordion>
+  </body>
+</html>
