@@ -4039,13 +4039,13 @@ vscode-dropdown::part(listbox)
     display: flex;
     padding-bottom: 5px;
     padding-top: 5px;
+    align-items: center;
 }
 
 .col-label
 {
     width: 150px;
     position: relative;
-    top: 4px;
     right: 8px;
     white-space: nowrap;
     text-align: right;
@@ -4064,6 +4064,18 @@ vscode-dropdown::part(listbox)
     padding-block-end: 0px;
     border-style: none;
     width: 300px;
+}
+
+.checkbox-set-vertical
+{
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-block-start: 0px;
+    padding-block-end: 0px;
+    border-style: none;
+    width: 300px;
+    display: grid;
+    padding: 0;
 }
 
 .variableRow
