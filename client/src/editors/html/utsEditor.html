@@ -18,7 +18,7 @@
   <body>
     <sp-accordion allow-multiple>
       <sp-accordion-item open label="Identification">
-        <nwn-text-field id="res_LocalizedName" label="Name"></nwn-text-field>
+        <nwn-text-field id="res_LocName" label="Name"></nwn-text-field>
         <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
       </sp-accordion-item>
       <sp-accordion-item label="Classification">
@@ -29,50 +29,50 @@
           <fieldset class="checkbox-set-vertical">
             <vscode-checkbox id="res_Active">Active</vscode-checkbox>
             <vscode-checkbox id="res_Continuous">Continuous</vscode-checkbox>
-            <vscode-checkbox id="res_RandomOrder">Random Order</vscode-checkbox>
-            <vscode-checkbox id="res_AreaWide">Area Wide</vscode-checkbox>
+            <vscode-checkbox id="res_Random">Random Order</vscode-checkbox>
+            <vscode-checkbox id="res_Positional">Area Wide</vscode-checkbox>
             <vscode-checkbox id="res_RandomPosition">Random Position</vscode-checkbox>
             <vscode-checkbox id="res_Looping">Looping</vscode-checkbox>
           </fieldset>
         </nwn-row>
         <nwn-drop-down id="res_Priority" label="Priority" listRef="SoundPriority"></nwn-drop-down>
         <nwn-number-field id="res_Interval" label="Interval" unit="miliseconds"></nwn-number-field>
-        <nwn-number-field id="res_IntervalVariation" label="Interval Variation" unit="miliseconds"></nwn-number-field>
-        <nwn-number-field id="res_MinimumHearingDistance" label="Min Hearing Distance" unit="distance"></nwn-number-field>
-        <nwn-number-field id="res_MaximumHearingDistance" label="Max Hearing Distance" unit="distance"></nwn-number-field>
-        <nwn-number-field id="res_RandomExtraX" label="Random Extra X" unit="distance"></nwn-number-field>
-        <nwn-number-field id="res_RandomExtraY" label="Random Extra Y" unit="distance"></nwn-number-field>
-        <nwn-number-field id="res_RandomExtraZ" label="Extra Z" unit="distance"></nwn-number-field>
+        <nwn-number-field id="res_IntervalVrtn" label="Interval Variation" unit="miliseconds"></nwn-number-field>
+        <nwn-number-field id="res_MinDistance" label="Min Hearing Distance" unit="distance"></nwn-number-field>
+        <nwn-number-field id="res_MaxDistance" label="Max Hearing Distance" unit="distance"></nwn-number-field>
+        <nwn-number-field id="res_RandomRangeX" label="Random Extra X" unit="distance"></nwn-number-field>
+        <nwn-number-field id="res_RandomRangeY" label="Random Extra Y" unit="distance"></nwn-number-field>
+        <nwn-number-field id="res_Elevation" label="Extra Z" unit="distance"></nwn-number-field>
         <nwn-volume-slider id="res_Volume" label="Volume"></nwn-volume-slider>
-        <nwn-number-field id="res_VolumeVariation" label="Volume Variation" unit="char"></nwn-number-field>
+        <nwn-number-field id="res_VolumeVrtn" label="Volume Variation" unit="char"></nwn-number-field>
         <nwn-number-field id="res_PitchVariation" label="Pitch Variation" unit="pitch"></nwn-number-field>
-        <nwn-drop-down id="res_PlayTimeType" label="Play Time Type" listRef="PlayTimeType"></nwn-drop-down>
+        <nwn-drop-down id="res_Times" label="Play Time Type" listRef="PlayTimeType"></nwn-drop-down>
         <nwn-row label="Specific Hours">
           <fieldset class="checkbox-set-vertical">
-            <vscode-checkbox id="res_Hour_0">00:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_1">01:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_2">02:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_3">03:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_4">04:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_5">05:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_6">06:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_7">07:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_8">08:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_9">09:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_10">10:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_11">11:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_12">12:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_13">13:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_14">14:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_15">15:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_16">16:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_17">17:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_18">18:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_19">19:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_20">20:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_21">21:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_22">22:00</vscode-checkbox>
-            <vscode-checkbox id="res_Hour_23">23:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_0">00:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_1">01:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_2">02:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_3">03:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_4">04:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_5">05:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_6">06:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_7">07:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_8">08:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_9">09:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_10">10:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_11">11:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_12">12:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_13">13:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_14">14:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_15">15:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_16">16:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_17">17:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_18">18:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_19">19:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_20">20:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_21">21:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_22">22:00</vscode-checkbox>
+            <vscode-checkbox id="res_hour_23">23:00</vscode-checkbox>
           </fieldset>
         </nwn-row>
       </sp-accordion-item>
