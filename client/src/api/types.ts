@@ -99,11 +99,19 @@ export enum VariableType {
 
 export enum GFFType {
   Byte = 0,
-  Color = 4,
+  Char = 1,
+  Word = 2,
+  Short = 3,
+  Dword = 4,
   Int = 5,
+  Dword64 = 6,
+  Int64 = 7,
   Float = 8,
-  String = 10,
+  Double = 9,
+  CExoString = 10,
   Resref = 11,
-  StringArray = 12,
-  ObjectArray = 15,
+  CExoLocalizedString = 12,
+  Void = 13,
+  Struct = 14,
+  List = 15,
 }
