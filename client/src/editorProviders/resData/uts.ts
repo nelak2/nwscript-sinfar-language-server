@@ -15,7 +15,7 @@ export class Uts extends ResData {
   }
 
   public getField(field: string) {
-    return this.data.resData[1][field];
+    return this.readField(this.data.resData[1][field]);
   }
 
   public setField(field: string, value: string) {
