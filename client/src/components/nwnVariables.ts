@@ -1,6 +1,6 @@
 import { buildLabel, buildDiv, buildButton, buildDropdown, buildTextField } from "./utils";
 import { VarType } from "./lists/index";
-import { ResData } from "../editorProviders/resData/resdataProvider";
+import { ResData } from "../editorProviders/resData/resData";
 import { Variable } from "../api/types";
 
 export class nwnVariables extends HTMLElement {
@@ -56,7 +56,7 @@ export class nwnVariables extends HTMLElement {
 
   public Init(content: ResData) {
     this._content = content;
-    this._variables = content.variables.List;
+    this._variables = content.VarTable.List;
 
     this.refreshVariables();
   }
@@ -78,7 +78,7 @@ export class nwnVariables extends HTMLElement {
     }
 
     // If the variable doesn't exist, we want to add it
-    if (this._content.variables.getVariable(fieldID) === undefined) {
+    if (this._content.VarTable.getVariable(fieldID) === undefined) {
       this.addVariable(newValue);
       return;
     }
@@ -103,7 +103,7 @@ export class nwnVariables extends HTMLElement {
       window.dispatchEvent(new CustomEvent("alert", { detail: error.message }));
 
       // If we failed to update the variable, revert to the old value
-      const oldValue = this._content.variables.getVariable(fieldId);
+      const oldValue = this._content.VarTable.getVariable(fieldId);
       if (oldValue) {
         this.setVariableToRowElements(row, oldValue);
       }
@@ -120,7 +120,7 @@ export class nwnVariables extends HTMLElement {
 
   // Add new variable to table
   private addVariable(variable: Variable) {
-    this._content.variables.addVariable(variable);
+    this._content.VarTable.addVariable(variable);
     this.refreshVariables();
   }
 
@@ -130,7 +130,7 @@ export class nwnVariables extends HTMLElement {
     let newValue: Variable = this.getVariableFromRowElements(row);
 
     try {
-      newValue = this._content.variables.validateAndFormatVariable(newValue, true);
+      newValue = this._content.VarTable.validateAndFormatVariable(newValue, true);
       this.addVariable(newValue);
     } catch (error: any) {
       window.dispatchEvent(new CustomEvent("alert", { detail: error.message }));
@@ -148,7 +148,7 @@ export class nwnVariables extends HTMLElement {
   }
 
   private deleteVariable(name: string) {
-    return this._content.variables.deleteVariable(name);
+    return this._content.VarTable.deleteVariable(name);
   }
 
   // Handles delete variable event
@@ -174,7 +174,7 @@ export class nwnVariables extends HTMLElement {
   // Replace the HTML for the variable table with the current variable list
   private refreshVariables() {
     this._variableListDiv.replaceChildren();
-    this._variables = this._content.variables.List;
+    this._variables = this._content.VarTable.List;
 
     for (let i = 0; i < this._variables.length; i++) {
       this.addRow(i.toString(), this._variables[i]);
@@ -184,8 +184,8 @@ export class nwnVariables extends HTMLElement {
   // Update an existing variable in the table
   private updateVarTable(index: number, variable: Variable): { oldValue: Variable; newValue: Variable } {
     // Try updating the vartable
-    const newValue = this._content.variables.validateAndFormatVariable(variable);
-    const oldValue = this._content.variables.updateVariable(index, newValue);
+    const newValue = this._content.VarTable.validateAndFormatVariable(variable);
+    const oldValue = this._content.VarTable.updateVariable(index, newValue);
 
     if (!oldValue) {
       throw new Error("Variable not found");

@@ -1,39 +1,40 @@
+import { ResData, VarTable } from ".";
 import { Tilesets } from "../../components/lists";
 
-export class Are {
-  private readonly _data: any;
+export class Are extends ResData {
+  private readonly _vartable: VarTable;
+
   constructor(resdata: any) {
-    this._data = resdata;
+    super(resdata);
+    this._vartable = new VarTable(this._data);
   }
 
-  // We return the fields as GFF fields so resData provider can handle some general cases
-  // that would apply to all resources
   public getField(field: string) {
     switch (field) {
       case "Size": {
         const width = this._data.resData[1].Width[1];
         const height = this._data.resData[1].Height[1];
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        return [10, width.toString() + "x" + height.toString()];
+        return this.readField([10, width.toString() + "x" + height.toString()]);
       }
       case "Tileset": {
         const resref = this._data.resData[1].Tileset[1];
         const tileset = Tilesets.find((t) => t.value === resref);
 
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        return [10, resref + " - " + tileset?.label];
+        return this.readField([10, resref + " - " + tileset?.label]);
       }
       case "Interior": {
-        return [4, this._data.resData[1].Flags[1] & 1];
+        return this.readField([4, this._data.resData[1].Flags[1] & 1]);
       }
       case "Underground": {
-        return [4, this._data.resData[1].Flags[1] & 2];
+        return this.readField([4, this._data.resData[1].Flags[1] & 2]);
       }
       case "Natural": {
-        return [4, this._data.resData[1].Flags[1] & 4];
+        return this.readField([4, this._data.resData[1].Flags[1] & 4]);
       }
       case "DayNightCycle": {
-        return [0, this._data.resData[1].DayNightCycle[1] ? 1 : this._data.resData[1].IsNight[1] ? 3 : 2];
+        return this.readField([0, this._data.resData[1].DayNightCycle[1] ? 1 : this._data.resData[1].IsNight[1] ? 3 : 2]);
       }
       case "SunAmbientColor":
       case "SunDiffuseColor":
@@ -43,10 +44,10 @@ export class Are {
       case "MoonFogColor": {
         const bgr: number = this._data.resData[1][field][1];
 
-        return [4, this.BGRtoRGB(bgr)];
+        return this.readField([4, this.BGRtoRGB(bgr)]);
       }
       default:
-        return this._data.resData[1][field];
+        return this.readField(this._data.resData[1][field]);
     }
   }
 
@@ -86,7 +87,7 @@ export class Are {
         break;
       }
       default: {
-        this._data.resData[1][field][1] = value;
+        this._data.resData[1][field][1] = this.writeField(value, this._data.resData[1][field][0]);
       }
     }
   }
@@ -105,6 +106,10 @@ export class Are {
     return fields;
   }
 
+  public get VarTable(): VarTable {
+    throw new Error("VarTable does not exist on ARE.");
+  }
+
   private BGRtoRGB(bgr: number): string {
     const hex = bgr.toString(16).padStart(6, "0");
     const r = hex.substr(4, 2);
@@ -120,37 +125,3 @@ export class Are {
     return b * 256 * 256 + g * 256 + r;
   }
 }
-
-// res_Name
-// res_Tag
-// res_Tileset
-// res_Size
-// res_DayNightCycle
-// res_Flags_SunShadows
-// res_Flags_MoonShadows
-// res_SunAmbientColor
-// res_SunDiffuseColor
-// res_SunFogAmount
-// res_SunFogColor
-// res_MoonAmbientColor
-// res_MoonDiffuseColor
-// res_MoonFogAmount
-// res_MoonFogColor
-// res_FogClipDistance
-// res_ShadowOp
-// res_ShadowOpacity
-// res_WeatherWindPower
-// res_WeatherSnowPercentage
-// res_WeatherRainPercentage
-// res_WeatherLightningPercentage
-// res_Skybox
-// res_Flags_NoRest
-// res_Flags_Interior
-// res_Flags_Underground
-// res_Flags_Natural
-// res_CheckModifierListen
-// res_CheckModifierSpot
-// res_PvP
-// res_LoadScreen
-
-// SCRIPTS

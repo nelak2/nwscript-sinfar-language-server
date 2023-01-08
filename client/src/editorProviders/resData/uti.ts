@@ -1,6 +1,6 @@
 import { ResData, VarTable } from ".";
 
-export class Utt extends ResData {
+export class Uti extends ResData {
   private readonly _vartable: VarTable;
 
   constructor(resdata: any) {
@@ -13,14 +13,14 @@ export class Utt extends ResData {
   }
 
   public getField(field: string) {
-    return this.readField(this._data.resData[1][field]);
+    return this.data.resData[1][field];
   }
 
   public setField(field: string, value: string) {
-    this._data.resData[1][field][1] = this.writeField(value, this._data.resData[1][field][0]);
+    this.data.resData[1][field][1] = this.writeField(value, this.data.resData[1][field][0]);
   }
 
-  public get VarTable(): VarTable {
-    return new VarTable(this._data);
+  public get VarTable() {
+    return this._vartable;
   }
 }

@@ -1,6 +1,6 @@
 import { InitializeNWNControls } from "../components";
 import { nwnVariables } from "../components/nwnVariables";
-import { ResData } from "../editorProviders/resData/resdataProvider";
+import { createResData, ResData } from "../editorProviders/resData";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
@@ -81,7 +81,7 @@ function InboundMessageHandler(event: any) {
     }
     // Handle init message
     else if (messageType === "init") {
-      content = new ResData(message.content, ResData.getEditorType(message.content.resName));
+      content = createResData(message.content);
       InitHTMLElements();
 
       if (message.edits) {
@@ -161,10 +161,10 @@ function getFileData(requestId: number = -1) {
 function BindListeners() {
   const editableFields = content.editableFields;
   for (const field of editableFields) {
-    const element = document.getElementById("res_" + <string>field);
+    const element = document.getElementById("res_" + field);
 
     if (!element) {
-      console.log("Element not found: " + <string>field);
+      console.log("Element not found: " + field);
       return;
     }
 

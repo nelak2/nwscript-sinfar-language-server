@@ -1,7 +1,11 @@
-export class Utd {
-  private readonly _data: any;
+import { ResData, VarTable } from ".";
+
+export class Utd extends ResData {
+  private readonly _vartable: VarTable;
+
   constructor(resdata: any) {
-    this._data = resdata;
+    super(resdata);
+    this._vartable = new VarTable(this._data);
   }
 
   public get editableFields() {
@@ -11,15 +15,15 @@ export class Utd {
   public getField(field: string) {
     switch (field) {
       case "AppearanceType": {
-        if (this._data.resData[1].Appearance[1] === 0) return [4, 1];
-        return [4, 0];
+        if (this._data.resData[1].Appearance[1] === 0) return this.readField([4, 1]);
+        return this.readField([4, 0]);
       }
       case "Appearance": {
-        if (this._data.resData[1].Appearance[1] === 0) return this._data.resData[1].GenericType_New;
-        return this._data.resData[1].Appearance;
+        if (this._data.resData[1].Appearance[1] === 0) return this.readField(this._data.resData[1].GenericType_New);
+        return this.readField(this._data.resData[1].Appearance);
       }
       default: {
-        return this._data.resData[1][field];
+        return this.readField(this._data.resData[1][field]);
       }
     }
   }
@@ -51,8 +55,12 @@ export class Utd {
         break;
       }
       default: {
-        this._data.resData[1][field][1] = value;
+        this._data.resData[1][field][1] = this.writeField(value, this._data.resData[1][field][0]);
       }
     }
+  }
+
+  public get VarTable(): VarTable {
+    return this._vartable;
   }
 }
