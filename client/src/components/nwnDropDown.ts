@@ -20,6 +20,9 @@ import {
   WaypointAppearance,
   PlayTimeType,
   SoundPriority,
+  PLCInitialState,
+  BodyBag,
+  PLCAppearances,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -94,6 +97,15 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "SoundPriority":
         list = SoundPriority;
+        break;
+      case "PLCInitialState":
+        list = PLCInitialState;
+        break;
+      case "BodyBag":
+        list = BodyBag;
+        break;
+      case "PLCAppearances":
+        list = PLCAppearances;
         break;
       default:
         list = [{ value: "-1", label: "Unknown List" }];
