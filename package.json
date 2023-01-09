@@ -236,6 +236,10 @@
           {
             "filenamePattern": "*.uts",
             "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.utp",
+            "resourceScheme": "sinfar"
           }
         ]
       }
