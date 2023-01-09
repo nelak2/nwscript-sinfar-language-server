@@ -1,6 +1,5 @@
-import { InitializeNWNControls } from "../components";
-import { nwnVariables } from "../components/nwnVariables";
-import { createResData, ResData } from "../editorProviders/resData";
+import { InitializeNWNControls, nwnVariables, nwnSoundsList } from "../components";
+import { createResData, ResData, Uts } from "../editorProviders/resData";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
@@ -8,6 +7,7 @@ InitializeNWNControls();
 let content: ResData;
 let initialized = false;
 let _varTable: nwnVariables;
+let _soundList: nwnSoundsList;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -64,6 +64,15 @@ function onEditableFieldChange(e: any) {
         });
         break;
       }
+      case "Sou": {
+        vscode.postMessage({
+          type: "update",
+          field: e.detail.field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
+        break;
+      }
     }
   } catch (e: any) {
     console.log(e);
@@ -77,7 +86,7 @@ function InboundMessageHandler(event: any) {
 
     // Handle update undo and redo messages
     if (messageType === "update" || messageType === "undo" || messageType === "redo") {
-      ProcessUpdateMessage(message.field, message.newValue);
+      ProcessUpdateMessage(message.field, message.newValue, message.oldValue);
     }
     // Handle init message
     else if (messageType === "init") {
@@ -86,7 +95,7 @@ function InboundMessageHandler(event: any) {
 
       if (message.edits) {
         for (const edit of message.edits) {
-          ProcessUpdateMessage(edit.field, edit.newValue);
+          ProcessUpdateMessage(edit.field, edit.newValue, edit.oldValue);
         }
       }
 
@@ -101,15 +110,27 @@ function InboundMessageHandler(event: any) {
   }
 }
 
-function ProcessUpdateMessage(field: string, newValue: any) {
+function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
   const updateType = field.split("_")[0];
 
   if (updateType === "var") {
     UpdateVarTable(field, newValue);
+  } else if (updateType === "SoundList") {
+    UpdateSoundList(field, newValue, oldValue);
   } else {
     content.setField(field, newValue);
     UpdateHTMLElementValue(field, newValue);
   }
+}
+
+function UpdateSoundList(field: string, newValue: any, oldValue: any) {
+  const soundFieldFullId = field.split("_");
+  const soundFieldId = soundFieldFullId[2];
+
+  if (!_soundList) return;
+
+  // update content
+  _soundList.Update(parseInt(soundFieldId), newValue, oldValue);
 }
 
 function UpdateVarTable(field: string, newValue: any) {
@@ -176,6 +197,11 @@ function BindListeners() {
     _varTable.addEventListener("vartable_change", onEditableFieldChange);
   }
 
+  // Bind the sound list
+  if (_soundList) {
+    _soundList.addEventListener("soundlist_change", onEditableFieldChange);
+  }
+
   initialized = true;
 }
 
@@ -190,5 +216,11 @@ function InitHTMLElements() {
   _varTable = <nwnVariables>document.getElementById("VarTable");
   if (_varTable) {
     _varTable.Init(content);
+  }
+
+  // Set the sound list
+  _soundList = <nwnSoundsList>document.getElementById("SoundList");
+  if (_soundList) {
+    _soundList.Init(content as Uts);
   }
 }
