@@ -1,5 +1,5 @@
 import { Uts } from "../editorProviders/resData";
-import { buildDiv, buildLabel, buildTextField, ButtonType } from "./utils";
+import { buildDiv, buildLabelColumn, buildTextField, ButtonType } from "./utils";
 
 export class nwnSoundsList extends HTMLElement {
   _content!: Uts;
@@ -114,13 +114,6 @@ export class nwnSoundsList extends HTMLElement {
     );
   }
 
-  private buildLabelColumn(text: string, htmlFor: string): HTMLDivElement {
-    const label = buildLabel(text, htmlFor);
-    const labelDiv = buildDiv("col-label");
-    labelDiv.appendChild(label);
-    return labelDiv;
-  }
-
   private buildSoundList(): HTMLDivElement {
     const fieldset = document.createElement("fieldset");
     fieldset.id = "SoundList";
@@ -139,7 +132,7 @@ export class nwnSoundsList extends HTMLElement {
   }
 
   private buildSoundListRow(): HTMLDivElement {
-    const listLabelCol = this.buildLabelColumn("Sounds", "SoundList");
+    const listLabelCol = buildLabelColumn("Sounds", "SoundList");
     const listInputCol = this.buildSoundList();
 
     const listRow = buildDiv("row");
@@ -149,7 +142,7 @@ export class nwnSoundsList extends HTMLElement {
   }
 
   private buildSoundAddRow(): HTMLDivElement {
-    const soundAddLabelCol = this.buildLabelColumn("Add Sound", "SoundAdd_txt");
+    const soundAddLabelCol = buildLabelColumn("Add Sound", "SoundAdd_txt");
     const soundAddInputCol = buildTextField({
       id: "SoundAdd",
       value: undefined,

@@ -48,7 +48,12 @@ export function buildTextField(options: {
   if (options.className) textField.className = options.className;
 
   if (options.id !== undefined && options.buttonType !== undefined) {
-    textField.appendChild(buildTextFieldButton(options.id, options.buttonType));
+    if (options.buttonType === ButtonType.GotoAndDelete) {
+      textField.appendChild(buildTextFieldButton(options.id + "_goto", ButtonType.goto));
+      textField.appendChild(buildTextFieldButton(options.id + "_del", ButtonType.delete));
+    } else {
+      textField.appendChild(buildTextFieldButton(options.id, options.buttonType));
+    }
   }
 
   return textField;
@@ -97,6 +102,7 @@ export enum ButtonType {
   "goto",
   "delete",
   "add",
+  "GotoAndDelete",
 }
 
 export function buildDropdown(value: string, fieldId: string = ""): HTMLElement {
@@ -132,4 +138,11 @@ export function buildTextAreaField(
   if (options.style) textField.setAttribute("style", options.style);
   if (options.resize) textField.setAttribute("resize", options.resize);
   return textField;
+}
+
+export function buildLabelColumn(text: string, htmlFor: string): HTMLDivElement {
+  const label = buildLabel(text, htmlFor);
+  const labelDiv = buildDiv("col-label");
+  labelDiv.appendChild(label);
+  return labelDiv;
 }
