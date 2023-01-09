@@ -1,4 +1,4 @@
-import { buildLabel, buildDiv } from "./utils";
+import { buildLabel, buildDiv, buildTextAreaField, buildTextField, ButtonType } from "./utils";
 
 export class nwnTextField extends HTMLElement {
   constructor() {
@@ -13,7 +13,12 @@ export class nwnTextField extends HTMLElement {
     if (!id) return;
 
     if (type === "comment") {
-      const comment = this.buildCommentField(id);
+      const comment = buildTextAreaField(id, {
+        cols: 70,
+        rows: 10,
+        resize: "vertical",
+        style: undefined,
+      });
       this.appendChild(comment);
       return;
     }
@@ -36,11 +41,29 @@ export class nwnTextField extends HTMLElement {
         break;
       }
       case "textarea": {
-        textField = this.buildTextAreaField(id);
+        textField = buildTextAreaField(id, {
+          cols: undefined,
+          rows: 6,
+          style: "width: 300px",
+          resize: "vertical",
+        });
         break;
       }
       default: {
-        textField = this.buildBasicTextField(id);
+        let disabled: boolean = false;
+        if (this.getAttribute("disabled") === "true") {
+          disabled = true;
+        }
+
+        textField = buildTextField({
+          id,
+          style: "width: 300px",
+          disabled,
+          maxLength: undefined,
+          className: undefined,
+          value: undefined,
+          buttonType: undefined,
+        });
       }
     }
 
@@ -54,55 +77,15 @@ export class nwnTextField extends HTMLElement {
     this.appendChild(rowDiv);
   }
 
-  buildCommentField(id: string): HTMLElement {
-    const comment = document.createElement("vscode-text-area");
-    comment.id = id;
-    comment.setAttribute("cols", "70");
-    comment.setAttribute("rows", "10");
-    comment.setAttribute("resize", "vertical");
-    return comment;
-  }
-
-  buildTextAreaField(id: string): HTMLElement {
-    const textField = document.createElement("vscode-text-area");
-    textField.id = id;
-    textField.setAttribute("style", "width: 300px");
-    textField.setAttribute("rows", "6");
-    textField.setAttribute("resize", "vertical");
-    return textField;
-  }
-
   buildResrefTextField(id: string): HTMLElement {
-    const span = document.createElement("span");
-    span.className = "codicon codicon-go-to-file";
-
-    const button = document.createElement("vscode-button");
-    button.id = id + "_btn";
-    button.setAttribute("appearance", "icon");
-    button.setAttribute("aria-label", "Goto File");
-    button.appendChild(span);
-
-    const section = document.createElement("section");
-    section.setAttribute("slot", "end");
-    section.setAttribute("style", "display:flex; align-items: center;");
-    section.appendChild(button);
-
-    const textField = document.createElement("vscode-text-field");
-    textField.id = id;
-    textField.setAttribute("maxlength", "16");
-    textField.appendChild(section);
-
-    return textField;
-  }
-
-  buildBasicTextField(id: string): HTMLElement {
-    const textField = document.createElement("vscode-text-field");
-    textField.id = id;
-    textField.setAttribute("style", "width: 300px");
-    const disabled = this.getAttribute("disabled");
-    if (disabled === "true") {
-      textField.setAttribute("disabled", "true");
-    }
-    return textField;
+    return buildTextField({
+      id,
+      style: "width: 300px",
+      disabled: false,
+      maxLength: 16,
+      className: undefined,
+      value: undefined,
+      buttonType: ButtonType.goto,
+    });
   }
 }

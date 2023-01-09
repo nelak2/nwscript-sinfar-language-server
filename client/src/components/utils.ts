@@ -29,12 +29,74 @@ export function buildButton(type: string, id: string = ""): HTMLElement {
   return button;
 }
 
-export function buildTextField(value: string, fieldId: string = ""): HTMLElement {
+export function buildTextField(options: {
+  id: string | undefined;
+  value: string | undefined;
+  style: string | undefined;
+  disabled: boolean | undefined;
+  maxLength: number | undefined;
+  className: string | undefined;
+  buttonType: ButtonType | undefined;
+}): HTMLElement {
   const textField = document.createElement("vscode-text-field");
-  textField.id = fieldId;
-  textField.className = "variableField";
-  textField.setAttribute("value", value);
+
+  if (options.id) textField.id = options.id;
+  if (options.value) textField.setAttribute("value", options.value);
+  if (options.style) textField.setAttribute("style", options.style);
+  if (options.disabled) textField.setAttribute("disabled", "true");
+  if (options.maxLength) textField.setAttribute("maxlength", options.maxLength.toString());
+  if (options.className) textField.className = options.className;
+
+  if (options.id !== undefined && options.buttonType !== undefined) {
+    textField.appendChild(buildTextFieldButton(options.id, options.buttonType));
+  }
+
   return textField;
+}
+
+function buildTextFieldButton(id: string, type: ButtonType): HTMLElement {
+  let className = "codicon codicon-";
+  let ariaLabel = "";
+
+  switch (type) {
+    case ButtonType.goto: {
+      className += "go-to-file";
+      ariaLabel = "Goto File";
+      break;
+    }
+    case ButtonType.delete: {
+      className += "trash";
+      ariaLabel = "Delete";
+      break;
+    }
+    case ButtonType.add: {
+      className += "add";
+      ariaLabel = "Add";
+      break;
+    }
+  }
+
+  const span = document.createElement("span");
+  span.className = "codicon codicon-" + className;
+
+  const button = document.createElement("vscode-button");
+  button.id = id + "_btn";
+  button.setAttribute("appearance", "icon");
+  button.setAttribute("aria-label", ariaLabel);
+  button.appendChild(span);
+
+  const section = document.createElement("section");
+  section.setAttribute("slot", "end");
+  section.setAttribute("style", "display:flex; align-items: center;");
+  section.appendChild(button);
+
+  return section;
+}
+
+export enum ButtonType {
+  "goto",
+  "delete",
+  "add",
 }
 
 export function buildDropdown(value: string, fieldId: string = ""): HTMLElement {
@@ -51,4 +113,23 @@ export function buildDropdown(value: string, fieldId: string = ""): HTMLElement 
 
   dropdown.setAttribute("current-value", value);
   return dropdown;
+}
+
+export function buildTextAreaField(
+  id: string,
+  options: {
+    cols: number | undefined;
+    rows: number | undefined;
+    style: string | undefined;
+    resize: string | undefined;
+  },
+): HTMLElement {
+  const textField = document.createElement("vscode-text-area");
+  textField.id = id;
+
+  if (options.cols) textField.setAttribute("cols", options.cols.toString());
+  if (options.rows) textField.setAttribute("rows", options.rows.toString());
+  if (options.style) textField.setAttribute("style", options.style);
+  if (options.resize) textField.setAttribute("resize", options.resize);
+  return textField;
 }
