@@ -240,6 +240,26 @@
           {
             "filenamePattern": "*.utp",
             "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.ute",
+            "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.utm",
+            "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.uti",
+            "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.utc",
+            "resourceScheme": "sinfar"
+          },
+          {
+            "filenamePattern": "*.ifo",
+            "resourceScheme": "sinfar"
           }
         ]
       }
