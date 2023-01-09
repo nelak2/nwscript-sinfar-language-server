@@ -10,6 +10,7 @@ export { Music } from "./music";
 export { EnvironmentalEffects } from "./environmentalEffects";
 export { Tilesets } from "./tilesets";
 export { TrapTypes } from "./trapTypes";
+export { PLCAppearances } from "./plcAppearances";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
@@ -120,4 +121,21 @@ export const SoundPriority: DropdownListItem[] = [
   { value: "19", label: "19 (Single_Shot_Global)" },
   { value: "20", label: "20 (Single_Shot_Positional)" },
   { value: "21", label: "255 (Default)" },
+];
+
+export const PLCInitialState: DropdownListItem[] = [
+  { value: "0", label: "Default" },
+  { value: "1", label: "Open" },
+  { value: "2", label: "Closed" },
+  { value: "3", label: "Destroyed" },
+];
+
+export const BodyBag: DropdownListItem[] = [
+  { value: "0", label: "Default" },
+  { value: "1", label: "Potion" },
+  { value: "2", label: "Scroll" },
+  { value: "3", label: "Treasure" },
+  { value: "4", label: "Body" },
+  { value: "5", label: "Bones" },
+  { value: "6", label: "Pouch" },
 ];
