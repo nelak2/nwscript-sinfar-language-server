@@ -38,9 +38,25 @@ export class nwnVariables extends HTMLElement {
 
     // create add variable controls
     const variableAddRow = buildDiv("variableRow");
-    const textFieldName = buildTextField("", "nwnvartable_add_name");
+    const textFieldName = buildTextField({
+      id: "nwnvartable_add_name",
+      value: undefined,
+      style: "width: 162.5px; padding-inline: 5px",
+      disabled: undefined,
+      maxLength: undefined,
+      className: undefined,
+      buttonType: undefined,
+    });
     const dropdownType = buildDropdown(VarType[0].value, "nwnvartable_add_type");
-    const textFieldValue = buildTextField("", "nwnvartable_add_value");
+    const textFieldValue = buildTextField({
+      id: "nwnvartable_add_value",
+      value: undefined,
+      style: "padding-inline: 5px",
+      disabled: undefined,
+      maxLength: undefined,
+      className: undefined,
+      buttonType: undefined,
+    });
     const buttonAdd = buildButton("add", "var_add_btn");
     variableAddRow.appendChild(textFieldName);
     variableAddRow.appendChild(dropdownType);
@@ -198,9 +214,25 @@ export class nwnVariables extends HTMLElement {
     if (!this._variableListDiv) return;
 
     const variableRow = buildDiv("variableRow");
-    const textFieldName = buildTextField(variable.Name, "var_name_" + fieldId);
+    const textFieldName = buildTextField({
+      id: "var_name_" + fieldId,
+      value: variable.Name,
+      disabled: undefined,
+      style: "width: 162.5px; padding-inline: 5px",
+      maxLength: undefined,
+      className: undefined,
+      buttonType: undefined,
+    });
     const dropdownType = buildDropdown(variable.Type.toString(), "var_type_" + fieldId);
-    const textFieldValue = buildTextField(variable.Value.toString(), "var_value_" + fieldId);
+    const textFieldValue = buildTextField({
+      id: "var_value_" + fieldId,
+      value: variable.Value.toString(),
+      disabled: undefined,
+      style: "padding-inline: 5px",
+      maxLength: undefined,
+      className: undefined,
+      buttonType: undefined,
+    });
     const buttonDelete = buildButton("close", "var_del_" + fieldId);
     variableRow.appendChild(textFieldName);
     variableRow.appendChild(dropdownType);
