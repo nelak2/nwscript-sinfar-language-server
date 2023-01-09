@@ -60,6 +60,7 @@ export abstract class ResData {
   protected readField(value: any): any {
     switch (value[0]) {
       case GFFType.CExoLocalizedString: {
+        if (value[1][this._data.langId] === undefined) return "";
         return value[1][this._data.langId];
       }
       default: {
