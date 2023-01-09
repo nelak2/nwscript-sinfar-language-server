@@ -1,8 +1,8 @@
-import { ResData } from "../editorProviders/resData/resdataProvider";
-import { buildDiv, buildLabel } from "./utils";
+import { Uts } from "../editorProviders/resData";
+import { buildDiv, buildLabel, buildTextField, ButtonType } from "./utils";
 
 export class nwnSoundsList extends HTMLElement {
-  _content!: ResData;
+  _content!: Uts;
   _soundsDiv!: HTMLFieldSetElement;
   constructor() {
     super();
@@ -14,67 +14,121 @@ export class nwnSoundsList extends HTMLElement {
     this.appendChild(soundAddRow);
   }
 
-  public Init(content: ResData) {
+  public Init(content: Uts) {
     this._content = content;
 
     this.refreshList();
   }
 
-  refreshList() {
+  public Update(index: number, newValue: any, oldValue: any) {
+    // If newValue is undefined then the sound was deleted
+    if (newValue === undefined && index >= 0) {
+      this._content.SoundList.deleteSound(index);
+    }
+
+    // If oldValue is undefined then the sound was added
+    if (oldValue === undefined) {
+      this._content.SoundList.addSound(newValue);
+    }
+
+    // If neither newValue or oldValue are undefined then the sound was updated
+    if (newValue !== undefined && oldValue !== undefined) {
+      this._content.SoundList.updateSound(index, newValue);
+    }
+
+    this.refreshList();
+  }
+
+  private refreshList() {
     // Clear the list
     this._soundsDiv.replaceChildren();
-    const sounds = this._content.uts.getSoundList();
+    const sounds = this._content.SoundList.getSoundList();
 
     // Add each sound to the list
-    for (const sound of sounds) {
-      this.addRow(sound);
+    for (let i = 0; i < sounds.length; i++) {
+      this.addRow(sounds[i], i);
     }
   }
 
   // Add HTML elements to the list
-  addRow(sound: string) {
-    throw new Error("Method not implemented.");
+  private addRow(sound: string, index: number) {
+    const soundListItem = buildTextField({
+      id: "snd_item_" + index.toString(),
+      value: sound,
+      disabled: true,
+      style: undefined,
+      className: undefined,
+      maxLength: 16,
+      buttonType: ButtonType.delete,
+    });
+
+    const delBtn = soundListItem.querySelector("vscode-button") as HTMLButtonElement;
+    if (delBtn) delBtn.addEventListener("click", (e) => this.deleteClickEventHandler(e, index));
+
+    const textField = soundListItem.querySelector("vscode-text-field") as HTMLInputElement;
+    if (textField) textField.addEventListener("change", (e) => this.changeEventHandler(e, index));
+
+    this._soundsDiv.appendChild(soundListItem);
   }
 
   // Add the sound to the list then refresh the list
-  addClickEventHandler(e: Event, newValue: string) {
-    const oldValue = this._content.uts.addSound(newValue);
+  private addClickEventHandler(e: Event, newValue: string) {
+    const oldValue = this._content.SoundList.addSound(newValue);
+
+    // clear the text field
+    const textField = document.getElementById("SoundAdd") as HTMLInputElement;
+    if (textField) textField.value = "";
 
     this.refreshList();
 
-    // Only fire the event if the value changed
-    // oldValue will be undefined if the value was added
-    // oldValue will be the old value if the value was updated
-    // if oldValue === newValue then the value was not changed
-    if (oldValue !== newValue) {
-      this.dispatchEvent(new CustomEvent("change", { detail: { oldValue, newValue } }));
+    if (oldValue === newValue) {
+      this.dispatchEvent(new CustomEvent("soundlist_change", { detail: { field: this.id, undefined, newValue } }));
     }
   }
 
   // Delete the sound from the list then refresh the list
-  deleteClickEventHandler(e: Event, sound: string) {
-    const oldValue = this._content.uts.deleteSound(sound);
+  private deleteClickEventHandler(e: Event, index: number) {
+    // Don't allow the last sound to be deleted
+    if (this._content.SoundList.getSoundList().length === 1) return;
+
+    const oldValue = this._content.SoundList.deleteSound(index);
     this.refreshList();
 
     // Only fire the event if the value was deleted
     // oldValue will be undefined if the value was not found
     if (oldValue) {
-      this.dispatchEvent(new CustomEvent("change", { detail: { oldValue, newValue: undefined } }));
+      this.dispatchEvent(
+        new CustomEvent("soundlist_change", {
+          detail: { field: "SoundList_item_" + index.toString(), oldValue, newValue: undefined },
+        }),
+      );
     }
   }
 
-  buildLabelColumn(text: string, htmlFor: string): HTMLDivElement {
+  private changeEventHandler(e: Event, index: number) {
+    const newValue = (e.target as HTMLInputElement).value;
+    const oldValue = this._content.SoundList.updateSound(index, newValue);
+
+    this.dispatchEvent(
+      new CustomEvent("soundlist_change", { detail: { field: (e.target as HTMLElement).id, oldValue, newValue } }),
+    );
+  }
+
+  private buildLabelColumn(text: string, htmlFor: string): HTMLDivElement {
     const label = buildLabel(text, htmlFor);
     const labelDiv = buildDiv("col-label");
     labelDiv.appendChild(label);
     return labelDiv;
   }
 
-  buildSoundList(): HTMLDivElement {
+  private buildSoundList(): HTMLDivElement {
     const fieldset = document.createElement("fieldset");
     fieldset.id = "SoundList";
-    fieldset.style.width = "275px";
-    fieldset.style.margin = "0px";
+    fieldset.style.width = "190px";
+    fieldset.style.display = "grid";
+    fieldset.style.padding = "5px 5px 5px 5px";
+    fieldset.style.borderColor = "var(--input-placeholder-foreground)";
+    fieldset.style.borderStyle = "inset";
 
     const inputCol = buildDiv("col-input");
     inputCol.appendChild(fieldset);
@@ -84,7 +138,7 @@ export class nwnSoundsList extends HTMLElement {
     return inputCol;
   }
 
-  buildSoundListRow(): HTMLDivElement {
+  private buildSoundListRow(): HTMLDivElement {
     const listLabelCol = this.buildLabelColumn("Sounds", "SoundList");
     const listInputCol = this.buildSoundList();
 
@@ -94,49 +148,32 @@ export class nwnSoundsList extends HTMLElement {
     return listRow;
   }
 
-  buildSoundAddRow(): HTMLDivElement {
+  private buildSoundAddRow(): HTMLDivElement {
     const soundAddLabelCol = this.buildLabelColumn("Add Sound", "SoundAdd_txt");
-    const soundAddInputCol = this.buildSoundAddInput();
+    const soundAddInputCol = buildTextField({
+      id: "SoundAdd",
+      value: undefined,
+      disabled: false,
+      style: undefined,
+      className: undefined,
+      maxLength: 16,
+      buttonType: ButtonType.add,
+    });
+
+    // Add event handlers
+    const addBtn = soundAddInputCol.querySelector("vscode-button");
+    if (addBtn !== null) {
+      addBtn.addEventListener("click", (e) => this.addClickEventHandler(e, (soundAddInputCol as HTMLInputElement).value));
+    }
+    soundAddInputCol.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        this.addClickEventHandler(e, (soundAddInputCol as HTMLInputElement).value);
+      }
+    });
 
     const soundAddRow = buildDiv("row");
     soundAddRow.appendChild(soundAddLabelCol);
     soundAddRow.appendChild(soundAddInputCol);
     return soundAddRow;
   }
-
-  buildSoundAddInput(): HTMLDivElement {
-    const textField = document.createElement("vscode-text-field");
-    textField.id = "SoundAdd_txt";
-
-    const span = document.createElement("span");
-    span.id = "SoundAdd_btn-icon";
-    span.className = "codicon codicon-add";
-
-    const button = document.createElement("vscode-button");
-    button.id = "SoundAdd_btn";
-    button.setAttribute("appearance", "icon");
-    button.setAttribute("aria-label", "add");
-    button.appendChild(span);
-
-    const inputCol = buildDiv("col-input");
-    inputCol.style.display = "flex";
-    inputCol.appendChild(textField);
-    inputCol.appendChild(button);
-    return inputCol;
-  }
 }
-
-// <nwn-row label="Sounds">
-//  <fieldset id="SoundList" style="width: 275px; margin: 0px"></fieldset>
-// </nwn-row>
-// <div class="row">
-//  <div class="col-label">
-//   <label class="vscode-input-label" for="SoundAdd_txt">Add Sound:</label>
-//  </div>
-//  <div class="col-input" style="display: flex">
-//   <vscode-text-field id="SoundAdd_txt" label="Add Sound"></vscode-text-field>
-//   <vscode-button id="SoundAdd_btn" appearance="icon">
-//     <span id="test-icon" class="codicon codicon-add"></span>
-//   </vscode-button>
-//  </div>
-// </div>
