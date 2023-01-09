@@ -27,6 +27,7 @@ export { nwnNumberField } from "./nwnNumberField";
 export { nwnTextField } from "./nwnTextField";
 export { nwnVolumeSlider } from "./nwnVolumeSlider";
 export { nwnRow } from "./nwnRow";
+export { nwnVariables } from "./nwnVariables";
 export { nwnCreatureAbilities } from "./nwnCreatureAbilities";
 export { nwnCreatureFeats } from "./nwnCreatureFeats";
 export { nwnCreatureInventory } from "./nwnCreatureInventory";
