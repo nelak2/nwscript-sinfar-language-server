@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /*${style}*/
+    </style>
+    <link href="${codiconsUri}" rel="stylesheet" />
+    <script>
+      var exports = {};
+    </script>
+    <script type="module" src="${toolkitUri}"></script>
+    <script type="module" src="${mainUri}"></script>
+    <title>Edit Ifo</title>
+  </head>
+
+  <body>
+    <sp-accordion allow-multiple>
+      <sp-accordion-item open label="Identification">
+        <nwn-text-field id="res_Mod_Name" label="Name"></nwn-text-field>
+        <nwn-text-field id="res_Mod_Tag" label="Tag"></nwn-text-field>
+        <nwn-text-field id="res_Mod_Description" label="Description" type="textarea"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Time">
+        <nwn-number-field id="res_Mod_MinPerHour" label="Minutes Per Hour" min="0" max="60"></nwn-number-field>
+        <nwn-number-field id="res_Mod_DawnHour" label="Dawn Start Hour" min="0" max="24"></nwn-number-field>
+        <nwn-number-field id="res_Mod_DuskHour" label="Dusk Start Hour" min="0" max="24"></nwn-number-field>
+        <nwn-number-field id="res_Mod_StartYear" label="Start Year" min="0" max="9999"></nwn-number-field>
+        <nwn-number-field id="res_Mod_StartMonth" label="Start Month" min="0" max="12"></nwn-number-field>
+        <nwn-number-field id="res_Mod_StartDay" label="Start Day" min="0" max="31"></nwn-number-field>
+        <nwn-number-field id="res_Mod_StartHour" label="Start Hour" min="0" max="24"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item open label="Scripts">
+        <nwn-text-field id="res_Mod_OnAcquirItem" label="OnAcquireItem" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnActvtItem" label="OnActivateItem" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnClientEntr" label="OnClientEnter" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnClientLeav" label="OnClientLeave" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnCutsnAbort" label="OnCutsceneAbort" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnHeartbeat" label="OnHeartbeat" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnModLoad" label="OnModuleLoad" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnModStart" label="OnModuleStart" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnPlrChat" label="OnPlayerChat" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnPlrDeath" label="OnPlayerDeath" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnPlrDying" label="OnPlayerDying" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnPlrEqItm" label="OnPlayerEquipItem" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnPlrLvlUp" label="OnPlayerLevelUp" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnSpawnBtnDn" label="OnPlayerRespawn" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnPlrRest" label="OnPlayerRest" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnPlrUnEqItm" label="OnPlayerUnequipItem" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnUnAqreItem" label="OnUnAcquireItem" type="script"></nwn-text-field>
+        <nwn-text-field id="res_Mod_OnUsrDefined" label="OnUserDefined" type="script"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Variables">
+        <nwn-variables id="VarTable"></nwn-variables>
+      </sp-accordion-item>
+    </sp-accordion>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /*${style}*/
+    </style>
+    <link href="${codiconsUri}" rel="stylesheet" />
+    <script>
+      var exports = {};
+    </script>
+    <script type="module" src="${toolkitUri}"></script>
+    <script type="module" src="${mainUri}"></script>
+    <title>Edit Uti</title>
+  </head>
+
+  <body>
+    <sp-accordion allow-multiple>
+      <sp-accordion-item open label="Identification">
+        <nwn-text-field id="res_LocalizedName" label="Name"></nwn-text-field>
+        <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
+        <nwn-text-field id="res_Description" label="Unidentified Description" type="textarea"></nwn-text-field>
+        <nwn-text-field id="res_DescIdentified" label="Identified Description" type="textarea"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Classification">
+        <nwn-number-field id="res_PaletteID" label="Palette ID" unit="byte"></nwn-number-field>
+        <nwn-drop-down id="res_BaseItem" label="Base Type" listRef="ItemBaseType"></nwn-drop-down>
+      </sp-accordion-item>
+      <sp-accordion-item label="Weapon Appearance">
+        <nwn-number-field id="res_ModelPart1" label="Top" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_ModelPart2" label="Middle" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_ModelPart3" label="Bottom" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Value">
+        <nwn-number-field id="res_AddCost" label="Additional Cost" unit="dword"></nwn-number-field>
+        <nwn-number-field id="res_StackSize" label="Stack Size" unit="dword"></nwn-number-field>
+        <nwn-number-field id="res_Charges" label="Charges" unit="dword"></nwn-number-field>
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set-vertical">
+            <vscode-checkbox id="res_Plot">Plot</vscode-checkbox>
+            <vscode-checkbox id="res_Stolen">Stolen</vscode-checkbox>
+            <vscode-checkbox id="res_Identified">Identified</vscode-checkbox>
+            <vscode-checkbox id="res_Cursed">Cursed</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+      </sp-accordion-item>
+      <sp-accordion-item label="Item Properties">
+        <nwn-item-properties id="ItemProperties"></nwn-item-properties>
+      </sp-accordion-item>
+      <sp-accordion-item label="Variables">
+        <nwn-variables id="VarTable"></nwn-variables>
+      </sp-accordion-item>
+      <sp-accordion-item label="Comment">
+        <nwn-text-field id="res_Comment" type="comment"></nwn-text-field>
+      </sp-accordion-item>
+    </sp-accordion>
+  </body>
+</html>

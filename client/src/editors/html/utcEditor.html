@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /*${style}*/
+    </style>
+    <link href="${codiconsUri}" rel="stylesheet" />
+    <script>
+      var exports = {};
+    </script>
+    <script type="module" src="${toolkitUri}"></script>
+    <script type="module" src="${mainUri}"></script>
+    <title>Edit Utc</title>
+  </head>
+
+  <body>
+    <sp-accordion allow-multiple>
+      <sp-accordion-item open label="Identification">
+        <nwn-text-field id="res_FirstName" label="First Name"></nwn-text-field>
+        <nwn-text-field id="res_LastName" label="Last Name"></nwn-text-field>
+        <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
+        <nwn-text-field id="res_Description" label="Description" type="textarea"></nwn-text-field>
+        <nwn-number-field id="res_PortraitId" label="Portrait ID" unit="short"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Classification">
+        <nwn-number-field id="res_PaletteID" label="Palette ID" unit="byte"></nwn-number-field>
+        <nwn-drop-down id="res_Race" label="Race" listRef="Race"></nwn-drop-down>
+        <nwn-text-field id="res_Subrace" label="Subrace"></nwn-text-field>
+        <nwn-text-field id="res_Deity" label="Deity"></nwn-text-field>
+        <nwn-row label="Classes">
+          <fieldset class="checkbox-set-vertical">
+            <div class="row">
+              <nwn-drop-down id="res_class0" listRef="Class"></nwn-drop-down>
+              <nwn-number-field id="res_classlevel0" unit="byte"></nwn-number-field>
+            </div>
+            <div class="row">
+              <nwn-drop-down id="res_class1" listRef="Class"></nwn-drop-down>
+              <nwn-number-field id="res_classlevel1" unit="byte"></nwn-number-field>
+            </div>
+            <div class="row">
+              <nwn-drop-down id="res_class2" listRef="Class"></nwn-drop-down>
+              <nwn-number-field id="res_classlevel2" unit="byte"></nwn-number-field>
+            </div>
+          </fieldset>
+        </nwn-row>
+        <nwn-drop-down id="res_FactionID" label="Faction" listRef="Faction"></nwn-drop-down>
+        <nwn-drop-down id="res_GoodEvil" label="Good/Evil" listRef="GoodEvil"></nwn-drop-down>
+        <nwn-drop-down id="res_LawfulChaotic" label="Law/Chaos" listRef="LawChaos"></nwn-drop-down>
+      </sp-accordion-item>
+      <sp-accordion-item label="Social">
+        <nwn-text-field id="res_Conversation" label="Conversation" type="dialog"></nwn-text-field>
+        <nwn-row label="Flags">
+          <vscode-checkbox id="res_Interruptable">Interruptable</vscode-checkbox>
+        </nwn-row>
+        <nwn-drop-down id="res_SoundSetFile" label="Sound Set" listRef="SoundSet"></nwn-drop-down>
+      </sp-accordion-item>
+      <sp-accordion-item label="Appearance">
+        <nwn-drop-down id="res_Appearance_Type" label="Appearance Type" listRef="CreatureAppearances"></nwn-drop-down>
+        <nwn-drop-down id="res_FootstepType" label="Footstep Sound" listRef="FootstepSound"></nwn-drop-down>
+        <nwn-drop-down id="res_Gender" label="Gender" listRef="Gender"></nwn-drop-down>
+        <nwn-number-field id="res_Wings_New" label="Wings" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Tail_New" label="Tail" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Dynamic Appearance">
+        <nwn-number-field id="res_Phenotype" label="Phenotype" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Appearance_Head" label="Head" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_Neck" label="Neck" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_RShoul" label="Right Shoulder" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_LShoul" label="Left Shoulder" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_RBicep" label="Right Bicep" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_LBicep" label="Left Bicep" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_RFArm" label="Right Forearm" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_LFArm" label="Left Forearm" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_RHand" label="Right Hand" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_LHand" label="Left Hand" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_Torso" label="Torso" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_Belt" label="Belt" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_Pelvis" label="Pelvis" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_RThigh" label="Right Thigh" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_LThigh" label="Left Thigh" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_RShin" label="Right Shin" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_LShin" label="Left Shin" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_RFoot" label="Right Foot" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_BodyPart_LFoot" label="Left Foot" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Colors">
+        <nwn-number-field id="res_Color_Hair" label="Hair" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Color_Skin" label="Skin" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Color_Tattoo1" label="Tattoo 1" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Color_Tattoo2" label="Tattoo 2" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Death">
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set-vertical">
+            <vscode-checkbox id="res_Lootable">Lootable</vscode-checkbox>
+            <vscode-checkbox id="res_NoPermDeath">No Permanent Death</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+        <nwn-drop-down id="res_BodyBag" label="Body Bag" listRef="BodyBag"></nwn-drop-down>
+        <nwn-number-field id="res_DecayTime" label="Decay Time" unit="seconds"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Statistics">
+        <nwn-number-field id="res_NaturalAC" label="AC" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_HitPoints" label="HP" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Abilities">
+        <nwn-number-field id="res_Str" label="Strength" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Dex" label="Dexterity" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Con" label="Constitution" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Int" label="Intelligence" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Wis" label="Wisdom" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Cha" label="Charisma" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Saves">
+        <nwn-number-field id="res_fortbonus" label="Fortitude" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_refbonus" label="Reflex" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_willbonus" label="Will" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Skills">
+        <nwn-number-field id="res_skill0" label="Animal Empathy" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill20" label="Appraise" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill23" label="Bluff" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill1" label="Concentration" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill25" label="Craft Armor" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill22" label="Craft Trap" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill26" label="Craft Weapon" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill2" label="Disable Trap" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill3" label="Discipline" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill4" label="Heal" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill5" label="Hide" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill24" label="Intimidate" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill6" label="Listen" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill7" label="Lore" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill8" label="Move Silently" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill9" label="Open Lock" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill10" label="Parry" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill11" label="Perform" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill12" label="Persuade" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill13" label="Pick Pocket" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill27" label="Ride" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill14" label="Search" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill15" label="Set Trap" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill16" label="Spellcraft" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill17" label="Spot" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill18" label="Taunt" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill21" label="Tumble" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_skill19" label="Use Magic Device" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Feats">
+        <nwn-creature-feats id="Feats"></nwn-creature-feats>
+      </sp-accordion-item>
+      <sp-accordion-item label="Spells">
+        <nwn-creature-spells id="Spells"></nwn-creature-spells>
+      </sp-accordion-item>
+      <sp-accordion-item label="Special Abilities">
+        <nwn-creature-abilities id="SpecialAbilities"></nwn-creature-abilities>
+      </sp-accordion-item>
+      <sp-accordion-item label="Combat">
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set-vertical">
+            <vscode-checkbox id="res_Plot">Plot</vscode-checkbox>
+            <vscode-checkbox id="res_IsImmortal">Immortal</vscode-checkbox>
+            <vscode-checkbox id="res_Disarmable">Disarmable</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+        <nwn-drop-down id="res_WalkRate" label="Movement Rate" listRef="MovementRate"></nwn-drop-down>
+        <nwn-drop-down id="res_PerceptionRange" label="Perception Range" listRef="PerceptionRange"></nwn-drop-down>
+      </sp-accordion-item>
+      <sp-accordion-item label="Equipped Items">
+        <nwn-text-field id="res_equipped_1" label="Head" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_2" label="Chest" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_4" label="Boots" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_8" label="Arms" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_16" label="Right Hand" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_32" label="Left Hand" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_64" label="Cloak" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_128" label="Right Ring" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_256" label="Left Ring" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_512" label="Neck" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_1024" label="Belt" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_2048" label="Arrows" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_4096" label="Bullets" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_8192" label="Bolts" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_16384" label="Creature Claw 1" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_32768" label="Creature Claw 2" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_65536" label="Creature Special Attack" type="resref"></nwn-text-field>
+        <nwn-text-field id="res_equipped_131072" label="Creature Skin/Hide" type="resref"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Inventory Items">
+        <nwn-creature-inventory id="CreatureInventory"></nwn-creature-inventory>
+      </sp-accordion-item>
+      <sp-accordion-item open label="Scripts">
+        <nwn-text-field id="res_ScriptOnBlocked" label="OnBlocked" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptEndRound" label="OnCombatRoundEnd" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptDialogue" label="OnConversation" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptDamaged" label="OnDamaged" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptDeath" label="OnDeath" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptDisturbed" label="OnDisturbed" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptHeartbeat" label="OnHeartbeat" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptOnNotice" label="OnPerception" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptAttacked" label="OnPhysicalAttacked" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptRested" label="OnRested" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptSpawn" label="OnSpawn" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptSpellAt" label="OnSpellCastAt" type="script"></nwn-text-field>
+        <nwn-text-field id="res_ScriptUserDefine" label="OnUserDefined" type="script"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Variables">
+        <nwn-variables id="VarTable"></nwn-variables>
+      </sp-accordion-item>
+      <sp-accordion-item label="Comment">
+        <nwn-text-field id="res_Comment" type="comment"></nwn-text-field>
+      </sp-accordion-item>
+    </sp-accordion>
+  </body>
+</html>
