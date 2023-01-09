@@ -43,7 +43,7 @@ export abstract class ResData {
         return value.toString().substring(0, 16);
       }
       case GFFType.CExoLocalizedString: {
-        return value[this._data.langId].toString();
+        return { s0: value.toString() };
       }
       case GFFType.Void: {
         throw new Error("Not implemented");
