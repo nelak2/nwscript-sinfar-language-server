@@ -1,26 +1,19 @@
-# Sinfar Scripters Extension
+# Sinfar NWN Toolset Replacement
 
-Sinfar Scripters Extension is a Visual Studio Code extension which enables working on scripts for the Sinfar NWN server using VS Code.
+The Sinfar NWN Toolset Replacement is a Visual Studio Code extension which is intended to replace the NWN toolset for most things and the Sinfar Dev website completely.
 
-The extension provides a virtual file system connected back to the Sinfar Dev server so all files are opened from and saved back to the server. Nothing is stored locally.
-NWScript Language Server functionality is provided by the a modified version of Philippe Chab's NWScript: EE Language Server (https://github.com/PhilippeChab/nwscript-ee-language-server)
+Actual editing of areas as per the Bioware NWN Toolset is not yet implemented but is planned once support for reading and writing all NWN resource files is fully implemented and tested.
+
+**Caution: Currently most core features are implemented (except for editing creatures and items) but not fully tested. There is a good chance of corrupting your NWN resources!!**
 
 ## Features
 
-- Enhanced syntax highlighting
-- Completion
-- Hover information
-- Goto definition
-- Formatting
-- Range formatting
-- Signature help
-- Diagnostics
+- Script editor leveraging VSCode's built in functionality and full language server with code completion based on a modified version of Philippe Chab's NWScript: EE Language Server (https://github.com/PhilippeChab/nwscript-ee-language-server).
+- Viewing, editing and creating most NWN resources similar to the Sinfar Dev website
+- All files are located remotely on the server so a single module can be worked on by an unlimited number of people without any need for manual merging of ERF/MODs
+- Login/authentication with the Sinfar Web API
 
-### Formatting
-
-[clang-format](https://clang.llvm.org/docs/ClangFormat.html).
-
-## Usage
+## Usage of NWScript Editor:
 
 After installing the extension
 
@@ -63,9 +56,7 @@ I personally use the [One Dark Pro](https://marketplace.visualstudio.com/items?i
 ## Attaching the debugger
 
 - Build and successfully run the extension
-- Invoke `yarn webpack`
-- Invoke `yarn run compile`
-- You may have to add a `waitForDebugger()` statement somewhere near the server startup (otherwise the additional processes the server spawns seem to confuse the debugger and it won't attach properly)
+- Invoke `yarn build`
 - Use `Launch the Client` command
 - Use `Attach to Server`
 
@@ -73,9 +64,9 @@ I personally use the [One Dark Pro](https://marketplace.visualstudio.com/items?i
 
 Replace `server/scripts/nwscript.nss` by its new version and execute `yarn run generate-lib-defs` in the server root directory.
 
-## Issues
+## Issues, Feedback, Feature Requests
 
-Please report any issues on the github [repository](https://github.com/nelak2/nwscript-sinfar-language-server).
+Please report any issues, feedback, or feature requests on the github [repository](https://github.com/nelak2/nwscript-sinfar-language-server).
 
 ## Credit
 
