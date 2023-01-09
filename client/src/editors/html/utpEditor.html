@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /*${style}*/
+    </style>
+    <link href="${codiconsUri}" rel="stylesheet" />
+    <script>
+      var exports = {};
+    </script>
+    <script type="module" src="${toolkitUri}"></script>
+    <script type="module" src="${mainUri}"></script>
+    <title>Edit Utp</title>
+  </head>
+
+  <body>
+    <sp-accordion allow-multiple>
+      <sp-accordion-item open label="Identification">
+        <nwn-text-field id="res_LocName" label="Name"></nwn-text-field>
+        <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
+        <nwn-text-field id="res_Description" label="Description" type="textarea"></nwn-text-field>
+        <nwn-number-field id="res_PortraitId" label="Portrait ID" unit="short"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Classification">
+        <nwn-number-field id="res_PaletteID" label="Palette ID" unit="byte"></nwn-number-field>
+        <nwn-drop-down id="res_Faction" label="Faction" listRef="Faction"></nwn-drop-down>
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set-vertical">
+            <vscode-checkbox id="res_Static">Static</vscode-checkbox>
+            <vscode-checkbox id="res_Useable">Useable</vscode-checkbox>
+            <vscode-checkbox id="res_HasInventory">Has Inventory</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+      </sp-accordion-item>
+      <sp-accordion-item label="Social">
+        <nwn-text-field id="res_Conversation" label="Conversation" type="dialog"></nwn-text-field>
+        <nwn-row label="Flags">
+          <vscode-checkbox id="res_Interruptable">Interruptable</vscode-checkbox>
+        </nwn-row>
+      </sp-accordion-item>
+      <sp-accordion-item label="Appearance">
+        <nwn-drop-down id="res_Appearance" label="Appearance" listRef="PLCAppearances"></nwn-drop-down>
+        <nwn-drop-down id="res_AnimationState" label="Initial State" listRef="PLCInitialState"></nwn-drop-down>
+        <nwn-drop-down id="res_BodyBag" label="Body Bag" listRef="BodyBag"></nwn-drop-down>
+      </sp-accordion-item>
+      <sp-accordion-item label="Resistance">
+        <nwn-row label="Flags">
+          <vscode-checkbox id="res_Plot">Plot</vscode-checkbox>
+        </nwn-row>
+        <nwn-number-field id="res_Hardness" label="Hardness" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_HP" label="HP" unit="short"></nwn-number-field>
+        <nwn-number-field id="res_Fort" label="Fortitude Save" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Ref" label="Reflex Save" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_Will" label="Will Save" unit="byte"></nwn-number-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Lock">
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set-vertical">
+            <vscode-checkbox id="res_Locked">Locked</vscode-checkbox>
+            <vscode-checkbox id="res_Lockable">Can be relocked</vscode-checkbox>
+            <vscode-checkbox id="res_AutoRemoveKey">Automatically remove key after use</vscode-checkbox>
+            <vscode-checkbox id="res_KeyRequired">Key required to unlock or lock</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+        <nwn-text-field id="res_KeyName" label="Key Tag"></nwn-text-field>
+        <nwn-number-field id="res_OpenLockDC" label="Open Lock DC" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_CloseLockDC" label="Close Lock DC" unit="byte"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Trap">
+        <nwn-drop-down id="res_TrapType" label="Type" listRef="TrapType"></nwn-drop-down>
+        <nwn-row label="Flags">
+          <fieldset class="checkbox-set-vertical">
+            <vscode-checkbox id="res_TrapFlag">Is Trapped</vscode-checkbox>
+            <vscode-checkbox id="res_TrapOneShot">One Shot</vscode-checkbox>
+            <vscode-checkbox id="res_TrapDetectable">Detectable</vscode-checkbox>
+            <vscode-checkbox id="res_TrapDisarmable">Disarmable</vscode-checkbox>
+          </fieldset>
+        </nwn-row>
+        <nwn-number-field id="res_TrapDetectDC" label="Detection DC" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_DisarmDC" label="Disarm DC" unit="byte"></nwn-number-field>
+        <nwn-text-field id="res_OnTrapTriggered" label="OnTrapTriggered" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnDisarm" label="OnDisarm" type="script"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Inventory Items">
+        <nwn-plc-inventory id="PLCInventory"></nwn-plc-inventory>
+      </sp-accordion-item>
+      <sp-accordion-item open label="Scripts">
+        <nwn-text-field id="res_OnOpen" label="OnOpen" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnClosed" label="OnClose" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnUnlock" label="OnUnlock" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnLock" label="OnLock" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnClick" label="OnClick" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnUsed" label="OnUsed" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnInvDisturbed" label="OnDisturbed" type="script"></nwn-text-field>
+        <vscode-divider role="presentation"></vscode-divider>
+        <nwn-text-field id="res_OnMeleeAttacked" label="OnPhysicalAttacked" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnSpellCastAt" label="OnSpellCastAt" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnDamaged" label="OnDamaged" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnDeath" label="OnDeath" type="script"></nwn-text-field>
+        <vscode-divider role="presentation"></vscode-divider>
+        <nwn-text-field id="res_OnHeartbeat" label="OnHeartbeat" type="script"></nwn-text-field>
+        <nwn-text-field id="res_OnUserDefined" label="OnUserDefined" type="script"></nwn-text-field>
+      </sp-accordion-item>
+      <sp-accordion-item label="Variables">
+        <nwn-variables id="VarTable"></nwn-variables>
+      </sp-accordion-item>
+      <sp-accordion-item label="Comment">
+        <nwn-text-field id="res_Comment" type="comment"></nwn-text-field>
+      </sp-accordion-item>
+    </sp-accordion>
+  </body>
+</html>

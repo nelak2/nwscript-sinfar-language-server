@@ -8,6 +8,7 @@ let content: ResData;
 let initialized = false;
 let _varTable: nwnVariables;
 let _soundList: nwnSoundsList;
+let _plcInventoryList: nwnPlcInventoryList;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -73,6 +74,15 @@ function onEditableFieldChange(e: any) {
         });
         break;
       }
+      case "PLC": {
+        vscode.postMessage({
+          type: "update",
+          field: e.detail.field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
+        break;
+      }
     }
   } catch (e: any) {
     console.log(e);
@@ -117,10 +127,22 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
     UpdateVarTable(field, newValue);
   } else if (updateType === "SoundList") {
     UpdateSoundList(field, newValue, oldValue);
+  } else if (updateType === "PLCInventory") {
+    UpdatePLCInventoryList(field, newValue, oldValue);
   } else {
     content.setField(field, newValue);
     UpdateHTMLElementValue(field, newValue);
   }
+}
+
+function UpdatePLCInventoryList(field: string, newValue, oldValue: any) {
+  const plcInventoryFieldFullId = field.split("_");
+  const plcInventoryFieldId = plcInventoryFieldFullId[2];
+
+  if (!_plcInventoryList) return;
+
+  // update content
+  _plcInventoryList.Update(parseInt(plcInventoryFieldId), newValue, oldValue);
 }
 
 function UpdateSoundList(field: string, newValue: any, oldValue: any) {
@@ -202,6 +224,10 @@ function BindListeners() {
     _soundList.addEventListener("soundlist_change", onEditableFieldChange);
   }
 
+  if (_plcInventoryList) {
+    _plcInventoryList.addEventListener("PLCInventory_change", onEditableFieldChange);
+  }
+
   initialized = true;
 }
 
@@ -222,5 +248,11 @@ function InitHTMLElements() {
   _soundList = <nwnSoundsList>document.getElementById("SoundList");
   if (_soundList) {
     _soundList.Init(content as Uts);
+  }
+
+  // Set the plc inventory list
+  _plcInventoryList = <nwnPlcInventoryList>document.getElementById("PLCInventory");
+  if (_plcInventoryList) {
+    _plcInventoryList.Init(content as Plc);
   }
 }
