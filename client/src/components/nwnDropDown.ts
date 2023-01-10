@@ -26,6 +26,10 @@ import {
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
+  readonly maxItems = 50;
+  readonly increment = 25;
+  list: DropdownListItem[] = [];
+  dropDown!: HTMLElement;
   constructor() {
     super();
 
@@ -39,76 +43,75 @@ export class nwnDropDown extends HTMLElement {
       return;
     }
 
-    let list: DropdownListItem[] = [];
     switch (listRef) {
       case "DayNightCycle":
-        list = DayNightCycle;
+        this.list = DayNightCycle;
         break;
       case "WindPower":
-        list = WindPower;
+        this.list = WindPower;
         break;
       case "SkyBox":
-        list = SkyBoxes;
+        this.list = SkyBoxes;
         break;
       case "PvP":
-        list = PvP;
+        this.list = PvP;
         break;
       case "LoadScreen":
-        list = LoadScreens;
+        this.list = LoadScreens;
         break;
       case "AmbientSound":
-        list = AmbientSounds;
+        this.list = AmbientSounds;
         break;
       case "Music":
-        list = Music;
+        this.list = Music;
         break;
       case "EnvironmentalEffects":
-        list = EnvironmentalEffects;
+        this.list = EnvironmentalEffects;
         break;
       case "VarType":
-        list = VarType;
+        this.list = VarType;
         break;
       case "Faction":
-        list = Faction;
+        this.list = Faction;
         break;
       case "TriggerType":
-        list = TriggerType;
+        this.list = TriggerType;
         break;
       case "Cursor":
-        list = Cursor;
+        this.list = Cursor;
         break;
       case "LinkedToFlags":
-        list = LinkedToFlags;
+        this.list = LinkedToFlags;
         break;
       case "TrapType":
-        list = TrapTypes;
+        this.list = TrapTypes;
         break;
       case "DoorAppearanceType":
-        list = DoorAppearanceType;
+        this.list = DoorAppearanceType;
         break;
       case "DoorInitialState":
-        list = DoorInitialState;
+        this.list = DoorInitialState;
         break;
       case "WaypointAppearance":
-        list = WaypointAppearance;
+        this.list = WaypointAppearance;
         break;
       case "PlayTimeType":
-        list = PlayTimeType;
+        this.list = PlayTimeType;
         break;
       case "SoundPriority":
-        list = SoundPriority;
+        this.list = SoundPriority;
         break;
       case "PLCInitialState":
-        list = PLCInitialState;
+        this.list = PLCInitialState;
         break;
       case "BodyBag":
-        list = BodyBag;
+        this.list = BodyBag;
         break;
       case "PLCAppearances":
-        list = PLCAppearances;
+        this.list = PLCAppearances;
         break;
       default:
-        list = [{ value: "-1", label: "Unknown List" }];
+        this.list = [{ value: "-1", label: "Unknown List" }];
     }
 
     const labelElement = buildLabel(label, id);
@@ -117,24 +120,56 @@ export class nwnDropDown extends HTMLElement {
     const divColLabel = buildDiv("col-label");
     divColLabel.appendChild(labelElement);
 
-    const dropDown = document.createElement("vscode-dropdown");
-    dropDown.id = id;
+    this.dropDown = document.createElement("vscode-dropdown");
+    this.dropDown.id = id;
 
-    for (const listItem of list) {
-      const option = document.createElement("vscode-option");
-      option.setAttribute("value", listItem.value);
-      option.textContent = listItem.label;
-      dropDown.appendChild(option);
-    }
+    void this.addOptionsAsync(this.dropDown, 0, this.list.length - 1);
 
     const divColInput = buildDiv("col-input");
-    divColInput.appendChild(dropDown);
+    divColInput.appendChild(this.dropDown);
 
     const rowDiv = buildDiv("row");
     rowDiv.appendChild(divColLabel);
     rowDiv.appendChild(divColInput);
 
     this.appendChild(rowDiv);
+
+    const debounce = (fn: Function, ms = 300) => {
+      let timeoutId: ReturnType<typeof setTimeout>;
+      return function (this: any, ...args: any[]) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(this, args), ms);
+      };
+    };
+
+    this.addEventListener("change", (event) => {
+      debounce(() => this.changeEventHandler(event));
+    });
+  }
+
+  private async addOptionsAsync(dropDown: HTMLElement, start: number, end: number) {
+    let count = 0;
+    for (let i = start; count < this.maxItems && i <= end; i++, count++) {
+      const option = document.createElement("vscode-option");
+      option.setAttribute("value", this.list[i].value);
+      option.textContent = this.list[i].label;
+      dropDown.appendChild(option);
+    }
+  }
+
+  changeEventHandler(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const value = parseInt(target.value);
+
+    let start = value - this.increment;
+    let end = value + this.increment;
+
+    if (start < 0) start = 0;
+    if (end > this.list.length - 1) end = this.list.length - 1;
+
+    this.dropDown.replaceChildren();
+
+    void this.addOptionsAsync(this.dropDown, start, end);
   }
 }
 
