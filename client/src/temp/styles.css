@@ -1,0 +1,113 @@
+:host,
+:root {
+  --search-box-width: 300px;
+  --search-box-height: 200px;
+  --vscode-input-background: #3c3c3c;
+  --vscode-input-foreground: #cccccc;
+  --vscode-focusBorder: #007fd4;
+  --vscode-foreground: #cccccc;
+  --vscode-font-family: 'Segoe WPC', 'Segoe UI', sans-serif;
+  --vscode-font-weight: normal;
+  --vscode-font-size: 13px;
+  --vscode-widget-shadow: rgba(0, 0, 0, 0.36);
+  --vscode-inputOption-activeBorder: rgba(0, 122, 204, 0);
+  --vscode-inputOption-hoverBackground: rgba(90, 93, 94, 0.5);
+  --vscode-inputOption-activeBackground: rgba(0, 127, 212, 0.4);
+  --vscode-inputOption-activeForeground: #ffffff;
+  --vscode-input-placeholderForeground: #a6a6a6;
+  --vscode-dropdown-background: #3c3c3c;
+  --vscode-dropdown-foreground: #f0f0f0;
+  --vscode-dropdown-border: #3c3c3c;
+  --vscode-button-foreground: #ffffff;
+  --vscode-button-separator: rgba(255, 255, 255, 0.4);
+  --vscode-button-background: #0e639c;
+  --vscode-button-hoverBackground: #1177bb;
+  --vscode-button-secondaryForeground: #ffffff;
+  --vscode-button-secondaryBackground: #3a3d41;
+  --vscode-button-secondaryHoverBackground: #45494e;
+  --vscode-badge-background: #4d4d4d;
+  --vscode-badge-foreground: #ffffff;
+  --vscode-scrollbar-shadow: #000000;
+  --vscode-scrollbarSlider-background: rgba(121, 121, 121, 0.4);
+  --vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
+  --vscode-scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
+  --vscode-list-focusOutline: #007fd4;
+  --vscode-list-activeSelectionBackground: #04395e;
+  --vscode-list-activeSelectionForeground: #ffffff;
+  --vscode-list-activeSelectionIconForeground: #ffffff;
+  --vscode-list-inactiveSelectionBackground: #37373d;
+  --vscode-list-hoverBackground: #2a2d2e;
+  --vscode-list-dropBackground: #383b3d;
+  --vscode-list-highlightForeground: #2aaaff;
+  --vscode-list-focusHighlightForeground: #2aaaff;
+  --vscode-list-invalidItemForeground: #b89500;
+  --vscode-list-errorForeground: #f88070;
+  --vscode-list-warningForeground: #cca700;
+  --vscode-listFilterWidget-background: #252526;
+  --vscode-listFilterWidget-outline: rgba(0, 0, 0, 0);
+  --vscode-listFilterWidget-noMatchesOutline: #be1100;
+  --vscode-listFilterWidget-shadow: rgba(0, 0, 0, 0.36);
+  --vscode-list-filterMatchBackground: rgba(234, 92, 0, 0.33);
+  --vscode-editor-background: #1e1e1e;
+  
+}
+
+* {
+  font-family: var(--vscode-font-family);
+  font-weight: var(--vscode-font-weight);
+  font-size: var(--vscode-font-size);
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgba(121, 121, 121, 0.1);
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-activeBackground);
+}
+
+body {
+  background-color: var(--vscode-editor-background);
+}
+
+.parent {
+  width: var(--search-box-width);
+}
+
+.search-box {
+  width: var(--search-box-width);
+  background-color: var(--vscode-dropdown-background);
+}
+
+.option-box {
+  max-height: 200px;
+  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  transition: max-height 0.2s ease-out;
+  background-color: var(--vscode-dropdown-background);
+  width: var(--search-box-width);
+  position: absolute;
+}
+
+.option-box > div {
+  width: var(--search-box-width);
+  color: var(--vscode-input-foreground);
+  padding: 8px 2px 2px 8px;
+}
+
+.others {
+  display: flex;
+}
