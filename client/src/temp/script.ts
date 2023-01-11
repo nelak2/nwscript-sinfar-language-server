@@ -20,6 +20,7 @@ class DropDown {
     this._search?.addEventListener("click", this.searchBoxClickHandler);
     // Add event listener to hide the options if we click away
     window.addEventListener("click", this.searchBoxClickOffHandler);
+    this._optionBox.addEventListener("scroll", this.optionBoxScrollHandler);
   }
 
   async asyncAddOptions() {
@@ -33,6 +34,15 @@ class DropDown {
       this._optionBox.appendChild(option);
       this._optionBox.style.maxHeight = "0px";
     }
+  }
+
+  // TODO: Add a scroll handler to load more options when we get to the bottom
+  // TODO: We can set the height of the option box to the height it would be if we had loaded all the elements
+  // this way our scroll bar will be correct and we can load more options as the user scrolls
+  optionBoxScrollHandler(e: Event) {
+    let target = e.target as HTMLDivElement;
+    console.log(target.scrollHeight);
+    console.log(target.scroll);
   }
 
   searchBoxClickHandler(e: Event) {
