@@ -84,30 +84,86 @@ body {
 
 .parent {
   width: var(--search-box-width);
+  position: relative;
 }
 
 .search-box {
   width: var(--search-box-width);
+  height: 20px;
+  padding: 2px 6px;
   background-color: var(--vscode-dropdown-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid;
+  border-radius: 2px;
+  border-color: var(--vscode-dropdown-background);
+}
+
+.search-box:focus {
+  outline-color: var(--vscode-focusBorder);
+  outline-width: 1px;
+  outline-style: solid;
+  outline-offset: -1px;
 }
 
 .option-box {
-  max-height: 200px;
+  max-height: 0px;
+  height: 200px;
   overflow: hidden;
   overflow-x: hidden;
   overflow-y: scroll;
+  overscroll-behavior: none;
   transition: max-height 0.2s ease-out;
   background-color: var(--vscode-dropdown-background);
+  width: 314px;
+  position: absolute;
+  cursor: pointer;
+}
+
+.option-item {
   width: var(--search-box-width);
+  height: 18px;
+  color: var(--vscode-input-foreground);
+  padding: 2px 2px 2px 2px;
   position: absolute;
 }
 
-.option-box > div {
-  width: var(--search-box-width);
+.option-item:hover {
+  background-color: var(--vscode-list-activeSelectionBackground);
+  outline-color: var(--vscode-focusBorder);
+  outline-width: 1px;
+  outline-style: solid;
+  outline-offset: -1px;
+}
+
+.option-hover {
+  background-color: var(--vscode-list-activeSelectionBackground);
+  outline-color: var(--vscode-focusBorder);
+  outline-width: 1px;
+  outline-style: solid;
+  outline-offset: -1px;
+}
+
+.option-placeholder {
+  height: 10px;
+  width: 10px;
+  pointer-events: none;
+  position: absolute;
+}
+
+.codicon {
   color: var(--vscode-input-foreground);
-  padding: 8px 2px 2px 8px;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  bottom: 0;
+  right: -6px;
+  margin: auto;
+  height: 16px;
+  width: 16px;
 }
 
 .others {
   display: flex;
+  background-color: #04395e;
+  margin: 7px 0px 7px 0px;
 }

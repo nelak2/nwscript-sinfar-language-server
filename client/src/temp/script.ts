@@ -1,10 +1,18 @@
-import { DropdownListItem, PLCAppearances } from "../components/lists/index";
+import { DropdownListItem, PLCAppearances } from "./components/lists/index";
+import * as fs from "node:fs";
+import * as _ from "lodash";
 
-class DropDown {
+const ITEM_HEIGHT = 22;
+
+class dropDown {
   _list: DropdownListItem[] = [];
-  _optionBox!: HTMLElement | null;
-  _self!: HTMLElement | null;
-  _search!: HTMLInputElement | null;
+  _optionBox: HTMLElement;
+  _self: HTMLElement;
+  _search: HTMLInputElement;
+
+  _start: number = 0;
+  _end: number = 0;
+
   constructor() {
     this._list = PLCAppearances;
   }
@@ -14,62 +22,263 @@ class DropDown {
     this._optionBox = this._self.querySelector(".option-box");
     this._search = this._self.querySelector(".search-box");
 
-    void this.asyncAddOptions();
+    // Ensure we have a selected item set
+    this._self.setAttribute("selecteditem", "0");
+    this._search.value = PLCAppearances[0].label;
+
+    // Set the height of the placeholder. This ensures our scroll bar is the right size
+    const placeholder = this._optionBox.querySelector(".option-placeholder") as HTMLDivElement;
+    placeholder.style.height = (this._list.length * ITEM_HEIGHT).toString() + "px";
+
+    void this.LoadOptions(0, 100);
 
     // Setup event listeners
-    this._search?.addEventListener("click", this.searchBoxClickHandler);
-    // Add event listener to hide the options if we click away
-    window.addEventListener("click", this.searchBoxClickOffHandler);
-    this._optionBox.addEventListener("scroll", this.optionBoxScrollHandler);
+    this._search.addEventListener("focus", this.searchBoxFocusHandler);
+    this._search.addEventListener("blur", this.searchBoxBlurHandler);
+    this._search.addEventListener("keydown", this.searchBoxKeyDownHandler);
+
+    this._optionBox.addEventListener("mousedown", this.optionBoxMouseDownHandler);
+    this._optionBox.addEventListener("scroll", _.debounce(this.optionBoxScrollHandler, 200));
   }
 
-  async asyncAddOptions() {
-    if (!this._optionBox) return;
+  searchBoxKeyDownHandler(e: KeyboardEvent) {
+    const selectedItem = parseInt(dropdown._self.getAttribute("selecteditem"));
 
-    for (let i = 0; i < this._list.length && i < 100; i++) {
-      const option = document.createElement("div");
-      option.textContent = this._list[i].label;
-      option.setAttribute("data-value", this._list[i].value);
+    switch (e.code) {
+      case "ArrowUp": {
+        if (selectedItem <= 0) return;
+        SetSelectedOption(selectedItem - 1);
 
-      this._optionBox.appendChild(option);
-      this._optionBox.style.maxHeight = "0px";
+        break;
+      }
+      case "ArrowDown": {
+        if (selectedItem >= PLCAppearances.length - 1) return;
+        SetSelectedOption(selectedItem + 1);
+
+        break;
+      }
+      case "Enter": {
+        closeOptionsList();
+      }
     }
   }
 
-  // TODO: Add a scroll handler to load more options when we get to the bottom
-  // TODO: We can set the height of the option box to the height it would be if we had loaded all the elements
-  // this way our scroll bar will be correct and we can load more options as the user scrolls
-  optionBoxScrollHandler(e: Event) {
-    let target = e.target as HTMLDivElement;
-    console.log(target.scrollHeight);
-    console.log(target.scroll);
+  buildOption(index: number): HTMLElement {
+    const option = document.createElement("div") as HTMLDivElement;
+    option.className = "option-item";
+    option.textContent = this._list[index].label;
+    option.setAttribute("data-value", this._list[index].value);
+    option.setAttribute("index", index.toString());
+
+    // option.style.position = 'absolute';
+    option.style.top = (index * ITEM_HEIGHT).toString() + "px";
+
+    return option;
   }
 
-  searchBoxClickHandler(e: Event) {
-    const optionBox = (e.target as HTMLElement).nextElementSibling as HTMLDivElement;
+  LoadOptions(start: number, end: number) {
+    const prevStart = dropdown._start;
+    const prevEnd = dropdown._end;
+
+    const options = dropdown._optionBox;
+
+    // Calculate overlap
+    const overlap = Math.max(0, Math.min(end, prevEnd) - Math.max(start, prevStart));
+
+    let endDiff = end - prevEnd;
+    let startDiff = start - prevStart;
+
+    if (overlap) {
+      if (endDiff > 0) {
+        for (let i = 0; i < endDiff && prevEnd + i < PLCAppearances.length; i++) {
+          const added = options.appendChild(this.buildOption(prevEnd + i));
+        }
+      } else if (endDiff < 0) {
+        endDiff = Math.abs(endDiff);
+        let i = 0;
+        while (i < endDiff) {
+          const removed = options.removeChild(options.lastElementChild);
+          i++;
+        }
+      }
+
+      if (startDiff < 0) {
+        let previousChild = options.firstElementChild;
+        for (let i = start; i < prevStart; i++) {
+          previousChild = previousChild.insertAdjacentElement("afterend", this.buildOption(i));
+        }
+      } else if (startDiff > 0) {
+        startDiff = Math.abs(startDiff);
+
+        const removeArray: Node[] = [];
+
+        // Skip 1 element since it is the placeholder
+        for (let i = 1; i < startDiff + 1; i++) {
+          removeArray.push(options.children[i]);
+        }
+
+        for (const node of removeArray) {
+          options.removeChild(node);
+        }
+      }
+    } else {
+      let nodes: (string | Node)[] = [];
+      // add the placeholder child
+
+      const first = options.firstElementChild;
+
+      let sibling = first.nextElementSibling;
+      while (sibling) {
+        options.removeChild(sibling);
+        sibling = first.nextElementSibling;
+      }
+
+      for (let i = start; i < end; i++) {
+        options.appendChild(dropdown.buildOption(i));
+      }
+    }
+
+    dropdown._start = start;
+    dropdown._end = end;
+  }
+
+  RecenterOptions(center: number) {
+    let start = center - 100;
+    if (start < 100) start = 0;
+
+    let end = center + 100;
+    if (end > PLCAppearances.length) end = PLCAppearances.length;
+
+    dropdown.LoadOptions(parseInt(start.toFixed(0)), parseInt(end.toFixed(0)));
+  }
+
+  optionBoxScrollHandler(e: Event) {
+    let target = e.target as HTMLDivElement;
+
+    const currentIndex = target.scrollTop / ITEM_HEIGHT;
+
+    dropdown.RecenterOptions(currentIndex);
+  }
+
+  // Searchbox has received focus
+  searchBoxFocusHandler(e: Event) {
+    const optionBox = dropdown._optionBox;
 
     // Expand it out when you click on it
     optionBox.style.maxHeight = "200px";
     optionBox.style.overflowY = "scroll";
+
+    // scroll to selected element
+    const selected = GetCurrentOption();
+    selected.scrollIntoView({
+      behavior: "auto",
+      block: "nearest",
+      inline: "start",
+    });
   }
 
-  searchBoxClickOffHandler(e: Event) {
-    const select = document.getElementById("res_DropDown") as HTMLDivElement;
+  // Search box has lost focus
+  searchBoxBlurHandler(e: Event) {
+    const start = dropdown._start;
+    const end = dropdown._end;
 
-    const isClickInside = select.contains(e.target as HTMLElement);
+    closeOptionsList();
+  }
 
-    if (!isClickInside) {
-      const optionBox = select.querySelector(".option-box") as HTMLDivElement;
-      optionBox.style.maxHeight = "0px";
+  optionBoxMouseDownHandler(e: Event) {
+    const clickedElement = e.target as HTMLElement;
+
+    if (clickedElement.className !== "option-item") return;
+
+    SetSelectedOption(parseInt(clickedElement.getAttribute("index")));
+
+    closeOptionsList();
+  }
+
+  findElementWithIndex(index: number): HTMLDivElement | null {
+    const optionBox = dropdown._optionBox;
+
+    for (const child of optionBox.children) {
+      const childIndex = parseInt(child.getAttribute("index"));
+      if (childIndex === index) {
+        return child as HTMLDivElement;
+      }
     }
+    return null;
   }
 }
 
-function main() {
-  const select = document.getElementById("res_DropDown") as HTMLDivElement;
-  const dd = new DropDown();
+let dropdown: dropDown;
 
-  dd.load(select);
+function closeOptionsList() {
+  const optionBox = dropdown._optionBox;
+
+  optionBox.style.maxHeight = "0px";
+}
+
+function GetCurrentOption(): HTMLElement {
+  const select = dropdown._self;
+
+  const index = parseInt(select.getAttribute("selecteditem"));
+  const selected = dropdown.findElementWithIndex(index);
+
+  return selected;
+}
+
+function SetSelectedOption(index: number) {
+  const select = dropdown._self;
+  const searchBox = dropdown._search;
+
+  dropdown.RecenterOptions(index);
+
+  const previousIndex = parseInt(select.getAttribute("selecteditem"));
+  const previousSelect = dropdown.findElementWithIndex(previousIndex);
+  if (previousSelect) previousSelect.classList.toggle("option-hover", false);
+
+  const selectedOption = dropdown.findElementWithIndex(index);
+  selectedOption.classList.toggle("option-hover", true);
+  selectedOption.scrollIntoView({
+    behavior: "auto",
+    block: "nearest",
+    inline: "start",
+  });
+
+  select.setAttribute("selecteditem", index.toString());
+  searchBox.value = PLCAppearances[index].label;
+}
+
+async function main() {
+  const select = document.getElementById("res_DropDown") as HTMLDivElement;
+  dropdown = new dropDown();
+
+  dropdown.load(select);
+}
+
+function VerifyList() {
+  const start = dropdown._start;
+  const end = dropdown._end;
+
+  for (let i = start; i < end; i++) {
+    const option = dropdown.findElementWithIndex(i);
+
+    if (option === null) {
+      console.log("Missing option: " + i);
+    }
+
+    const label = option.textContent;
+
+    if (PLCAppearances[i].label !== label) {
+      console.log("Incorrect label at (" + i + ")" + " " + label);
+    }
+
+    const value = option.getAttribute("data-value");
+
+    if (PLCAppearances[i].value !== value) {
+      console.log("Incorrect value at (" + i + ")" + " " + value);
+    }
+  }
+
+  console.log("Verified");
 }
 
 main();
