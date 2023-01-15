@@ -153,7 +153,8 @@ body {
 .codicon {
   color: var(--vscode-input-foreground);
   position: absolute;
-  pointer-events: none;
+  /* pointer-events: none; */
+  cursor: pointer;
   top: 0;
   bottom: 0;
   right: -6px;
