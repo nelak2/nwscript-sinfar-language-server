@@ -23,6 +23,8 @@ import {
   PLCInitialState,
   BodyBag,
   PLCAppearances,
+  Difficulty,
+  SpawnOption,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -109,6 +111,12 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "PLCAppearances":
         this.list = PLCAppearances;
+        break;
+      case "Difficulty":
+        this.list = Difficulty;
+        break;
+      case "SpawnOption":
+        this.list = SpawnOption;
         break;
       default:
         this.list = [{ value: "-1", label: "Unknown List" }];
