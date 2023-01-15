@@ -11,6 +11,7 @@ export { EnvironmentalEffects } from "./environmentalEffects";
 export { Tilesets } from "./tilesets";
 export { TrapTypes } from "./trapTypes";
 export { PLCAppearances } from "./plcAppearances";
+export { CreatureAppearances } from "./creatureAppearances";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
