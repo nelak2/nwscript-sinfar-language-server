@@ -3,6 +3,10 @@ import { DropdownListItem, PLCAppearances, CreatureAppearances } from "./lists";
 import { Index } from "flexsearch";
 
 export class nwnDropDownLarge extends HTMLElement {
+  static get observedAttributes() {
+    return ["value"];
+  }
+
   private readonly ITEM_HEIGHT = 22;
 
   private _originalList: DropdownListItem[] = [];
@@ -35,6 +39,12 @@ export class nwnDropDownLarge extends HTMLElement {
     this._shadow.appendChild(style);
   }
 
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (name === "value") {
+      this.value = newValue;
+    }
+  }
+
   public get value(): string {
     const attributeValue = this.getAttribute("selecteditem");
     if (!attributeValue) return "0";
@@ -54,7 +64,7 @@ export class nwnDropDownLarge extends HTMLElement {
   }
 
   connectedCallback() {
-    const list = this.getAttribute("listef");
+    const list = this.getAttribute("listref");
 
     switch (list) {
       case "PLCAppearances": {
@@ -118,7 +128,7 @@ export class nwnDropDownLarge extends HTMLElement {
     this._search = new Index("score");
 
     let i = 0;
-    for (const item of PLCAppearances) {
+    for (const item of this._originalList) {
       void this._search.addAsync(i, item.label);
       i++;
     }
@@ -129,7 +139,7 @@ export class nwnDropDownLarge extends HTMLElement {
     const filter = this._searchBox.value;
 
     const results = this._search.search(filter, {
-      limit: PLCAppearances.length,
+      limit: this._originalList.length,
     });
 
     if (results.length === 0) {
@@ -141,8 +151,8 @@ export class nwnDropDownLarge extends HTMLElement {
 
     // build filtered list
     for (const result of results) {
-      const value = PLCAppearances[result].value;
-      const label = PLCAppearances[result].label;
+      const value = this._originalList[result].value;
+      const label = this._originalList[result].label;
       this._list.push({ value, label });
     }
 
@@ -353,7 +363,7 @@ export class nwnDropDownLarge extends HTMLElement {
     if (!selecteditem) return;
     const index = parseInt(selecteditem);
 
-    searchBox.value = PLCAppearances[index].label;
+    searchBox.value = this._originalList[index].label;
 
     if (this._filtered) {
       this.ResetFilteredList(index);
@@ -382,7 +392,7 @@ export class nwnDropDownLarge extends HTMLElement {
 
   private ResetFilteredList(index: number) {
     this._list = [];
-    this._list = PLCAppearances;
+    this._list = this._originalList;
     this._filtered = false;
 
     this._placeholder.style.height = (this._list.length * this.ITEM_HEIGHT).toString() + "px";
@@ -451,6 +461,8 @@ export class nwnDropDownLarge extends HTMLElement {
 
     this.setAttribute("selecteditem", index.toString());
     this._searchBox.value = this._list[index].label;
+
+    this.dispatchEvent(new Event("change"));
   }
 
   private readonly _html: string = `
