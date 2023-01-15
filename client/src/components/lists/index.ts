@@ -140,3 +140,16 @@ export const BodyBag: DropdownListItem[] = [
   { value: "5", label: "Bones" },
   { value: "6", label: "Pouch" },
 ];
+
+export const Difficulty: DropdownListItem[] = [
+  { value: "0", label: "Very Easy" },
+  { value: "1", label: "Easy" },
+  { value: "2", label: "Normal" },
+  { value: "3", label: "Hard" },
+  { value: "4", label: "Impossible" },
+];
+
+export const SpawnOption: DropdownListItem[] = [
+  { value: "0", label: "Continuous" },
+  { value: "1", label: "Single Shot" },
+];
