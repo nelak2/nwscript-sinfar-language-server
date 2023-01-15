@@ -34,6 +34,7 @@
     "@spectrum-web-components/overlay": "^0.18.9",
     "@spectrum-web-components/popover": "^0.12.9",
     "@spectrum-web-components/styles": "^0.21.0",
+    "@types/flexsearch": "^0.7.3",
     "@vscode/codicons": "^0.0.32",
     "@vscode/webview-ui-toolkit": "1.2.0",
     "copyfiles": "^2.4.1",
