@@ -37,8 +37,8 @@
         <nwn-number-field id="res_MaxCreatures" label="Maximum Creatures" unit="byte"></nwn-number-field>
         <nwn-number-field id="res_RecCreatures" label="Minimum Creatures" unit="byte"></nwn-number-field>
         <nwn-drop-down id="res_SpawnOption" label="Spawn Option" listRef="SpawnOption"></nwn-drop-down>
-        <nwn-number-field id="res_ResetTime" label="Respawn Time (seconds)" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_Respawns" label="Number of Time to Respawn (-1=infinite)" unit="byte"></nwn-number-field>
+        <nwn-number-field id="res_ResetTime" label="Respawn Time (seconds)" unit="seconds"></nwn-number-field>
+        <nwn-number-field id="res_Respawns" label="Time to Respawn (-1=infinite)" unit="respawn"></nwn-number-field>
       </sp-accordion-item>
       <sp-accordion-item label="Spawn Creatures">
         <nwn-encounter-list id="EncounterList"></nwn-encounter-list>
