@@ -1,5 +1,5 @@
-import { InitializeNWNControls, nwnVariables, nwnSoundsList } from "../components";
-import { createResData, ResData, Uts } from "../editorProviders/resData";
+import { InitializeNWNControls, nwnVariables, nwnSoundsList, nwnPLCInventory } from "../components";
+import { createResData, ResData, Uts, Utp } from "../editorProviders/resData";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
@@ -8,7 +8,7 @@ let content: ResData;
 let initialized = false;
 let _varTable: nwnVariables;
 let _soundList: nwnSoundsList;
-let _plcInventoryList: nwnPlcInventoryList;
+let _plcInventoryList: nwnPLCInventory;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -135,7 +135,7 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
   }
 }
 
-function UpdatePLCInventoryList(field: string, newValue, oldValue: any) {
+function UpdatePLCInventoryList(field: string, newValue: any, oldValue: any) {
   const plcInventoryFieldFullId = field.split("_");
   const plcInventoryFieldId = plcInventoryFieldFullId[2];
 
@@ -251,8 +251,8 @@ function InitHTMLElements() {
   }
 
   // Set the plc inventory list
-  _plcInventoryList = <nwnPlcInventoryList>document.getElementById("PLCInventory");
+  _plcInventoryList = <nwnPLCInventory>document.getElementById("PLCInventory");
   if (_plcInventoryList) {
-    _plcInventoryList.Init(content as Plc);
+    _plcInventoryList.Init(content as Utp);
   }
 }
