@@ -20,6 +20,7 @@ import { nwnMerchantInventory } from "./nwnMerchantInventory";
 import { nwnMerchantRestrictions } from "./nwnMerchantRestrictions";
 import { nwnPLCInventory } from "./nwnPLCInventory";
 import { nwnSoundsList } from "./nwnSoundsList";
+import { nwnDropDownLarge } from "./nwnDropDownLarge";
 
 export { nwnColorPicker } from "./nwnColorPicker";
 export { nwnDropDown } from "./nwnDropDown";
@@ -38,6 +39,7 @@ export { nwnMerchantInventory } from "./nwnMerchantInventory";
 export { nwnMerchantRestrictions } from "./nwnMerchantRestrictions";
 export { nwnPLCInventory } from "./nwnPLCInventory";
 export { nwnSoundsList } from "./nwnSoundsList";
+export { nwnDropDownLarge } from "./nwnDropDownLarge";
 
 export function InitializeNWNControls() {
   customElements.define("nwn-volume-slider", nwnVolumeSlider);
@@ -57,4 +59,5 @@ export function InitializeNWNControls() {
   customElements.define("nwn-merchant-restrictions", nwnMerchantRestrictions);
   customElements.define("nwn-plc-inventory", nwnPLCInventory);
   customElements.define("nwn-sound-list", nwnSoundsList);
+  customElements.define("nwn-drop-down-large", nwnDropDownLarge);
 }
