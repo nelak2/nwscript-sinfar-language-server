@@ -185,6 +185,10 @@ function UpdateHTMLElementValue(field: string, newValue: string) {
     else if (element.tagName === "INPUT") {
       (element as HTMLInputElement).value = newValue;
     }
+    // Handle our custom large drop downs
+    else if (element.tagName === "NWN-DROP-DOWN-LARGE") {
+      element.setAttribute("value", newValue);
+    }
 
     // Rebind the event listener
     element.addEventListener("change", onEditableFieldChange);
