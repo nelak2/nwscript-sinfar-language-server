@@ -17,7 +17,7 @@
 
   <body>
     <sp-accordion allow-multiple>
-      <sp-accordion-item open label="Identification">
+      <sp-accordion-item label="Identification">
         <nwn-text-field id="res_LocName" label="Name"></nwn-text-field>
         <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
         <nwn-text-field id="res_Description" label="Description" type="textarea"></nwn-text-field>
@@ -40,8 +40,10 @@
           <vscode-checkbox id="res_Interruptable">Interruptable</vscode-checkbox>
         </nwn-row>
       </sp-accordion-item>
-      <sp-accordion-item label="Appearance">
-        <nwn-drop-down id="res_Appearance" label="Appearance" listRef="PLCAppearances"></nwn-drop-down>
+      <sp-accordion-item open label="Appearance">
+        <nwn-row label="Appearance">
+          <nwn-drop-down-large id="res_Appearance2" label="Appearance 2" listRef="PLCAppearances"></nwn-drop-down-large>
+        </nwn-row>
         <nwn-drop-down id="res_AnimationState" label="Initial State" listRef="PLCInitialState"></nwn-drop-down>
         <nwn-drop-down id="res_BodyBag" label="Body Bag" listRef="BodyBag"></nwn-drop-down>
       </sp-accordion-item>
@@ -86,7 +88,7 @@
       <sp-accordion-item label="Inventory Items">
         <nwn-plc-inventory id="PLCInventory"></nwn-plc-inventory>
       </sp-accordion-item>
-      <sp-accordion-item open label="Scripts">
+      <sp-accordion-item label="Scripts">
         <nwn-text-field id="res_OnOpen" label="OnOpen" type="script"></nwn-text-field>
         <nwn-text-field id="res_OnClosed" label="OnClose" type="script"></nwn-text-field>
         <nwn-text-field id="res_OnUnlock" label="OnUnlock" type="script"></nwn-text-field>
