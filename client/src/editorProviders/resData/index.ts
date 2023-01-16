@@ -6,14 +6,14 @@ import { Utd } from "./utd";
 import { Utt } from "./utt";
 import { Utw } from "./utw";
 import { Uts } from "./uts";
-import { Ute } from "./ute";
+import { Ute, CreatureListItem } from "./ute";
 import { Utm } from "./utm";
 import { Uti } from "./uti";
 import { Utp } from "./utp";
 import { Utc } from "./utc";
 import { EditorTypes } from "../../api/types";
 
-export { ResData, VarTable, Are, Git, Utd, Utt, Utw, Uts, Ute, Utm, Uti, Utc, Utp };
+export { ResData, VarTable, Are, Git, Utd, Utt, Utw, Uts, Ute, Utm, Uti, Utc, Utp, CreatureListItem };
 
 export function createResData(content: any): ResData {
   const type = getEditorType(content.resName);
