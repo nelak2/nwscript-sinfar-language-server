@@ -1,5 +1,5 @@
-import { InitializeNWNControls, nwnVariables, nwnSoundsList, nwnPLCInventory } from "../components";
-import { createResData, ResData, Uts, Utp } from "../editorProviders/resData";
+import { InitializeNWNControls, nwnVariables, nwnSoundsList, nwnPLCInventory, nwnEncounterList } from "../components";
+import { createResData, ResData, Uts, Utp, Ute } from "../editorProviders/resData";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
@@ -9,6 +9,7 @@ let initialized = false;
 let _varTable: nwnVariables;
 let _soundList: nwnSoundsList;
 let _plcInventoryList: nwnPLCInventory;
+let _encounterList: nwnEncounterList;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -83,6 +84,15 @@ function onEditableFieldChange(e: any) {
         });
         break;
       }
+      case "Enc": {
+        vscode.postMessage({
+          type: "update",
+          field: e.detail.field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
+        break;
+      }
     }
   } catch (e: any) {
     console.log(e);
@@ -129,6 +139,8 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
     UpdateSoundList(field, newValue, oldValue);
   } else if (updateType === "PLCInventory") {
     UpdatePLCInventoryList(field, newValue, oldValue);
+  } else if (updateType === "EncounterList") {
+    UpdateEncounterList(field, newValue, oldValue);
   } else {
     content.setField(field, newValue);
     UpdateHTMLElementValue(field, newValue);
@@ -163,6 +175,16 @@ function UpdateVarTable(field: string, newValue: any) {
 
   // update content
   _varTable.Update(parseInt(varFieldId), newValue);
+}
+
+function UpdateEncounterList(field: string, newValue: any, oldValue: any) {
+  const encounterFieldFullId = field.split("_");
+  const encounterFieldId = encounterFieldFullId[2];
+
+  if (!_encounterList) return;
+
+  // update content
+  _encounterList.Update(parseInt(encounterFieldId), newValue, oldValue);
 }
 
 function UpdateHTMLElementValue(field: string, newValue: string) {
@@ -232,6 +254,10 @@ function BindListeners() {
     _plcInventoryList.addEventListener("PLCInventory_change", onEditableFieldChange);
   }
 
+  if (_encounterList) {
+    _encounterList.addEventListener("EncounterList_change", onEditableFieldChange);
+  }
+
   initialized = true;
 }
 
@@ -258,5 +284,11 @@ function InitHTMLElements() {
   _plcInventoryList = <nwnPLCInventory>document.getElementById("PLCInventory");
   if (_plcInventoryList) {
     _plcInventoryList.Init(content as Utp);
+  }
+
+  // Set the encounter list
+  _encounterList = <nwnEncounterList>document.getElementById("EncounterList");
+  if (_encounterList) {
+    _encounterList.Init(content as Ute);
   }
 }
