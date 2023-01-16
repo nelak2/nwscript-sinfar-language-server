@@ -1,5 +1,13 @@
-import { InitializeNWNControls, nwnVariables, nwnSoundsList, nwnPLCInventory, nwnEncounterList } from "../components";
-import { createResData, ResData, Uts, Utp, Ute } from "../editorProviders/resData";
+import {
+  InitializeNWNControls,
+  nwnVariables,
+  nwnSoundsList,
+  nwnPLCInventory,
+  nwnEncounterList,
+  nwnMerchantRestrictions,
+  nwnMerchantInventory,
+} from "../components";
+import { createResData, ResData, Uts, Utp, Ute, Utm } from "../editorProviders/resData";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
@@ -10,6 +18,8 @@ let _varTable: nwnVariables;
 let _soundList: nwnSoundsList;
 let _plcInventoryList: nwnPLCInventory;
 let _encounterList: nwnEncounterList;
+let _restrictionList: nwnMerchantRestrictions;
+let _merchantInventory: nwnMerchantInventory;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -93,6 +103,24 @@ function onEditableFieldChange(e: any) {
         });
         break;
       }
+      case "Res": {
+        vscode.postMessage({
+          type: "update",
+          field: e.detail.field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
+        break;
+      }
+      case "Mer": {
+        vscode.postMessage({
+          type: "update",
+          field: e.detail.field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
+        break;
+      }
     }
   } catch (e: any) {
     console.log(e);
@@ -141,10 +169,24 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
     UpdatePLCInventoryList(field, newValue, oldValue);
   } else if (updateType === "EncounterList") {
     UpdateEncounterList(field, newValue, oldValue);
+  } else if (updateType === "RestrictionList") {
+    UpdateRestrictionList(field, newValue, oldValue);
+  } else if (updateType === "MerchantInventory") {
+    UpdateMerchantInventory(field, newValue, oldValue);
   } else {
     content.setField(field, newValue);
     UpdateHTMLElementValue(field, newValue);
   }
+}
+
+function UpdateMerchantInventory(field: string, newValue: any, oldValue: any) {
+  const merchantInventoryFieldFullId = field.split("_");
+  const merchantInventoryFieldId = merchantInventoryFieldFullId[2];
+
+  if (!_merchantInventory) return;
+
+  // update content
+  _merchantInventory.Update(parseInt(merchantInventoryFieldId), newValue, oldValue);
 }
 
 function UpdatePLCInventoryList(field: string, newValue: any, oldValue: any) {
@@ -185,6 +227,16 @@ function UpdateEncounterList(field: string, newValue: any, oldValue: any) {
 
   // update content
   _encounterList.Update(parseInt(encounterFieldId), newValue, oldValue);
+}
+
+function UpdateRestrictionList(field: string, newValue: any, oldValue: any) {
+  const restrictionFieldFullId = field.split("_");
+  const restrictionFieldId = restrictionFieldFullId[2];
+
+  if (!_restrictionList) return;
+
+  // update content
+  _restrictionList.Update(parseInt(restrictionFieldId), newValue, oldValue);
 }
 
 function UpdateHTMLElementValue(field: string, newValue: string) {
@@ -258,6 +310,14 @@ function BindListeners() {
     _encounterList.addEventListener("EncounterList_change", onEditableFieldChange);
   }
 
+  if (_restrictionList) {
+    _restrictionList.addEventListener("RestrictionList_change", onEditableFieldChange);
+  }
+
+  if (_merchantInventory) {
+    _merchantInventory.addEventListener("MerchantInventory_change", onEditableFieldChange);
+  }
+
   initialized = true;
 }
 
@@ -290,5 +350,17 @@ function InitHTMLElements() {
   _encounterList = <nwnEncounterList>document.getElementById("EncounterList");
   if (_encounterList) {
     _encounterList.Init(content as Ute);
+  }
+
+  // Set the restriction list
+  _restrictionList = <nwnMerchantRestrictions>document.getElementById("RestrictionList");
+  if (_restrictionList) {
+    _restrictionList.Init(content as Utm);
+  }
+
+  // Set the merchant inventory list
+  _merchantInventory = <nwnMerchantInventory>document.getElementById("MerchantInventory");
+  if (_merchantInventory) {
+    _merchantInventory.Init(content as Utm);
   }
 }
