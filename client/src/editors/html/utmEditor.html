@@ -32,13 +32,13 @@
             <vscode-checkbox id="res_BlackMarket">Buy Stolen Goods</vscode-checkbox>
           </fieldset>
         </nwn-row>
-        <nwn-number-field id="res_BM_Markdown" label="Stolen Goods - Buy Mark Down" unit="percent"></nwn-number-field>
+        <nwn-number-field id="res_BM_MarkDown" label="Stolen Goods - Buy Mark Down" unit="percent"></nwn-number-field>
       </sp-accordion-item>
       <sp-accordion-item label="Restriction">
         <nwn-number-field id="res_StoreGold" label="Store Gold (-1=infinite)" unit="gold"></nwn-number-field>
         <nwn-number-field id="res_MaxBuyPrice" label="Maximum Buy Price (-1=infinite)" unit="gold"></nwn-number-field>
-        <nwn-drop-down id="res_ItemsRestrictionType" label="Item Restriction Type" listRef="ItemRestrictionType"></nwn-drop-down>
-        <nwn-merchant-restrictions id="MerchantRestrictions"></nwn-merchant-restrictions>
+        <nwn-drop-down id="res_RestrictionType" label="Item Restriction Type" listRef="ItemRestrictionType"></nwn-drop-down>
+        <nwn-merchant-restrictions id="RestrictionList"></nwn-merchant-restrictions>
       </sp-accordion-item>
       <sp-accordion-item label="Inventory Items">
         <nwn-merchant-inventory id="MerchantInventory"></nwn-merchant-inventory>
