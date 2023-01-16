@@ -95,6 +95,13 @@ export class nwnNumberField extends HTMLElement {
         numberField.style.width = "100px";
         numberField.value = 0;
         break;
+      case "gold":
+        numberField.setAttribute("min", "-1");
+        numberField.setAttribute("max", "999999999");
+        numberField.style.width = "150px";
+        numberField.value = 0;
+        numberField.formatOptions = { style: "unit", unit: "gp" };
+        break;
       case "word":
         numberField.setAttribute("min", "0");
         numberField.setAttribute("max", "65535");
