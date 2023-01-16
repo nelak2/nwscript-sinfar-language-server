@@ -4027,7 +4027,7 @@ governing permissions and limitations under the License.
 
 vscode-dropdown
 {
-    width: 300px;
+    width: 350px;
 }
 vscode-dropdown::part(listbox)
 {
@@ -4047,8 +4047,14 @@ vscode-dropdown::part(listbox)
     width: 150px;
     position: relative;
     right: 8px;
-    white-space: nowrap;
+    /* white-space: nowrap; */
     text-align: right;
+    overflow-wrap: break-word;
+}
+
+.col-label > label
+{
+    overflow-wrap: break-word;
 }
 
 .col-input
@@ -4063,7 +4069,7 @@ vscode-dropdown::part(listbox)
     padding-block-start: 0px;
     padding-block-end: 0px;
     border-style: none;
-    width: 300px;
+    width: 350px;
 }
 
 .checkbox-set-vertical
@@ -4073,7 +4079,7 @@ vscode-dropdown::part(listbox)
     padding-block-start: 0px;
     padding-block-end: 0px;
     border-style: none;
-    width: 300px;
+    width: 350px;
     display: grid;
     padding: 0;
 }
