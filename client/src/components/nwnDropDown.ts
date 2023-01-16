@@ -25,10 +25,12 @@ import {
   PLCAppearances,
   Difficulty,
   SpawnOption,
+  ItemRestrictionType,
+  BaseItems,
+  MerchantInventoryCategory,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
-  readonly maxItems = 50;
   readonly increment = 25;
   list: DropdownListItem[] = [];
   dropDown!: HTMLElement;
@@ -118,6 +120,15 @@ export class nwnDropDown extends HTMLElement {
       case "SpawnOption":
         this.list = SpawnOption;
         break;
+      case "ItemRestrictionType":
+        this.list = ItemRestrictionType;
+        break;
+      case "BaseItems":
+        this.list = BaseItems;
+        break;
+      case "MerchantInventoryCategory":
+        this.list = MerchantInventoryCategory;
+        break;
       default:
         this.list = [{ value: "-1", label: "Unknown List" }];
     }
@@ -157,7 +168,7 @@ export class nwnDropDown extends HTMLElement {
 
   private async addOptionsAsync(dropDown: HTMLElement, start: number, end: number) {
     let count = 0;
-    for (let i = start; count < this.maxItems && i <= end; i++, count++) {
+    for (let i = start; i <= end; i++, count++) {
       const option = document.createElement("vscode-option");
       option.setAttribute("value", this.list[i].value);
       option.textContent = this.list[i].label;
