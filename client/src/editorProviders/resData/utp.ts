@@ -52,12 +52,8 @@ class InventoryList {
   }
 
   public updateItem(index: number, newValue: string): string | undefined {
-    let oldValue: string;
-    try {
-      oldValue = this._data.resData[1].ItemList[1][index][1].InventoryRes[1];
-    } catch (e) {
-      return undefined;
-    }
+    const oldValue = this.getItem(index);
+    if (!oldValue) return undefined;
 
     this._data.resData[1].ItemList[1][index] = [0, { InventoryRes: [11, newValue] }];
     return oldValue;
@@ -72,12 +68,8 @@ class InventoryList {
   }
 
   public deleteItem(index: number): string | undefined {
-    let oldValue: string;
-    try {
-      oldValue = this._data.resData[1].ItemList[1][index][1].InventoryRes[1];
-    } catch (e) {
-      return undefined;
-    }
+    const oldValue = this.getItem(index);
+    if (!oldValue) return undefined;
 
     this._data.resData[1].ItemList[1].splice(index, 1);
     return oldValue;
