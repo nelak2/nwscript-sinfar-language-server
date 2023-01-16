@@ -3,7 +3,9 @@ import { VarType } from "./lists/index";
 export function buildLabel(text: string, htmlFor: string): HTMLLabelElement {
   const label = document.createElement("label");
   label.className = "vscode-input-label";
-  label.innerText = text + ":";
+
+  if (text === " ") label.innerText = "";
+  else label.innerText = text + ":";
   label.htmlFor = htmlFor;
   return label;
 }
