@@ -12,6 +12,7 @@ export { Tilesets } from "./tilesets";
 export { TrapTypes } from "./trapTypes";
 export { PLCAppearances } from "./plcAppearances";
 export { CreatureAppearances } from "./creatureAppearances";
+export { BaseItems } from "./baseItems";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
@@ -152,4 +153,17 @@ export const Difficulty: DropdownListItem[] = [
 export const SpawnOption: DropdownListItem[] = [
   { value: "0", label: "Continuous" },
   { value: "1", label: "Single Shot" },
+];
+
+export const ItemRestrictionType: DropdownListItem[] = [
+  { value: "1", label: "Will Not Buy" },
+  { value: "2", label: "Will Only Buy" },
+];
+
+export const MerchantInventoryCategory: DropdownListItem[] = [
+  { value: "0", label: "Armor" },
+  { value: "4", label: "Weapon" },
+  { value: "2", label: "Potions" },
+  { value: "3", label: "Jewel" },
+  { value: "1", label: "Miscellaneous" },
 ];
