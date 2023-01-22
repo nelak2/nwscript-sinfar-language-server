@@ -1,11 +1,16 @@
 import { Utm } from "../editorProviders/resData";
 import { InventoryItem } from "../editorProviders/resData/utm";
-import { BaseItems, MerchantInventoryCategory } from "./lists";
+import { MerchantInventoryCategory } from "./lists";
 import { buildTextField, buildLabelColumn, buildDiv, ButtonType } from "./utils";
 
 export class nwnMerchantInventory extends HTMLElement {
   _content!: Utm;
-  _listDiv!: HTMLFieldSetElement[];
+  _listDiv: HTMLFieldSetElement[] = [];
+
+  _addCategory!: HTMLElement;
+  _addResref!: HTMLElement;
+  _addInfinite!: HTMLElement;
+
   constructor() {
     super();
 
@@ -33,7 +38,9 @@ export class nwnMerchantInventory extends HTMLElement {
     this.refreshList();
   }
 
-  public Update(index: number, newValue: InventoryItem, oldValue: InventoryItem) {
+  public Update(category: number, index: number, newValue: InventoryItem, oldValue: InventoryItem) {
+    if (category === undefined || index === undefined) return;
+
     // If newValue is undefined then the item was deleted
     if (newValue === undefined && index >= 0) {
       this._content.InventoryList.deleteItem(index, oldValue.Category);
@@ -71,38 +78,60 @@ export class nwnMerchantInventory extends HTMLElement {
 
   // Add HTML elements to the list
   private addRow(item: InventoryItem, index: number, listIndex: number) {
+    const infinite = item.Infinite ? " (Infinite)" : "";
+
     const inventoryListItem = buildTextField({
       id: "rst_item" + listIndex.toString() + "_" + index.toString(),
-      value: item.Resref,
+      value: item.Resref + infinite,
       disabled: true,
       style: undefined,
       className: undefined,
       maxLength: 16,
-      buttonType: ButtonType.delete,
+      buttonType: ButtonType.GotoAndDelete,
     });
 
     const btns = inventoryListItem.querySelectorAll("vscode-button");
-    const delButton = btns[0];
-    if (delButton) delButton.addEventListener("click", (e) => this.deleteClickEventHandler(e, index));
+    const gotoButton = btns[0];
+    if (gotoButton) gotoButton.addEventListener("click", (e) => this.gotoClickEventHandler(e, index));
+    const delButton = btns[1];
+    if (delButton) delButton.addEventListener("click", (e) => this.deleteClickEventHandler(e, index, item.Category));
 
     this._listDiv[listIndex].appendChild(inventoryListItem);
   }
 
   // Add the item to the list then refresh the list
-  private addClickEventHandler(e: Event, newValue: InventoryItem) {
-    const oldValue = this._content.InventoryList.addItem(newValue, newValue.Category);
+  private addClickEventHandler(e: Event) {
+    const resref = (this._addResref as HTMLInputElement).getAttribute("current-value");
+    const infinite = (this._addInfinite as HTMLInputElement).checked;
+    const category = parseInt((this._addCategory as HTMLSelectElement).getAttribute("current-value") || "");
 
-    // if the item already exists then do nothing
-    if (!oldValue) return;
+    if (resref === null || resref === "") return;
+
+    const newValue: InventoryItem = { Resref: resref, Infinite: infinite, Category: category };
+
+    const oldValue = this._content.InventoryList.addItem(newValue, category);
 
     // clear the fields
-    const textField = document.getElementById("InventoryAddItem") as HTMLInputElement;
-    if (textField) textField.value = "";
+    (this._addResref as HTMLInputElement).value = "";
 
     this.refreshList();
 
-    if (oldValue === newValue) {
-      this.dispatchEvent(new CustomEvent("InventoryList_change", { detail: { field: this.id, undefined, newValue } }));
+    const index = this._content.InventoryList.getItemList(newValue.Category).length - 1;
+
+    if (
+      oldValue?.Category === newValue.Category &&
+      oldValue?.Resref === newValue.Resref &&
+      oldValue?.Infinite === newValue.Infinite
+    ) {
+      this.dispatchEvent(
+        new CustomEvent("MerchantInventory_change", {
+          detail: {
+            field: "MerchantInventory_item_" + newValue.Category.toString() + "_" + index.toString(),
+            undefined,
+            newValue,
+          },
+        }),
+      );
     }
   }
 
@@ -113,22 +142,15 @@ export class nwnMerchantInventory extends HTMLElement {
 
     if (oldValue) {
       this.dispatchEvent(
-        new CustomEvent("InventoryList_change", {
-          detail: { field: "InventoryList_item_" + index.toString(), oldValue, newValue: undefined },
+        new CustomEvent("MerchantInventory_change", {
+          detail: {
+            field: "MerchantInventory_item_" + category.toString() + "_" + index.toString(),
+            oldValue,
+            newValue: undefined,
+          },
         }),
       );
     }
-  }
-
-  private changeEventHandler(e: Event, index: number) {
-    const newValue = (e.target as HTMLInputElement).value;
-    const oldValue = this._content.InventoryList.updateItem(index, newValue);
-
-    this.dispatchEvent(
-      new CustomEvent("InventoryList_change", {
-        detail: { field: "InventoryList_item_" + index.toString(), oldValue, newValue },
-      }),
-    );
   }
 
   private gotoClickEventHandler(e: Event, index: number) {
@@ -154,7 +176,7 @@ export class nwnMerchantInventory extends HTMLElement {
 
   private buildInventoryList(category: string): HTMLDivElement {
     const fieldset = document.createElement("fieldset");
-    fieldset.id = "InventoryList";
+    fieldset.id = "MerchantInventory";
     fieldset.style.width = "320px";
     fieldset.style.display = "grid";
     fieldset.style.padding = "5px 5px 5px 5px";
@@ -165,7 +187,8 @@ export class nwnMerchantInventory extends HTMLElement {
     inputCol.appendChild(fieldset);
 
     // Store reference to the fieldset so we can add/remove children
-    this._listDiv[this.getListIndex(category)].push(fieldset);
+    this._listDiv[this.getListIndex(category)] = fieldset;
+    // this._listDiv[this.getListIndex(category)].push(fieldset);
     return inputCol;
   }
 
@@ -184,38 +207,37 @@ export class nwnMerchantInventory extends HTMLElement {
     AddRow.innerHTML = this._addRowHtml;
     AddRow.className = "row";
 
+    this._addCategory = AddRow.querySelector("vscode-dropdown") as HTMLElement;
+    this._addResref = AddRow.querySelector("vscode-text-field") as HTMLElement;
+    this._addInfinite = AddRow.querySelector("vscode-checkbox") as HTMLElement;
+
+    this._addCategory.style.maxWidth = "200px";
+    this._addResref.style.maxWidth = "200px";
+
+    const addButton = AddRow.querySelectorAll("vscode-button");
+    addButton[1].addEventListener("click", (e) => this.addClickEventHandler(e));
+
     return AddRow;
   }
 
-  private buildAddButton(): HTMLDivElement {
-    const AddButton = document.createElement("div");
-    AddButton.className = "row";
-    AddButton.innerHTML = this._addButtonHtml;
-
-    const addBtn = AddButton.querySelector("vscode-button") as HTMLButtonElement;
-    addBtn.addEventListener("click", (e) =>
-      this.addClickEventHandler(e, (document.getElementById("InventoryListAdd") as HTMLInputElement).value),
-    );
-
-    return AddButton;
-  }
-
   private readonly _addRowHtml: string = `
-  <nwn-row label="Add Inventory Item">
-    <nwn-text-field id="InventoryAddResref" label="ResRef" type="resref"></nwn-text-field>
-    <nwn-drop-down id="InventoryAddCategory" label="Category" listRef="MerchantInventoryCategory"></nwn-drop-down>
-    <nwn-row label="Flags">
-      <vscode-checkbox id="InventoryAddInfinite">Infinite</vscode-checkbox>
-    </nwn-row>
-    <nwn-row label=" ">
-      <vscode-button id="InventoryListAddButton">Add</vscode-button>
-    </nwn-row>
-  </nwn-row>
+  <div class="row">
+  <div class="col-label">
+      <label class="vscode-input-label" for="">Add Inventory Item:</label>
+  </div>
+  <div class="col-input">
+      <nwn-text-field id="InventoryAddResref" label="ResRef" type="resref" style="max-width: 200px;">
+      </nwn-text-field>
+      <nwn-drop-down id="InventoryAddCategory" label="Category" listRef="MerchantInventoryCategory" style="max-width: 200px;"></nwn-drop-down>
+      <nwn-row label="Flags">
+          <vscode-checkbox id="InventoryAddInfinite" role="checkbox" aria-checked="false" aria-required="false"
+          aria-disabled="false" tabindex="0" aria-label="Infinite" current-value="on"
+          current-checked="false">Infinite</vscode-checkbox>
+      </nwn-row>
+      <nwn-row label=" ">
+          <vscode-button id="MerchantInventoryAddButton">Add</vscode-button>
+      </nwn-row>
+  </div>
+</div>
   `;
-
-  private readonly _addButtonHtml: string = `
-  <nwn-row label=" ">
-    
-  </nwn-row>
-    `;
 }
