@@ -1,5 +1,4 @@
 import { ResData, VarTable } from ".";
-import { MerchantInventoryCategory } from "../../components/lists";
 
 export class Utm extends ResData {
   private readonly _vartable: VarTable;
@@ -202,7 +201,7 @@ class InventoryList {
 
   public getItem(index: number, category: number): InventoryItem | undefined {
     try {
-      return this._data.resData[1].StoreList[1][category][1].ItemList[1][index][1];
+      return this.readItem(this._data.resData[1].StoreList[1][category][1].ItemList[1][index], category);
     } catch (e) {
       return undefined;
     }
@@ -212,7 +211,7 @@ class InventoryList {
     const oldValue = this.getItem(index, category);
     if (!oldValue) return undefined;
 
-    this._data.resData[1].StoreList[1][category][1].splice(index, 1);
+    this._data.resData[1].StoreList[1][category][1].ItemList[1].splice(index, 1);
     return oldValue;
   }
 }
