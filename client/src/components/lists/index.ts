@@ -163,7 +163,7 @@ export const ItemRestrictionType: DropdownListItem[] = [
 export const MerchantInventoryCategory: DropdownListItem[] = [
   { value: "0", label: "Armor" },
   { value: "4", label: "Weapon" },
-  { value: "2", label: "Potions" },
   { value: "3", label: "Jewel" },
+  { value: "2", label: "Potions" },
   { value: "1", label: "Miscellaneous" },
 ];
