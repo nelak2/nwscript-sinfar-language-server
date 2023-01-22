@@ -4057,6 +4057,10 @@ vscode-dropdown::part(listbox)
     overflow-wrap: break-word;
 }
 
+.col-input .col-label {
+    width: 75px;
+}
+
 .col-input
 {
     width: auto;
