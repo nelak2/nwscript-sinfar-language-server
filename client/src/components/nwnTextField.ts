@@ -36,6 +36,7 @@ export class nwnTextField extends HTMLElement {
       case "script":
       case "dialog":
       case "item":
+      case "resref":
       case "creature": {
         textField = this.buildResrefTextField(id);
         break;
