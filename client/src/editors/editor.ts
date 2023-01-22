@@ -181,12 +181,14 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
 
 function UpdateMerchantInventory(field: string, newValue: any, oldValue: any) {
   const merchantInventoryFieldFullId = field.split("_");
-  const merchantInventoryFieldId = merchantInventoryFieldFullId[2];
+
+  const category = parseInt(merchantInventoryFieldFullId[2]);
+  const index = parseInt(merchantInventoryFieldFullId[3]);
 
   if (!_merchantInventory) return;
 
   // update content
-  _merchantInventory.Update(parseInt(merchantInventoryFieldId), newValue, oldValue);
+  _merchantInventory.Update(category, index, newValue, oldValue);
 }
 
 function UpdatePLCInventoryList(field: string, newValue: any, oldValue: any) {
