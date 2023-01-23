@@ -7,6 +7,7 @@ import {
   nwnMerchantRestrictions,
   nwnMerchantInventory,
   nwnItemAppearance,
+  nwnItemProperties,
 } from "../components";
 import { createResData, ResData, Uts, Utp, Ute, Utm, Uti } from "../editorProviders/resData";
 
@@ -22,6 +23,7 @@ let _encounterList: nwnEncounterList;
 let _restrictionList: nwnMerchantRestrictions;
 let _merchantInventory: nwnMerchantInventory;
 let _itemAppearance: nwnItemAppearance;
+let _itemProperties: nwnItemProperties;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -374,5 +376,11 @@ function InitHTMLElements() {
     const baseItemField = document.getElementById("res_BaseItem");
     if (!baseItemField) return;
     _itemAppearance.Init(content as Uti, baseItemField);
+  }
+
+  // Set the item property fields
+  _itemProperties = <nwnItemProperties>document.getElementById("ItemProperties");
+  if (_itemProperties) {
+    _itemProperties.Init(content as Uti);
   }
 }
