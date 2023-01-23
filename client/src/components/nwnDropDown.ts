@@ -28,6 +28,10 @@ import {
   ItemRestrictionType,
   BaseItems,
   MerchantInventoryCategory,
+  ipSubType,
+  ipType,
+  ipValueParamType,
+  ipValueType,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -129,6 +133,18 @@ export class nwnDropDown extends HTMLElement {
       case "MerchantInventoryCategory":
         this.list = MerchantInventoryCategory;
         break;
+      case "ipType":
+        this.list = ipType;
+        break;
+      case "ipSubType":
+        this.list = ipSubType;
+        break;
+      case "ipValueType":
+        this.list = ipValueType;
+        break;
+      case "ipValueParamType":
+        this.list = ipValueParamType;
+        break;
       default:
         this.list = [{ value: "-1", label: "Unknown List" }];
     }
@@ -167,8 +183,7 @@ export class nwnDropDown extends HTMLElement {
   }
 
   private async addOptionsAsync(dropDown: HTMLElement, start: number, end: number) {
-    let count = 0;
-    for (let i = start; i <= end; i++, count++) {
+    for (let i = start; i <= end; i++) {
       const option = document.createElement("vscode-option");
       option.setAttribute("value", this.list[i].value);
       option.textContent = this.list[i].label;

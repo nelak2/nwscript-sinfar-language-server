@@ -13,6 +13,10 @@ export { TrapTypes } from "./trapTypes";
 export { PLCAppearances } from "./plcAppearances";
 export { CreatureAppearances } from "./creatureAppearances";
 export { BaseItems } from "./baseItems";
+export { ipType } from "./ipType";
+export { ipSubType } from "./ipSubType";
+export { ipValueType } from "./ipValueType";
+export { ipValueParamType } from "./ipValueParamType";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
