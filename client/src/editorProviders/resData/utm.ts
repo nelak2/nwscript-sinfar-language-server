@@ -187,6 +187,8 @@ class InventoryList {
   }
 
   public addItem(item: InventoryItem, category: number): InventoryItem | undefined {
+    if (this.getItemList(category).find((i) => i.Resref === item.Resref && i.Infinite)) return undefined;
+
     this._data.resData[1].StoreList[1][category][1].ItemList[1].push(this.writeItem(item));
     return item;
   }
