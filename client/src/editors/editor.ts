@@ -6,8 +6,9 @@ import {
   nwnEncounterList,
   nwnMerchantRestrictions,
   nwnMerchantInventory,
+  nwnItemAppearance,
 } from "../components";
-import { createResData, ResData, Uts, Utp, Ute, Utm } from "../editorProviders/resData";
+import { createResData, ResData, Uts, Utp, Ute, Utm, Uti } from "../editorProviders/resData";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
@@ -20,6 +21,7 @@ let _plcInventoryList: nwnPLCInventory;
 let _encounterList: nwnEncounterList;
 let _restrictionList: nwnMerchantRestrictions;
 let _merchantInventory: nwnMerchantInventory;
+let _itemAppearance: nwnItemAppearance;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -364,5 +366,13 @@ function InitHTMLElements() {
   _merchantInventory = <nwnMerchantInventory>document.getElementById("MerchantInventory");
   if (_merchantInventory) {
     _merchantInventory.Init(content as Utm);
+  }
+
+  // Set the item appearance fields
+  _itemAppearance = <nwnItemAppearance>document.getElementById("ItemAppearance");
+  if (_itemAppearance) {
+    const baseItemField = document.getElementById("res_BaseItem");
+    if (!baseItemField) return;
+    _itemAppearance.Init(content as Uti, baseItemField);
   }
 }
