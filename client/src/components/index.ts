@@ -21,6 +21,7 @@ import { nwnMerchantRestrictions } from "./nwnMerchantRestrictions";
 import { nwnPLCInventory } from "./nwnPLCInventory";
 import { nwnSoundsList } from "./nwnSoundsList";
 import { nwnDropDownLarge } from "./nwnDropDownLarge";
+import { nwnItemAppearance } from "./nwnItemAppearance";
 
 export { nwnColorPicker } from "./nwnColorPicker";
 export { nwnDropDown } from "./nwnDropDown";
@@ -35,6 +36,7 @@ export { nwnCreatureInventory } from "./nwnCreatureInventory";
 export { nwnCreatureSpells } from "./nwnCreatureSpells";
 export { nwnEncounterList } from "./nwnEncounterList";
 export { nwnItemProperties } from "./nwnItemProperties";
+export { nwnItemAppearance } from "./nwnItemAppearance";
 export { nwnMerchantInventory } from "./nwnMerchantInventory";
 export { nwnMerchantRestrictions } from "./nwnMerchantRestrictions";
 export { nwnPLCInventory } from "./nwnPLCInventory";
@@ -60,4 +62,5 @@ export function InitializeNWNControls() {
   customElements.define("nwn-plc-inventory", nwnPLCInventory);
   customElements.define("nwn-sound-list", nwnSoundsList);
   customElements.define("nwn-drop-down-large", nwnDropDownLarge);
+  customElements.define("nwn-item-appearance", nwnItemAppearance);
 }
