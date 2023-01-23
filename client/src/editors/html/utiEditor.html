@@ -25,13 +25,9 @@
       </sp-accordion-item>
       <sp-accordion-item label="Classification">
         <nwn-number-field id="res_PaletteID" label="Palette ID" unit="byte"></nwn-number-field>
-        <nwn-drop-down id="res_BaseItem" label="Base Type" listRef="ItemBaseType"></nwn-drop-down>
+        <nwn-drop-down id="res_BaseItem" label="Base Type" listRef="BaseItems"></nwn-drop-down>
       </sp-accordion-item>
-      <sp-accordion-item label="Weapon Appearance">
-        <nwn-number-field id="res_ModelPart1" label="Top" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_ModelPart2" label="Middle" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_ModelPart3" label="Bottom" unit="byte"></nwn-number-field>
-      </sp-accordion-item>
+      <nwn-item-appearance id="ItemAppearance"></nwn-item-appearance>
       <sp-accordion-item label="Value">
         <nwn-number-field id="res_AddCost" label="Additional Cost" unit="dword"></nwn-number-field>
         <nwn-number-field id="res_StackSize" label="Stack Size" unit="dword"></nwn-number-field>
