@@ -1,4 +1,3 @@
-import { values } from "lodash";
 import { Uti } from "../editorProviders/resData";
 import { ipSubType, ipType, ipValueParamType, ipValueType } from "./lists";
 
@@ -56,6 +55,10 @@ export class nwnItemProperties extends HTMLElement {
     const currentSelection = (this._ipTypeField as HTMLSelectElement).getAttribute("current-value") || "1";
 
     this.SetType(currentSelection);
+
+    const test = this._content.ItemProperties.getPropertyList();
+
+    const list = this.querySelector("nwn-list") as HTMLElement;
   }
 
   private HideAll() {
