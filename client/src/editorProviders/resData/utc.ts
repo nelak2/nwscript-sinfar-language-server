@@ -18,10 +18,18 @@ export class Utc extends ResData {
     fields.push("classlevel1");
     fields.push("class2");
     fields.push("classlevel2");
+    fields.push("FootstepType");
+
+    // 28 skills from 0 to 27
+    for (let i = 0; i < 28; i++) {
+      fields.push("skill" + i.toString());
+    }
+
     return fields;
   }
 
   public getField(field: string) {
+    // UTC has a lot of optional fields so we aren't guaranteed to have a value for each field
     try {
       if (field === "class0") return this.readField(this.data.resData[1].ClassList[1][0][1].Class);
       if (field === "classlevel0") return this.readField(this.data.resData[1].ClassList[1][0][1].ClassLevel);
@@ -30,9 +38,13 @@ export class Utc extends ResData {
       if (field === "class2") return this.readField(this.data.resData[1].ClassList[1][2][1].Class);
       if (field === "classlevel2") return this.readField(this.data.resData[1].ClassList[1][2][1].ClassLevel);
 
+      if (field.includes("skill")) {
+        const skillId = parseInt(field.substring(5));
+        return this.readField(this.data.resData[1].SkillList[1][skillId][1].Rank);
+      }
+
       return this.readField(this.data.resData[1][field]);
     } catch (e) {
-      console.log(e);
       return null;
     }
   }
