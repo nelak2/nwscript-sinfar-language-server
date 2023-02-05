@@ -8,8 +8,9 @@ import {
   nwnMerchantInventory,
   nwnItemAppearance,
   nwnItemProperties,
+  nwnCreatureAppearance,
 } from "../components";
-import { createResData, ResData, Uts, Utp, Ute, Utm, Uti } from "../editorProviders/resData";
+import { createResData, ResData, Uts, Utp, Ute, Utm, Uti, Utc } from "../editorProviders/resData";
 
 const vscode = acquireVsCodeApi();
 InitializeNWNControls();
@@ -24,6 +25,7 @@ let _restrictionList: nwnMerchantRestrictions;
 let _merchantInventory: nwnMerchantInventory;
 let _itemAppearance: nwnItemAppearance;
 let _itemProperties: nwnItemProperties;
+let _creatureAppearance: nwnCreatureAppearance;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -40,9 +42,6 @@ function main() {
 function onEditableFieldChange(e: any) {
   const fieldtype = (<string>e.target.id).substring(0, 3);
   const field = (<string>e.target.id).substring(4);
-
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  console.log(`Event on Field: ${field} New Value: ${e.target.value} Field Type: ${fieldtype}`);
 
   try {
     switch (fieldtype) {
@@ -197,6 +196,10 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
     // Makes sure that if the base item changes, the available options are updated
     if (updateType === "BaseItem" && _itemAppearance) {
       _itemAppearance.HandleBaseItemChange();
+    }
+
+    if (updateType === "Appearance_Type" && _creatureAppearance) {
+      _creatureAppearance.HandleAppearanceChange();
     }
   }
 }
@@ -412,5 +415,13 @@ function InitHTMLElements() {
   _itemProperties = <nwnItemProperties>document.getElementById("ItemProperties");
   if (_itemProperties) {
     _itemProperties.Init(content as Uti);
+  }
+
+  // Set the creature appearance fields
+  _creatureAppearance = <nwnCreatureAppearance>document.getElementById("CreatureAppearanceSection");
+  if (_creatureAppearance) {
+    const baseApprField = document.getElementById("res_Appearance_Type");
+    if (!baseApprField) return;
+    _creatureAppearance.Init(content as Utc, baseApprField);
   }
 }

@@ -22,7 +22,9 @@
         <nwn-text-field id="res_LastName" label="Last Name"></nwn-text-field>
         <nwn-text-field id="res_Tag" label="Tag"></nwn-text-field>
         <nwn-text-field id="res_Description" label="Description" type="textarea"></nwn-text-field>
-        <nwn-number-field id="res_PortraitId" label="Portrait ID" unit="short"></nwn-number-field>
+        <nwn-row label="Portrait">
+          <nwn-drop-down-large id="res_PortraitId" listRef="Portraits"></nwn-drop-down-large>
+        </nwn-row>
       </sp-accordion-item>
       <sp-accordion-item label="Classification">
         <nwn-number-field id="res_PaletteID" label="Palette ID" unit="byte"></nwn-number-field>
@@ -54,43 +56,11 @@
         <nwn-row label="Flags">
           <vscode-checkbox id="res_Interruptable">Interruptable</vscode-checkbox>
         </nwn-row>
-        <nwn-drop-down id="res_SoundSetFile" label="Sound Set" listRef="SoundSet"></nwn-drop-down>
+        <nwn-row label="Sound Set">
+          <nwn-drop-down-large id="res_SoundSetFile" listRef="SoundSet"></nwn-drop-down-large>
+        </nwn-row>
       </sp-accordion-item>
-      <sp-accordion-item label="Appearance">
-        <nwn-drop-down id="res_Appearance_Type" label="Appearance Type" listRef="CreatureAppearances"></nwn-drop-down>
-        <nwn-drop-down id="res_FootstepType" label="Footstep Sound" listRef="FootstepSound"></nwn-drop-down>
-        <nwn-drop-down id="res_Gender" label="Gender" listRef="Gender"></nwn-drop-down>
-        <nwn-number-field id="res_Wings_New" label="Wings" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_Tail_New" label="Tail" unit="byte"></nwn-number-field>
-      </sp-accordion-item>
-      <sp-accordion-item label="Dynamic Appearance">
-        <nwn-number-field id="res_Phenotype" label="Phenotype" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_Appearance_Head" label="Head" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_Neck" label="Neck" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_RShoul" label="Right Shoulder" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_LShoul" label="Left Shoulder" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_RBicep" label="Right Bicep" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_LBicep" label="Left Bicep" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_RFArm" label="Right Forearm" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_LFArm" label="Left Forearm" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_RHand" label="Right Hand" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_LHand" label="Left Hand" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_Torso" label="Torso" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_Belt" label="Belt" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_Pelvis" label="Pelvis" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_RThigh" label="Right Thigh" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_LThigh" label="Left Thigh" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_RShin" label="Right Shin" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_LShin" label="Left Shin" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_RFoot" label="Right Foot" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_BodyPart_LFoot" label="Left Foot" unit="byte"></nwn-number-field>
-      </sp-accordion-item>
-      <sp-accordion-item label="Colors">
-        <nwn-number-field id="res_Color_Hair" label="Hair" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_Color_Skin" label="Skin" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_Color_Tattoo1" label="Tattoo 1" unit="byte"></nwn-number-field>
-        <nwn-number-field id="res_Color_Tattoo2" label="Tattoo 2" unit="byte"></nwn-number-field>
-      </sp-accordion-item>
+      <nwn-creature-appearance id="CreatureAppearanceSection"> </nwn-creature-appearance>
       <sp-accordion-item label="Death">
         <nwn-row label="Flags">
           <fieldset class="checkbox-set-vertical">
