@@ -30,7 +30,7 @@ export class nwnItemAppearance extends HTMLElement {
     this.UpdateAppearanceFields();
   }
 
-  private HandleBaseItemChange(e: Event) {
+  private HandleBaseItemChange() {
     this.UpdateAppearanceFields();
   }
 
