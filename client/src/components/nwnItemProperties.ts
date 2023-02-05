@@ -1,24 +1,29 @@
 import { Uti } from "../editorProviders/resData";
+import { ItemProperty } from "../editorProviders/resData/uti";
 import { ipSubType, ipType, ipValueParamType, ipValueType } from "./lists";
+import { buildTextField, ButtonType } from "./utils";
 
 export class nwnItemProperties extends HTMLElement {
   _content!: Uti;
 
-  _ipTypeField!: HTMLElement;
-  _ipSubTypeField!: HTMLElement;
-  _ipValueField!: HTMLElement;
-  _ipValueParamField!: HTMLElement;
+  _ipTypeField!: HTMLSelectElement;
+  _ipSubTypeField!: HTMLSelectElement;
+  _ipValueField!: HTMLSelectElement;
+  _ipValueParamField!: HTMLSelectElement;
 
   _ipTypeFieldRow!: HTMLElement;
   _ipSubTypeFieldRow!: HTMLElement;
   _ipValueFieldRow!: HTMLElement;
   _ipValueParamFieldRow!: HTMLElement;
 
+  _listDiv!: HTMLElement;
+
   constructor() {
     super();
     this.innerHTML = this._html;
 
     const dropdowns = this.querySelectorAll("nwn-drop-down");
+    this._listDiv = this.querySelector("#item-property-list") as HTMLElement;
 
     dropdowns.forEach((d) => {
       const label = d.getAttribute("label") || "";
@@ -38,27 +43,110 @@ export class nwnItemProperties extends HTMLElement {
 
     this.HideAll();
 
-    this._ipTypeField = this.querySelector("#ItemProperty_Type") as HTMLElement;
-    this._ipSubTypeField = this.querySelector("#ItemProperty_SubType") as HTMLElement;
-    this._ipValueField = this.querySelector("#ItemProperty_Value") as HTMLElement;
-    this._ipValueParamField = this.querySelector("#ItemProperty_ValueParam") as HTMLElement;
+    this._ipTypeField = this.querySelector("#ItemProperty_Type") as HTMLSelectElement;
+    this._ipSubTypeField = this.querySelector("#ItemProperty_SubType") as HTMLSelectElement;
+    this._ipValueField = this.querySelector("#ItemProperty_Value") as HTMLSelectElement;
+    this._ipValueParamField = this.querySelector("#ItemProperty_ValueParam") as HTMLSelectElement;
 
     this._ipTypeField.addEventListener("change", this.HandleDropDownChange.bind(this));
     this._ipSubTypeField.addEventListener("change", this.HandleDropDownChange.bind(this));
     this._ipValueField.addEventListener("change", this.HandleDropDownChange.bind(this));
     this._ipValueParamField.addEventListener("change", this.HandleDropDownChange.bind(this));
+
+    const addBtn = document.getElementById("ItemPropertyAddButton");
+    addBtn?.addEventListener("click", (e) => this.addClickEventHandler(e));
+  }
+
+  public RefreshList() {
+    const propertyList = this._content.ItemProperties.getPropertyList();
+
+    this._listDiv.replaceChildren();
+
+    for (let i = 0; i < propertyList.length; i++) {
+      this.addRow(propertyList[i], i);
+    }
+  }
+
+  private addRow(property: ItemProperty, index: number) {
+    const propertyListItem = buildTextField({
+      id: "itm_prop_" + index.toString(),
+      value: property.DisplayName || "Error",
+      disabled: true,
+      style: undefined,
+      className: undefined,
+      buttonType: ButtonType.delete,
+      maxLength: undefined,
+    });
+
+    const delButton = propertyListItem.querySelector("vscode-button");
+    if (delButton) delButton.addEventListener("click", (e) => this.deleteClickEventHandler(e, index));
+
+    this._listDiv.appendChild(propertyListItem);
+  }
+
+  public Update(index: number, newValue: ItemProperty, oldValue: ItemProperty) {
+    // If newValue is undefined then the item was deleted
+    if (newValue === undefined && index >= 0) {
+      this._content.ItemProperties.deleteProperty(index);
+    }
+
+    // If oldValue is undefined then the item was added
+    if (oldValue === undefined) {
+      this._content.ItemProperties.addProperty(newValue);
+    }
+
+    this.RefreshList();
+  }
+
+  addClickEventHandler(e: Event): void {
+    const ipType = this._ipTypeField.getAttribute("current-value");
+    const ipSubType = this._ipSubTypeField.getAttribute("current-value");
+    const ipValueType = this._ipValueField.getAttribute("current-value");
+    const ipValueParamType = this._ipValueParamField.getAttribute("current-value");
+
+    const newValue = this._content.ItemProperties.buildProperty(ipType, ipSubType, ipValueType, ipValueParamType);
+    this._content.ItemProperties.addProperty(newValue);
+
+    this.RefreshList();
+
+    if (newValue) {
+      this.dispatchEvent(
+        new CustomEvent("ItemProperty_change", {
+          detail: {
+            field: "itm_prop_" + (this._content.ItemProperties.getPropertyList().length - 1).toString(),
+            oldValue: undefined,
+            newValue,
+          },
+        }),
+      );
+    }
+  }
+
+  deleteClickEventHandler(e: Event, index: number): void {
+    const oldValue = this._content.ItemProperties.deleteProperty(index);
+    this.RefreshList();
+
+    if (oldValue) {
+      this.dispatchEvent(
+        new CustomEvent("ItemProperty_change", {
+          detail: {
+            field: "itm_prop_" + index.toString(),
+            oldValue,
+            newValue: undefined,
+          },
+        }),
+      );
+    }
   }
 
   public Init(content: Uti) {
     this._content = content;
 
-    const currentSelection = (this._ipTypeField as HTMLSelectElement).getAttribute("current-value") || "1";
+    const currentSelection = this._ipTypeField.getAttribute("current-value") || "1";
 
     this.SetType(currentSelection);
 
-    const test = this._content.ItemProperties.getPropertyList();
-
-    const list = this.querySelector("nwn-list") as HTMLElement;
+    this.RefreshList();
   }
 
   private HideAll() {
@@ -140,7 +228,18 @@ export class nwnItemProperties extends HTMLElement {
   }
 
   private readonly _html: string = `
-  <div class="row">
+<div class="row">
+  <div class="col-label">
+    <label class="vscode-input-label" for="">Properties:</label>
+  </div>
+  <div class="col-input">
+    <fieldset id="item-property-list" style="display: grid; padding: 5px; width: 410px;">
+
+    </fieldset>
+  </div>
+</div>
+
+<div class="row">
   <div class="col-label">
       <label class="vscode-input-label" for="">Add Item Property:</label>
   </div>
