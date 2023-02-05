@@ -13,7 +13,12 @@ export class Utc extends ResData {
   }
 
   public getField(field: string) {
-    return this.data.resData[1][field];
+    try {
+      return this.readField(this.data.resData[1][field]);
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 
   public setField(field: string, value: string) {
