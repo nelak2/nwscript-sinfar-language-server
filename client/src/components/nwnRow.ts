@@ -8,11 +8,7 @@ export class nwnRow extends HTMLElement {
     const id = this.getAttribute("id") || "";
     const label = this.getAttribute("label");
 
-    if (!label) {
-      return;
-    }
-
-    const labelElement = buildLabel(label, id);
+    const labelElement = buildLabel(label || " ", id);
     labelElement.className = "vscode-input-label";
 
     const divColLabel = document.createElement("div");
@@ -30,7 +26,7 @@ export class nwnRow extends HTMLElement {
 
     // Append the columns to the row
     const divRow = buildDiv("row");
-    divRow.appendChild(divColLabel);
+    if (label) divRow.appendChild(divColLabel);
     divRow.appendChild(divColInput);
 
     // Append the row to the element

@@ -55,7 +55,7 @@ export class nwnDropDown extends HTMLElement {
     const label = this.getAttribute("label");
     const listRef = this.getAttribute("listRef");
 
-    if (!id || !label || !listRef) {
+    if (!id || !listRef) {
       return;
     }
 
@@ -181,12 +181,6 @@ export class nwnDropDown extends HTMLElement {
         this.list = [{ value: "-1", label: "Unknown List" }];
     }
 
-    const labelElement = buildLabel(label, id);
-    labelElement.className = "vscode-input-label";
-
-    const divColLabel = buildDiv("col-label");
-    divColLabel.appendChild(labelElement);
-
     this.dropDown = document.createElement("vscode-dropdown");
     this.dropDown.id = id;
 
@@ -196,7 +190,17 @@ export class nwnDropDown extends HTMLElement {
     divColInput.appendChild(this.dropDown);
 
     const rowDiv = buildDiv("row");
-    rowDiv.appendChild(divColLabel);
+
+    if (label) {
+      const labelElement = buildLabel(label, id);
+      labelElement.className = "vscode-input-label";
+
+      const divColLabel = buildDiv("col-label");
+      divColLabel.appendChild(labelElement);
+
+      rowDiv.appendChild(divColLabel);
+    }
+
     rowDiv.appendChild(divColInput);
 
     this.appendChild(rowDiv);

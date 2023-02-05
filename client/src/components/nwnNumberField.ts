@@ -11,15 +11,9 @@ export class nwnNumberField extends HTMLElement {
     const label = this.getAttribute("label");
     const unit = this.getAttribute("unit");
 
-    if (!id || !label || !unit) {
+    if (!id || !unit) {
       return;
     }
-
-    const labelElement = buildLabel(label, id);
-    labelElement.className = "vscode-input-label";
-
-    const divColLabel = buildDiv("col-label");
-    divColLabel.appendChild(labelElement);
 
     const numberField = new NumberField();
     numberField.id = id;
@@ -122,13 +116,29 @@ export class nwnNumberField extends HTMLElement {
         numberField.style.width = "100px";
         numberField.value = 0;
         break;
+      case "level":
+        numberField.setAttribute("min", "0");
+        numberField.setAttribute("max", "60");
+        numberField.style.width = "100px";
+        numberField.value = 0;
+        break;
     }
 
     const divColInput = buildDiv("col-input");
     divColInput.appendChild(numberField);
 
     const divRow = buildDiv("row");
-    divRow.appendChild(divColLabel);
+
+    if (label) {
+      const labelElement = buildLabel(label, id);
+      labelElement.className = "vscode-input-label";
+
+      const divColLabel = buildDiv("col-label");
+      divColLabel.appendChild(labelElement);
+
+      divRow.appendChild(divColLabel);
+    }
+
     divRow.appendChild(divColInput);
 
     this.appendChild(divRow);
