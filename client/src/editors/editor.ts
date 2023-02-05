@@ -125,6 +125,15 @@ function onEditableFieldChange(e: any) {
         });
         break;
       }
+      case "Ite": {
+        vscode.postMessage({
+          type: "update",
+          field: e.detail.field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
+        break;
+      }
     }
   } catch (e: any) {
     console.log(e);
@@ -177,10 +186,29 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
     UpdateRestrictionList(field, newValue, oldValue);
   } else if (updateType === "MerchantInventory") {
     UpdateMerchantInventory(field, newValue, oldValue);
+  } else if (updateType === "itm") {
+    // ItemProperty
+    UpdateItemProperties(field, newValue, oldValue);
   } else {
     content.setField(field, newValue);
     UpdateHTMLElementValue(field, newValue);
+
+    // Handling for base item changes in the UTI editor
+    // Makes sure that if the base item changes, the available options are updated
+    if (updateType === "BaseItem" && _itemAppearance) {
+      _itemAppearance.HandleBaseItemChange();
+    }
   }
+}
+
+function UpdateItemProperties(field: string, newValue: any, oldValue: any) {
+  const itemPropertyFieldFullId = field.split("_");
+  const index = parseInt(itemPropertyFieldFullId[2]);
+
+  if (!_itemProperties) return;
+
+  // update content
+  _itemProperties.Update(index, newValue, oldValue);
 }
 
 function UpdateMerchantInventory(field: string, newValue: any, oldValue: any) {
@@ -298,12 +326,10 @@ function BindListeners() {
     element.addEventListener("change", onEditableFieldChange);
   }
 
-  // Bind the variable table
   if (_varTable) {
     _varTable.addEventListener("vartable_change", onEditableFieldChange);
   }
 
-  // Bind the sound list
   if (_soundList) {
     _soundList.addEventListener("soundlist_change", onEditableFieldChange);
   }
@@ -322,6 +348,10 @@ function BindListeners() {
 
   if (_merchantInventory) {
     _merchantInventory.addEventListener("MerchantInventory_change", onEditableFieldChange);
+  }
+
+  if (_itemProperties) {
+    _itemProperties.addEventListener("ItemProperty_change", onEditableFieldChange);
   }
 
   initialized = true;
