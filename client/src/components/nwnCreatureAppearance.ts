@@ -95,7 +95,7 @@ export class nwnCreatureAppearance extends HTMLElement {
 <nwn-number-field id="res_BodyPart_LThigh" label="Left Thigh" unit="byte"></nwn-number-field>
 <nwn-number-field id="res_BodyPart_RShin" label="Right Shin" unit="byte"></nwn-number-field>
 <nwn-number-field id="res_BodyPart_LShin" label="Left Shin" unit="byte"></nwn-number-field>
-<nwn-number-field id="res_BodyPart_RFoot" label="Right Foot" unit="byte"></nwn-number-field>
+<nwn-number-field id="res_ArmorPart_RFoot" label="Right Foot" unit="byte"></nwn-number-field>
 <nwn-number-field id="res_BodyPart_LFoot" label="Left Foot" unit="byte"></nwn-number-field>
 </sp-accordion-item>
 <sp-accordion-item id="CreatureColors" label="Colors" style="display: none;">
