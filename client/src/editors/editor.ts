@@ -9,6 +9,7 @@ import {
   nwnItemAppearance,
   nwnItemProperties,
   nwnCreatureAppearance,
+  nwnCreatureInventory,
 } from "../components";
 import { createResData, ResData, Uts, Utp, Ute, Utm, Uti, Utc } from "../editorProviders/resData";
 
@@ -26,6 +27,7 @@ let _merchantInventory: nwnMerchantInventory;
 let _itemAppearance: nwnItemAppearance;
 let _itemProperties: nwnItemProperties;
 let _creatureAppearance: nwnCreatureAppearance;
+let _creatureInventory: nwnCreatureInventory;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -133,6 +135,15 @@ function onEditableFieldChange(e: any) {
         });
         break;
       }
+      case "CRE": {
+        vscode.postMessage({
+          type: "update",
+          field: e.detail.field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
+        break;
+      }
     }
   } catch (e: any) {
     console.log(e);
@@ -188,6 +199,8 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
   } else if (updateType === "itm") {
     // ItemProperty
     UpdateItemProperties(field, newValue, oldValue);
+  } else if (updateType === "CREInventory") {
+    UpdateCREInventoryList(field, newValue, oldValue);
   } else {
     content.setField(field, newValue);
     UpdateHTMLElementValue(field, newValue);
@@ -202,6 +215,16 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
       _creatureAppearance.HandleAppearanceChange();
     }
   }
+}
+
+function UpdateCREInventoryList(field: string, newValue: any, oldValue: any) {
+  const creInventoryFieldFullId = field.split("_");
+  const creInventoryFieldId = creInventoryFieldFullId[2];
+
+  if (!_creatureInventory) return;
+
+  // update content
+  _creatureInventory.Update(parseInt(creInventoryFieldId), newValue, oldValue);
 }
 
 function UpdateItemProperties(field: string, newValue: any, oldValue: any) {
@@ -357,6 +380,10 @@ function BindListeners() {
     _itemProperties.addEventListener("ItemProperty_change", onEditableFieldChange);
   }
 
+  if (_creatureInventory) {
+    _creatureInventory.addEventListener("CREInventory_change", onEditableFieldChange);
+  }
+
   initialized = true;
 }
 
@@ -423,5 +450,11 @@ function InitHTMLElements() {
     const baseApprField = document.getElementById("res_Appearance_Type");
     if (!baseApprField) return;
     _creatureAppearance.Init(content as Utc, baseApprField);
+  }
+
+  // Set the plc inventory list
+  _creatureInventory = <nwnCreatureInventory>document.getElementById("CREInventory");
+  if (_creatureInventory) {
+    _creatureInventory.Init(content as Utc);
   }
 }
