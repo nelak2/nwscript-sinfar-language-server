@@ -22,6 +22,7 @@ import { nwnPLCInventory } from "./nwnPLCInventory";
 import { nwnSoundsList } from "./nwnSoundsList";
 import { nwnDropDownLarge } from "./nwnDropDownLarge";
 import { nwnItemAppearance } from "./nwnItemAppearance";
+import { nwnCreatureAppearance } from "./nwnCreatureAppearance";
 
 export { nwnColorPicker } from "./nwnColorPicker";
 export { nwnDropDown } from "./nwnDropDown";
@@ -42,6 +43,7 @@ export { nwnMerchantRestrictions } from "./nwnMerchantRestrictions";
 export { nwnPLCInventory } from "./nwnPLCInventory";
 export { nwnSoundsList } from "./nwnSoundsList";
 export { nwnDropDownLarge } from "./nwnDropDownLarge";
+export { nwnCreatureAppearance } from "./nwnCreatureAppearance";
 
 export function InitializeNWNControls() {
   customElements.define("nwn-volume-slider", nwnVolumeSlider);
@@ -63,4 +65,5 @@ export function InitializeNWNControls() {
   customElements.define("nwn-sound-list", nwnSoundsList);
   customElements.define("nwn-drop-down-large", nwnDropDownLarge);
   customElements.define("nwn-item-appearance", nwnItemAppearance);
+  customElements.define("nwn-creature-appearance", nwnCreatureAppearance);
 }
