@@ -32,6 +32,14 @@ import {
   ipType,
   ipValueParamType,
   ipValueType,
+  PerceptionRange,
+  MovementRate,
+  Gender,
+  FootstepSound,
+  LawChaos,
+  GoodEvil,
+  Class,
+  Race,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -144,6 +152,30 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "ipValueParamType":
         this.list = ipValueParamType;
+        break;
+      case "PerceptionRange":
+        this.list = PerceptionRange;
+        break;
+      case "MovementRate":
+        this.list = MovementRate;
+        break;
+      case "Gender":
+        this.list = Gender;
+        break;
+      case "FootstepSound":
+        this.list = FootstepSound;
+        break;
+      case "LawChaos":
+        this.list = LawChaos;
+        break;
+      case "GoodEvil":
+        this.list = GoodEvil;
+        break;
+      case "Class":
+        this.list = Class;
+        break;
+      case "Race":
+        this.list = Race;
         break;
       default:
         this.list = [{ value: "-1", label: "Unknown List" }];

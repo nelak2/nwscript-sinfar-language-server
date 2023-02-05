@@ -17,6 +17,8 @@ export { ipType } from "./ipType";
 export { ipSubType } from "./ipSubType";
 export { ipValueType } from "./ipValueType";
 export { ipValueParamType } from "./ipValueParamType";
+export { Portraits } from "./portraits";
+export { SoundSet } from "./soundset";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
@@ -170,4 +172,148 @@ export const MerchantInventoryCategory: DropdownListItem[] = [
   { value: "3", label: "Jewel" },
   { value: "2", label: "Potions" },
   { value: "1", label: "Miscellaneous" },
+];
+
+export const Race: DropdownListItem[] = [
+  { value: "0", label: "Dwarf" },
+  { value: "1", label: "Elf" },
+  { value: "2", label: "Gnome" },
+  { value: "3", label: "Halfling" },
+  { value: "4", label: "Half-Elf" },
+  { value: "5", label: "Half-Orc" },
+  { value: "6", label: "Human" },
+  { value: "7", label: "Aberration" },
+  { value: "8", label: "Animal" },
+  { value: "9", label: "Beast" },
+  { value: "10", label: "Construct" },
+  { value: "11", label: "Dragon" },
+  { value: "12", label: "Goblinoid" },
+  { value: "13", label: "Monstrous" },
+  { value: "14", label: "Orc" },
+  { value: "15", label: "Reptilian" },
+  { value: "16", label: "Elemental" },
+  { value: "17", label: "Fey" },
+  { value: "18", label: "Giant" },
+  { value: "19", label: "Magical Beast" },
+  { value: "20", label: "Outsider" },
+  { value: "23", label: "Shapechanger" },
+  { value: "24", label: "Undead" },
+  { value: "25", label: "Vermin" },
+  { value: "29", label: "Ooze" },
+];
+
+export const Class: DropdownListItem[] = [
+  { value: "0", label: "Barbarian" },
+  { value: "1", label: "Bard" },
+  { value: "2", label: "Cleric" },
+  { value: "3", label: "Druid" },
+  { value: "4", label: "Fighter" },
+  { value: "5", label: "Monk" },
+  { value: "6", label: "Paladin" },
+  { value: "7", label: "Ranger" },
+  { value: "8", label: "Rogue" },
+  { value: "9", label: "Sorcerer" },
+  { value: "10", label: "Wizard" },
+  { value: "11", label: "Aberration" },
+  { value: "12", label: "Animal" },
+  { value: "13", label: "Construct" },
+  { value: "14", label: "Humanoid" },
+  { value: "15", label: "Monstrous" },
+  { value: "16", label: "Elemental" },
+  { value: "17", label: "Fey" },
+  { value: "18", label: "Dragon" },
+  { value: "19", label: "Undead" },
+  { value: "20", label: "Commoner" },
+  { value: "21", label: "Beast" },
+  { value: "22", label: "Giant" },
+  { value: "23", label: "Magical Beast" },
+  { value: "24", label: "Outsider" },
+  { value: "25", label: "Shapechanger" },
+  { value: "26", label: "Vermin" },
+  { value: "27", label: "Shadowdancer" },
+  { value: "28", label: "Harper Scout" },
+  { value: "29", label: "Arcane Archer" },
+  { value: "30", label: "Assassin" },
+  { value: "31", label: "Blackguard" },
+  { value: "32", label: "Champion of Torm" },
+  { value: "33", label: "Weapon Master" },
+  { value: "34", label: "Pale Master" },
+  { value: "35", label: "Shifter" },
+  { value: "36", label: "Dwarven Defender" },
+  { value: "37", label: "Red Dragon Disciple" },
+  { value: "38", label: "ooze" },
+  { value: "41", label: "Purple Dragon Knight" },
+];
+
+export const GoodEvil: DropdownListItem[] = [
+  { value: "0", label: "Evil" },
+  { value: "50", label: "Neutral" },
+  { value: "100", label: "Good" },
+];
+
+export const LawChaos: DropdownListItem[] = [
+  { value: "0", label: "Chaotic" },
+  { value: "50", label: "Neutral" },
+  { value: "100", label: "Lawful" },
+];
+
+export const FootstepSound: DropdownListItem[] = [
+  { value: "-1", label: "Default" },
+  { value: "0", label: "normal" },
+  { value: "1", label: "large" },
+  { value: "2", label: "dragon" },
+  { value: "3", label: "soft" },
+  { value: "4", label: "hoof" },
+  { value: "5", label: "hoof_large" },
+  { value: "6", label: "beetle" },
+  { value: "7", label: "spider" },
+  { value: "8", label: "skeleton" },
+  { value: "9", label: "leather_wing" },
+  { value: "10", label: "feather_wing" },
+  { value: "11", label: "lizard" },
+  { value: "12", label: "none" },
+  { value: "13", label: "seagull" },
+  { value: "14", label: "shark" },
+  { value: "15", label: "water_normal" },
+  { value: "16", label: "water_large" },
+  { value: "17", label: "horse" },
+  { value: "29", label: "bio_reserved" },
+  { value: "30", label: "slime" },
+  { value: "31", label: "treant" },
+  { value: "32", label: "Wasp" },
+  { value: "33", label: "CODI_Monodrone" },
+  { value: "34", label: "CODI_Marut" },
+  { value: "61", label: "dragonc" },
+  { value: "49", label: "cep_reserved" },
+  { value: "59", label: "USER" },
+  { value: "60", label: "Kuotoa" },
+  { value: "62", label: "re_zombi" },
+  { value: "63", label: "re_hunter" },
+  { value: "64", label: "re_cerberus" },
+];
+
+export const Gender: DropdownListItem[] = [
+  { value: "0", label: "Male" },
+  { value: "1", label: "Female" },
+  { value: "2", label: "Both" },
+  { value: "3", label: "Other" },
+  { value: "4", label: "None" },
+];
+
+export const MovementRate: DropdownListItem[] = [
+  { value: "1", label: "Immobile" },
+  { value: "2", label: "Very Slow" },
+  { value: "3", label: "Slow" },
+  { value: "4", label: "Normal" },
+  { value: "5", label: "Fast" },
+  { value: "6", label: "Very Fast" },
+  { value: "7", label: "Default" },
+  { value: "8", label: "DM Fast" },
+];
+
+export const PerceptionRange: DropdownListItem[] = [
+  { value: "8", label: "Short (10m sight/10m listen)" },
+  { value: "9", label: "Medium (20m sight/20m listen)" },
+  { value: "10", label: "Long (35m sight/20m listen)" },
+  { value: "11", label: "Default" },
 ];
