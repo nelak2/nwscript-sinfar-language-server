@@ -49,10 +49,7 @@ export type ItemProperty = {
   ValueType: number;
   Property: number;
   SubType: number;
-  PropertyName: string;
-  ValueTypeName: string | null;
-  ValueParamTypeName: string | null;
-  SubTypeName: string | null;
+  DisplayName: string | null;
 };
 
 class ItemProperties {
@@ -66,27 +63,118 @@ class ItemProperties {
     const properties: ItemProperty[] = [];
 
     for (const property of this._data.resData[1].PropertiesList[1]) {
-      const prop: ItemProperty = {
-        ChanceAppear: property[1].ChanceAppear[1],
-        CostTable: property[1].CostTable[1],
-        CostValue: property[1].CostValue[1],
-        ValueParamType: property[1].Param1[1],
-        ValueType: property[1].CostValue[1],
-        Property: property[1].PropertyName[1],
-        SubType: property[1].Subtype[1],
-        PropertyName: this.GetPropertyName(property[1].PropertyName[1]),
-        ValueTypeName: this.GetValueTypeName(property[1].PropertyName[1], property[1].CostValue[1]),
-        ValueParamTypeName: this.GetValueParamTypeName(property[1].PropertyName[1], property[1].Param1[1]),
-        SubTypeName: this.GetSubTypeName(property[1].PropertyName[1], property[1].Subtype[1]),
-      };
+      const prop = this.readProperty(property);
+
       properties.push(prop);
     }
 
     return properties;
   }
 
+  public readProperty(property: any): ItemProperty {
+    const prop: ItemProperty = {
+      ChanceAppear: property[1].ChanceAppear[1],
+      CostTable: property[1].CostTable[1],
+      CostValue: property[1].CostValue[1],
+      ValueParamType: property[1].Param1[1],
+      ValueType: property[1].Param1Value[1],
+      Property: property[1].PropertyName[1],
+      SubType: property[1].Subtype[1],
+      DisplayName: null,
+    };
+    prop.DisplayName = this.GetDisplayName(prop);
+
+    return prop;
+  }
+
+  public getProperty(index: number): ItemProperty | undefined {
+    try {
+      return this._data.resData[1].PropertiesList[1][index];
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  public buildProperty(
+    selType: string | null,
+    selSubType: string | null,
+    selValueType: string | null,
+    selValueParamType: string | null,
+  ): ItemProperty {
+    if (selType === null) throw new Error("Invalid property type");
+    const typeOption = ipType.find((x) => x.value === selType);
+    if (!typeOption) throw new Error("Invalid property type");
+
+    const propType = parseInt(selType);
+    const subType = selSubType && typeOption.subType ? parseInt(selSubType) : 0;
+
+    const costTable = parseInt(typeOption.valueType || "255");
+    const costValue = typeOption.valueType && selValueType ? parseInt(selValueType) : 0;
+
+    const costParamTable = parseInt(typeOption.valueParamType || "255");
+    const costParamValue = typeOption.valueParamType && selValueParamType ? parseInt(selValueParamType) : 0;
+
+    const newProperty: ItemProperty = {
+      ChanceAppear: 100,
+      CostTable: costTable,
+      CostValue: costValue,
+      ValueParamType: costParamTable,
+      ValueType: costParamValue,
+      Property: propType,
+      SubType: subType,
+      DisplayName: null,
+    };
+    newProperty.DisplayName = this.GetDisplayName(newProperty);
+
+    return newProperty;
+  }
+
+  public addProperty(property: ItemProperty) {
+    this._data.resData[1].PropertiesList[1].push([
+      0,
+      {
+        PropertyName: [2, property.Property],
+        Subtype: [2, property.SubType],
+        CostTable: [0, property.CostTable],
+        CostValue: [2, property.CostValue],
+        Param1: [0, property.ValueParamType],
+        Param1Value: [0, property.ValueType],
+        ChanceAppear: [0, 100],
+      },
+    ]);
+  }
+
+  public deleteProperty(index: number): ItemProperty | undefined {
+    const oldValue = this.getProperty(index);
+    if (!oldValue) return undefined;
+
+    this._data.resData[1].PropertiesList[1].splice(index, 1);
+    return oldValue;
+  }
+
+  public GetDisplayName(property: ItemProperty): string {
+    let name = ipType.find((x) => x.value === property.Property.toString())?.displayString || "Error";
+
+    if (property.SubType) {
+      name += " ";
+      name += this.GetSubTypeName(property.Property, property.SubType) || "Error";
+    }
+
+    if (property.CostTable !== 255) {
+      name += " ";
+      name += this.GetValueTypeName(property.Property, property.CostValue) || "Error";
+    }
+
+    if (property.ValueParamType !== 255) {
+      name += " ";
+      name += this.GetValueParamTypeName(property.Property, property.ValueType) || "Error";
+    }
+
+    return name;
+  }
+
   public GetPropertyName(property: number): string {
-    return ipType.find((x) => x.value === property.toString())?.label || "Invalid Property";
+    return ipType.find((x) => x.value === property.toString())?.label || "Error";
   }
 
   public GetSubTypeName(property: number, subTypeID: number): string | null {
