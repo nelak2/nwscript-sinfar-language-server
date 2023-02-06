@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { DropdownListItem, PLCAppearances, CreatureAppearances, Portraits, SoundSet, Feats, Abilities } from "./lists";
+import { DropdownListItem, PLCAppearances, CreatureAppearances, Portraits, SoundSet, Feats, Abilities, Spells } from "./lists";
 import { Index } from "flexsearch";
 
 export class nwnDropDownLarge extends HTMLElement {
@@ -89,6 +89,10 @@ export class nwnDropDownLarge extends HTMLElement {
       }
       case "Abilities": {
         this._originalList = Abilities;
+        break;
+      }
+      case "Spells": {
+        this._originalList = Spells;
         break;
       }
       default: {
