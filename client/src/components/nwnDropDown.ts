@@ -40,6 +40,8 @@ import {
   GoodEvil,
   Class,
   Race,
+  Metamagic,
+  CastingClass,
 } from "./lists/index";
 
 export class nwnDropDown extends HTMLElement {
@@ -176,6 +178,12 @@ export class nwnDropDown extends HTMLElement {
         break;
       case "Race":
         this.list = Race;
+        break;
+      case "Metamagic":
+        this.list = Metamagic;
+        break;
+      case "CastingClass":
+        this.list = CastingClass;
         break;
       default:
         this.list = [{ value: "-1", label: "Unknown List" }];
