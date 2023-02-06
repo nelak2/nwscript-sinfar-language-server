@@ -12,6 +12,7 @@ import {
   nwnCreatureInventory,
   nwnCreatureFeats,
   nwnCreatureAbilities,
+  nwnCreatureSpells,
 } from "../components";
 import { createResData, ResData, Uts, Utp, Ute, Utm, Uti, Utc } from "../editorProviders/resData";
 
@@ -32,7 +33,7 @@ let _creatureAppearance: nwnCreatureAppearance;
 let _creatureInventory: nwnCreatureInventory;
 let _creatureFeats: nwnCreatureFeats;
 let _creatureAbilities: nwnCreatureAbilities;
-// let _creatureSpells: nwnCreatureSpells;
+let _creatureSpells: nwnCreatureSpells;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -525,5 +526,11 @@ function InitHTMLElements() {
   _creatureAbilities = <nwnCreatureAbilities>document.getElementById("SpecialAbilities");
   if (_creatureAbilities) {
     _creatureAbilities.Init(content as Utc);
+  }
+
+  // Set the spell list
+  _creatureSpells = <nwnCreatureSpells>document.getElementById("SpellList");
+  if (_creatureSpells) {
+    _creatureSpells.Init(content as Utc);
   }
 }

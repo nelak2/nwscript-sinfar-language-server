@@ -6,6 +6,7 @@ export class Utc extends ResData {
   private readonly _inventoryList: InventoryList;
   private readonly _featList: FeatList;
   private readonly _abilityList: AbilityList;
+  private readonly _spellList: SpellList;
 
   constructor(resdata: any) {
     super(resdata);
@@ -13,6 +14,7 @@ export class Utc extends ResData {
     this._inventoryList = new InventoryList(this._data);
     this._featList = new FeatList(this._data);
     this._abilityList = new AbilityList(this._data);
+    this._spellList = new SpellList(this._data);
   }
 
   public get editableFields() {
@@ -99,6 +101,10 @@ export class Utc extends ResData {
   public get AbilityList() {
     return this._abilityList;
   }
+
+  public get SpellList() {
+    return this._spellList;
+  }
 }
 
 class FeatList {
@@ -164,6 +170,72 @@ class FeatList {
     this._data.resData[1].FeatList[1].splice(index, 1);
 
     return true;
+  }
+}
+
+export enum Metamagic {
+  None = 0,
+  Empower = 1,
+  Extend = 2,
+  Maximize = 4,
+  Quicken = 8,
+  Silent = 16,
+  Still = 32,
+}
+
+export enum SpellCastingClass {
+  Bard = 1,
+  Cleric = 2,
+  Druid = 3,
+  Paladin = 6,
+  Ranger = 7,
+  Sorcerer = 9,
+  Wizard = 10,
+}
+
+export type Spell = {
+  spell: number;
+  class: SpellCastingClass;
+  uses: number;
+  metamagic: Metamagic;
+};
+
+class SpellList {
+  private readonly _data: any;
+  constructor(resdata: any) {
+    this._data = resdata;
+  }
+
+  public getSpellList(): Spell[] {
+    const spells: Spell[] = [];
+
+    for (const pcClass of this._data.resData[1].ClassList[1]) {
+      const classId: number = pcClass[1].Class[1];
+
+      const properties = Object.keys(pcClass[1]);
+
+      for (const property of properties) {
+        if (property.includes("MemorizedList")) {
+          const spellLists = pcClass[1][property][1];
+
+          for (const spell of spellLists) {
+            const spellId = spell[1].Spell[1];
+            // const spellFlags = spell[1].SpellFlags[1];
+            const spellMetaMagic = spell[1].SpellMetaMagic[1];
+
+            // check if the spell exists in our list. Each use of a spell is a separate entry
+            const exists = spells.findIndex((s) => s.spell === spellId && s.class === classId && s.metamagic === spellMetaMagic);
+
+            if (exists === -1) {
+              spells.push({ spell: spellId, class: classId, uses: 1, metamagic: spellMetaMagic });
+            } else {
+              spells[exists].uses++;
+            }
+          }
+        }
+      }
+    }
+    return spells;
   }
 }
 
