@@ -22,6 +22,24 @@ export class Utc extends ResData {
     fields.push("class2");
     fields.push("classlevel2");
     fields.push("FootstepType");
+    fields.push("equipped_1");
+    fields.push("equipped_2");
+    fields.push("equipped_4");
+    fields.push("equipped_8");
+    fields.push("equipped_16");
+    fields.push("equipped_32");
+    fields.push("equipped_64");
+    fields.push("equipped_128");
+    fields.push("equipped_256");
+    fields.push("equipped_512");
+    fields.push("equipped_1024");
+    fields.push("equipped_2048");
+    fields.push("equipped_4096");
+    fields.push("equipped_8192");
+    fields.push("equipped_16384");
+    fields.push("equipped_32768");
+    fields.push("equipped_65536");
+    fields.push("equipped_131072");
 
     // 28 skills from 0 to 27
     for (let i = 0; i < 28; i++) {
@@ -44,6 +62,14 @@ export class Utc extends ResData {
       if (field.includes("skill")) {
         const skillId = parseInt(field.substring(5));
         return this.readField(this.data.resData[1].SkillList[1][skillId][1].Rank);
+      }
+
+      if (field.includes("equipped_")) {
+        const equippedId = parseInt(field.substring(9));
+
+        for (const item of this.data.resData[1].Equip_ItemList[1]) {
+          if (item[0] === equippedId) return this.readField(item[1].EquippedRes);
+        }
       }
 
       return this.readField(this.data.resData[1][field]);
