@@ -21,6 +21,7 @@ export { Portraits } from "./portraits";
 export { SoundSet } from "./soundset";
 export { Feats } from "./feats";
 export { Abilities } from "./abilities";
+export { Spells } from "./spells";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
@@ -318,4 +319,25 @@ export const PerceptionRange: DropdownListItem[] = [
   { value: "9", label: "Medium (20m sight/20m listen)" },
   { value: "10", label: "Long (35m sight/20m listen)" },
   { value: "11", label: "Default" },
+];
+
+export const Metamagic: DropdownListItem[] = [
+  { value: "0", label: "None" },
+  { value: "1", label: "Empower" },
+  { value: "2", label: "Extend" },
+  { value: "4", label: "Maximize" },
+  { value: "8", label: "Quicken" },
+  { value: "16", label: "Silent" },
+  { value: "32", label: "Still" },
+];
+
+export const CastingClass: DropdownListItem[] = [
+  { value: "0", label: "None" },
+  { value: "1", label: "Bard" },
+  { value: "2", label: "Cleric" },
+  { value: "3", label: "Druid" },
+  { value: "6", label: "Paladin" },
+  { value: "7", label: "Ranger" },
+  { value: "9", label: "Sorcerer" },
+  { value: "10", label: "Wizard" },
 ];
