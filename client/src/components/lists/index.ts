@@ -20,6 +20,7 @@ export { ipValueParamType } from "./ipValueParamType";
 export { Portraits } from "./portraits";
 export { SoundSet } from "./soundset";
 export { Feats } from "./feats";
+export { Abilities } from "./abilities";
 
 export const DayNightCycle: DropdownListItem[] = [
   { value: "1", label: "Cycle Day and Night" },
