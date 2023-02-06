@@ -11,6 +11,7 @@ import {
   nwnCreatureAppearance,
   nwnCreatureInventory,
   nwnCreatureFeats,
+  nwnCreatureAbilities,
 } from "../components";
 import { createResData, ResData, Uts, Utp, Ute, Utm, Uti, Utc } from "../editorProviders/resData";
 
@@ -29,7 +30,9 @@ let _itemAppearance: nwnItemAppearance;
 let _itemProperties: nwnItemProperties;
 let _creatureAppearance: nwnCreatureAppearance;
 let _creatureInventory: nwnCreatureInventory;
-let _featList: nwnCreatureFeats;
+let _creatureFeats: nwnCreatureFeats;
+let _creatureAbilities: nwnCreatureAbilities;
+// let _creatureSpells: nwnCreatureSpells;
 
 window.addEventListener("load", main);
 window.addEventListener("message", InboundMessageHandler);
@@ -157,6 +160,16 @@ function onEditableFieldChange(e: any) {
         });
         break;
       }
+      // Abilities List
+      case "CRA": {
+        vscode.postMessage({
+          type: "update",
+          field: e.detail.field,
+          newValue: e.detail.newValue,
+          oldValue: e.detail.oldValue,
+        });
+        break;
+      }
     }
   } catch (e: any) {
     console.log(e);
@@ -216,6 +229,8 @@ function ProcessUpdateMessage(field: string, newValue: any, oldValue: any) {
     UpdateCREInventoryList(field, newValue, oldValue);
   } else if (updateType === "FeatList") {
     UpdateFeatList(field, newValue, oldValue);
+  } else if (updateType === "CRAbilities") {
+    UpdateAbilitiesList(field, newValue, oldValue);
   } else {
     content.setField(field, newValue);
     UpdateHTMLElementValue(field, newValue);
@@ -318,10 +333,20 @@ function UpdateFeatList(field: string, newValue: any, oldValue: any) {
   const featListFullId = field.split("_");
   const featFieldId = featListFullId[2];
 
-  if (!_featList) return;
+  if (!_creatureFeats) return;
 
   // update content
-  _featList.Update(parseInt(featFieldId), newValue, oldValue);
+  _creatureFeats.Update(parseInt(featFieldId), newValue, oldValue);
+}
+
+function UpdateAbilitiesList(field: string, newValue: any, oldValue: any) {
+  const abilityListFullId = field.split("_");
+  const abilityFieldId = abilityListFullId[2];
+
+  if (!_creatureAbilities) return;
+
+  // update content
+  _creatureAbilities.Update(parseInt(abilityFieldId), newValue, oldValue);
 }
 
 function UpdateHTMLElementValue(field: string, newValue: string) {
@@ -409,8 +434,12 @@ function BindListeners() {
     _creatureInventory.addEventListener("CREInventory_change", onEditableFieldChange);
   }
 
-  if (_featList) {
-    _featList.addEventListener("FeatList_change", onEditableFieldChange);
+  if (_creatureFeats) {
+    _creatureFeats.addEventListener("FeatList_change", onEditableFieldChange);
+  }
+
+  if (_creatureAbilities) {
+    _creatureAbilities.addEventListener("CreatureAbility_change", onEditableFieldChange);
   }
 
   initialized = true;
@@ -488,8 +517,13 @@ function InitHTMLElements() {
   }
 
   // Set the feat list
-  _featList = <nwnCreatureFeats>document.getElementById("FeatsList");
-  if (_featList) {
-    _featList.Init(content as Utc);
+  _creatureFeats = <nwnCreatureFeats>document.getElementById("FeatsList");
+  if (_creatureFeats) {
+    _creatureFeats.Init(content as Utc);
+  }
+
+  _creatureAbilities = <nwnCreatureAbilities>document.getElementById("SpecialAbilities");
+  if (_creatureAbilities) {
+    _creatureAbilities.Init(content as Utc);
   }
 }
