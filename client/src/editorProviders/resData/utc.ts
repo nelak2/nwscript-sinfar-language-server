@@ -5,12 +5,14 @@ export class Utc extends ResData {
   private readonly _vartable: VarTable;
   private readonly _inventoryList: InventoryList;
   private readonly _featList: FeatList;
+  private readonly _abilityList: AbilityList;
 
   constructor(resdata: any) {
     super(resdata);
     this._vartable = new VarTable(this._data);
     this._inventoryList = new InventoryList(this._data);
     this._featList = new FeatList(this._data);
+    this._abilityList = new AbilityList(this._data);
   }
 
   public get editableFields() {
@@ -93,6 +95,10 @@ export class Utc extends ResData {
   public get FeatList() {
     return this._featList;
   }
+
+  public get AbilityList() {
+    return this._abilityList;
+  }
 }
 
 class FeatList {
@@ -156,6 +162,66 @@ class FeatList {
 
   private deleteFeat(index: number): Boolean {
     this._data.resData[1].FeatList[1].splice(index, 1);
+
+    return true;
+  }
+}
+
+export type Ability = {
+  spell: number;
+  spellcasterlevel: number;
+  spellflags: number;
+  uses: number;
+};
+
+class AbilityList {
+  private readonly _data: any;
+  constructor(resdata: any) {
+    this._data = resdata;
+  }
+
+  public getAbilityList(): Ability[] {
+    const abilities: Ability[] = [];
+
+    for (const ability of this._data.resData[1].SpecAbilityList[1]) {
+      const spell: number = ability[1].Spell[1];
+      const spellcasterlevel: number = ability[1].SpellCasterLevel[1];
+      const spellflags: number = ability[1].SpellFlags[1];
+
+      // each usage of an ability is a separate entry in the list
+      const existingAbility = abilities.findIndex((a) => a.spell === spell);
+
+      // if it already exists in the list, increment the uses
+      if (existingAbility !== -1) {
+        abilities[existingAbility].uses++;
+      } else {
+        abilities.push({ spell, spellcasterlevel, spellflags, uses: 1 });
+      }
+    }
+
+    return abilities;
+  }
+
+  public addAbility(newValue: Ability): boolean {
+    // Remove the ability first if it already exists
+    this.deleteAbilityBySpellID(newValue.spell);
+
+    // Add the ability
+    for (let i = 0; i < newValue.uses; i++) {
+      const ability = [
+        4,
+        { Spell: [2, newValue.spell], SpellCasterLevel: [0, newValue.spellcasterlevel], SpellFlags: [0, newValue.spellflags] },
+      ];
+      this._data.resData[1].SpecAbilityList[1].push(ability);
+    }
+
+    return true;
+  }
+
+  public deleteAbilityBySpellID(spellID: number): boolean {
+    this._data.resData[1].SpecAbilityList[1] = this._data.resData[1].SpecAbilityList[1].filter(
+      (e: any) => e[1].Spell[1] !== spellID,
+    );
 
     return true;
   }
