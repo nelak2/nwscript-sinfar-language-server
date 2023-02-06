@@ -1,17 +1,36 @@
 import { Utc } from "../editorProviders/resData";
-import { buildTextField, buildLabelColumn, buildDiv, ButtonType } from "./utils";
+import { buildTextField, ButtonType } from "./utils";
 
 export class nwnCreatureInventory extends HTMLElement {
   _content!: Utc;
   _inventoryDiv!: HTMLFieldSetElement;
+
+  _addResref!: HTMLInputElement;
+  _addDropable!: HTMLInputElement;
+  _addPickpocketable!: HTMLInputElement;
+
   constructor() {
     super();
 
-    const inventoryListRow = this.buildInventoryListRow();
-    const inventoryAddRow = this.buildInventoryAddRow();
+    this.innerHTML = this._html;
 
-    this.appendChild(inventoryListRow);
-    this.appendChild(inventoryAddRow);
+    const fieldset = this.querySelector("#CREInventory");
+    if (fieldset) this._inventoryDiv = fieldset as HTMLFieldSetElement;
+
+    const addResref = this.querySelector("#CREInventory_Add_Resref");
+    if (addResref) this._addResref = addResref as HTMLInputElement;
+
+    const addDropable = this.querySelector("#CREInventory_Add_Dropable");
+    if (addDropable) this._addDropable = addDropable as HTMLInputElement;
+
+    const addPickpocketable = this.querySelector("#CREInventory_Add_Pickpocketable");
+    if (addPickpocketable) this._addPickpocketable = addPickpocketable as HTMLInputElement;
+
+    // Add event handlers
+    const addBtn = this.querySelector("vscode-button");
+    if (addBtn !== null) {
+      addBtn.addEventListener("click", (e) => this.addClickEventHandler(e));
+    }
   }
 
   public Init(content: Utc) {
@@ -28,12 +47,7 @@ export class nwnCreatureInventory extends HTMLElement {
 
     // If oldValue is undefined then the item was added
     if (oldValue === undefined) {
-      this._content.InventoryList.addItem(newValue);
-    }
-
-    // If neither newValue or oldValue are undefined then the item was updated
-    if (newValue !== undefined && oldValue !== undefined) {
-      this._content.InventoryList.updateItem(index, newValue);
+      this._content.InventoryList.addItem(newValue.resref, newValue.dropable, newValue.pickpocketable);
     }
 
     this.refreshList();
@@ -72,16 +86,20 @@ export class nwnCreatureInventory extends HTMLElement {
   }
 
   // Add the item to the list then refresh the list
-  private addClickEventHandler(e: Event, newValue: string) {
-    const oldValue = this._content.InventoryList.addItem(newValue);
+  private addClickEventHandler(e: Event) {
+    const resref = this._addResref.getAttribute("current-value");
+    if (!resref) return;
 
-    // clear the text field
-    const textField = document.getElementById("CREInventoryAdd") as HTMLInputElement;
-    if (textField) textField.value = "";
+    const dropable = this._addDropable.checked;
+    const pickpocketable = this._addPickpocketable.checked;
+
+    const newValue = { resref, dropable, pickpocketable };
+
+    const success = this._content.InventoryList.addItem(resref, dropable, pickpocketable);
 
     this.refreshList();
 
-    if (oldValue === newValue) {
+    if (success) {
       this.dispatchEvent(new CustomEvent("CREInventory_change", { detail: { field: this.id, undefined, newValue } }));
     }
   }
@@ -100,74 +118,40 @@ export class nwnCreatureInventory extends HTMLElement {
     }
   }
 
-  private changeEventHandler(e: Event, index: number) {
-    const newValue = (e.target as HTMLInputElement).value;
-    const oldValue = this._content.InventoryList.updateItem(index, newValue);
-
-    this.dispatchEvent(
-      new CustomEvent("CREInventory_change", {
-        detail: { field: "CREInventory_item_" + index.toString(), oldValue, newValue },
-      }),
-    );
-  }
-
   private gotoClickEventHandler(e: Event, index: number) {
     throw new Error("Method not implemented.");
   }
 
-  private buildInventoryList(): HTMLDivElement {
-    const fieldset = document.createElement("fieldset");
-    fieldset.id = "CREInventory";
-    fieldset.style.width = "190px";
-    fieldset.style.display = "grid";
-    fieldset.style.padding = "5px 5px 5px 5px";
-    fieldset.style.borderColor = "var(--input-placeholder-foreground)";
-    fieldset.style.borderStyle = "inset";
+  private readonly _html: string = `
+  <div class="row">
+  <div class="col-label">
+      <label class="vscode-input-label" for="">Inventory Items:</label>
+  </div>
+  <div class="col-input">
+      <fieldset id="CREInventory" style="width: 325px; display: grid; padding: 5px 5px 5px 5px; border-color: var(--input-placeholder-foreground); border-style: inset;">
 
-    const inputCol = buildDiv("col-input");
-    inputCol.appendChild(fieldset);
+      </fieldset>
+  </div>
+</div>
 
-    // Store reference to the fieldset so we can add/remove children
-    this._inventoryDiv = fieldset;
-    return inputCol;
-  }
-
-  private buildInventoryListRow(): HTMLDivElement {
-    const listLabelCol = buildLabelColumn("Inventory Items", "CREInventory");
-    const listInputCol = this.buildInventoryList();
-
-    const listRow = buildDiv("row");
-    listRow.appendChild(listLabelCol);
-    listRow.appendChild(listInputCol);
-    return listRow;
-  }
-
-  private buildInventoryAddRow(): HTMLDivElement {
-    const inventoryAddLabelCol = buildLabelColumn("Add Item", "CREInventoryAdd_txt");
-    const inventoryAddInputCol = buildTextField({
-      id: "CREInventoryItemAdd",
-      value: undefined,
-      disabled: false,
-      style: undefined,
-      className: undefined,
-      maxLength: 16,
-      buttonType: ButtonType.add,
-    });
-
-    // Add event handlers
-    const addBtn = inventoryAddInputCol.querySelector("vscode-button");
-    if (addBtn !== null) {
-      addBtn.addEventListener("click", (e) => this.addClickEventHandler(e, (inventoryAddInputCol as HTMLInputElement).value));
-    }
-    inventoryAddInputCol.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        this.addClickEventHandler(e, (inventoryAddInputCol as HTMLInputElement).value);
-      }
-    });
-
-    const soundAddRow = buildDiv("row");
-    soundAddRow.appendChild(inventoryAddLabelCol);
-    soundAddRow.appendChild(inventoryAddInputCol);
-    return soundAddRow;
-  }
+<div class="row">
+  <div class="col-label">
+      <label class="vscode-input-label" for="">Add Item:</label>
+  </div>
+  <div class="col-input">
+      <div class="row">
+        <vscode-checkbox id="CREInventory_Add_Dropable">Dropable</vscode-checkbox>
+        <vscode-checkbox id="CREInventory_Add_Pickpocketable">Pickpocketable</vscode-checkbox>
+      </div>
+      <div class="row">
+        <vscode-text-field id="CREInventory_Add_Resref" maxlength="16" placeholder="ResRef" type="text" style="width: 200px;">
+        </vscode-text-field>
+      </div>
+      <div class="row">
+        <vscode-button id="CREInventory_Add_btn">Add</vscode-button>
+      </div>
+      
+  </div>
+</div>
+  `;
 }
