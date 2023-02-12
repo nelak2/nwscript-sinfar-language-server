@@ -12,8 +12,20 @@ TODO.txt
 *.vsix
 
 client/**
-server/**
+
 !client/out/extension.js
+!client/out/editor.js
+!client/fileicons/*.*
+!client/out/html/*.html
+!client/out/html/*.css
+!client/node_modules/spectrum-colorpicker/spectrum.css
+!client/node_modules/spectrum-colorpicker/spectrum.js
+!client/node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js
+!client/node_modules/@vscode/codicons/dist/codicon.css
+!client/node_modules/@vscode/codicons/dist/codicon.ttf
+!client/node_modules/jquery/dist/jquery.min.js
+
+server/**
 !server/out/server.js
 !server/out/indexer.js
 !server/resources/**

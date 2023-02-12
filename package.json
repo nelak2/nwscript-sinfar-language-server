@@ -302,7 +302,7 @@
     "watch": "tsc -b -w",
     "lint": "eslint ./client/src ./server/src --ext .ts",
     "postinstall": "cd client && yarn install && cd ../server && yarn install && cd ..",
-    "clean": "rimraf client/out/* && rimraf server/out/* && copyfiles -u 2 ./server/resources/*.* ./server/out/resources/",
+    "clean": "rimraf client/out/* && rimraf server/out/* && copyfiles -u 2 ./server/resources/*.* ./server/out/resources/ && copyfiles -f ./client/src/editors/html/*.* ./client/out/html/ && copyfiles -f ./client/src/editors/styles.css ./client/out/html/",
     "buildClient": "esbuild extension=./client/src/extension.ts editor=./client/src/editors/editor.ts --sourcemap --bundle --external:vscode --platform=node --outdir=./client/out/",
     "buildServer": "esbuild server=./server/src/server.ts --sourcemap --bundle --external:vscode --platform=node --outdir=./server/out/",
     "build": "yarn clean && yarn buildClient && yarn buildServer"
