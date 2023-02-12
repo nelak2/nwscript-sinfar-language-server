@@ -18,7 +18,7 @@ export abstract class ResData {
   }
 
   // Convert the value to the correct type before writing it to the GFF
-  protected writeField(value: string, type: GFFType): any {
+  protected writeField(value: string, type: GFFType): number | string | { s0: string } {
     switch (type) {
       case GFFType.Byte:
       case GFFType.Char:
