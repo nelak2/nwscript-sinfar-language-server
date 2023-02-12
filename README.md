@@ -4,7 +4,7 @@ The Sinfar NWN Toolset Replacement is a Visual Studio Code extension which is in
 
 Actual editing of areas as per the Bioware NWN Toolset is not yet implemented but is planned once support for reading and writing all NWN resource files is fully implemented and tested.
 
-**Caution: Currently most core features are implemented (except for editing creatures and items) but not fully tested. There is a good chance of corrupting your NWN resources!!**
+**Caution: Currently most core features are implemented but not fully tested. There is a good chance of corrupting your NWN resources!!**
 
 ## Features
 
@@ -37,14 +37,6 @@ void myFunction(int param)
 }
 ```
 
-Notes:
-
-- Diagnostics are not currently working
-
-### Syntax highligthing
-
-I personally use the [One Dark Pro](https://marketplace.visualstudio.com/items?itemName=zhuangtongfa.Material-theme) theme . See VS Code [documentation](https://code.visualstudio.com/docs/getstarted/themes) if you wish to customize the highlighting further.
-
 ## Building and running
 
 - Install NodeJS from https://nodejs.org/en/.
@@ -52,17 +44,6 @@ I personally use the [One Dark Pro](https://marketplace.visualstudio.com/items?i
 - In the project root directory, invoke `yarn install` which will install all dependencies using Yarn.
 - In the project root directory, invoke `vsce package` which will produce a .vsix file.
 - To install, in VS Code on the extension pane, click on the three dots at the top right then select `Install From VSIX` and navigate to the package you just produced.
-
-## Attaching the debugger
-
-- Build and successfully run the extension
-- Invoke `yarn build`
-- Use `Launch the Client` command
-- Use `Attach to Server`
-
-### Generating the language library definitions
-
-Replace `server/scripts/nwscript.nss` by its new version and execute `yarn run generate-lib-defs` in the server root directory.
 
 ## Issues, Feedback, Feature Requests
 
