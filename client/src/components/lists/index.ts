@@ -205,7 +205,8 @@ export const Race: DropdownListItem[] = [
   { value: "29", label: "Ooze" },
 ];
 
-export const Class: DropdownListItem[] = [
+export const CharacterClass: DropdownListItem[] = [
+  { value: "-1", label: "None" },
   { value: "0", label: "Barbarian" },
   { value: "1", label: "Bard" },
   { value: "2", label: "Cleric" },
