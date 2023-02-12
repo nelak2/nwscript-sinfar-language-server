@@ -2,29 +2,17 @@ import { Utc } from "../editorProviders/resData";
 import { Metamagic, Spell, SpellCastingClass } from "../editorProviders/resData/utc";
 import { Spells } from "./lists";
 import { SpellData } from "./lists/spells";
+import { nwnDropDownLarge } from "./nwnDropDownLarge";
 import { buildTextField, ButtonType } from "./utils";
 
 export class nwnCreatureSpells extends HTMLElement {
   _content!: Utc;
 
-  _bardDiv!: HTMLDivElement;
-  _clericDiv!: HTMLDivElement;
-  _druidDiv!: HTMLDivElement;
-  _paladinDiv!: HTMLDivElement;
-  _rangerDiv!: HTMLDivElement;
-  _sorcererDiv!: HTMLDivElement;
-  _wizardDiv!: HTMLDivElement;
-
-  _bardFieldset!: HTMLFieldSetElement;
-  _clericFieldset!: HTMLFieldSetElement;
-  _druidFieldset!: HTMLFieldSetElement;
-  _paladinFieldset!: HTMLFieldSetElement;
-  _rangerFieldset!: HTMLFieldSetElement;
-  _sorcererFieldset!: HTMLFieldSetElement;
-  _wizardFieldset!: HTMLFieldSetElement;
+  _DivElements: { classId: SpellCastingClass; div: HTMLDivElement }[] = [];
+  _FieldsetElements: { classId: SpellCastingClass; fieldset: HTMLFieldSetElement }[] = [];
 
   _castingClass!: HTMLSelectElement;
-  _spell!: HTMLSelectElement;
+  _spell!: nwnDropDownLarge;
   _uses!: HTMLInputElement;
   _metaMagic!: HTMLSelectElement;
 
@@ -34,61 +22,34 @@ export class nwnCreatureSpells extends HTMLElement {
   _class1!: HTMLSelectElement;
   _class2!: HTMLSelectElement;
 
+  _initialized = false;
+
   constructor() {
     super();
 
     this.innerHTML = this._html;
 
-    // DIV elements for hiding/revealing spell lists
-    const bardDiv = this.querySelector("#SpellBardDiv");
-    if (bardDiv) this._bardDiv = bardDiv as HTMLDivElement;
+    for (const pcClass in SpellCastingClass) {
+      // DIV elements for hiding/revealing spell lists
+      const currentClass = this.getSpellCastingClass(pcClass);
+      const div = this.querySelector(`#Spell${pcClass}Div`) as HTMLDivElement;
+      if (div) this._DivElements.push({ classId: currentClass, div });
 
-    const clericDiv = this.querySelector("#SpellClericDiv");
-    if (clericDiv) this._clericDiv = clericDiv as HTMLDivElement;
-
-    const druidDiv = this.querySelector("#SpellDruidDiv");
-    if (druidDiv) this._druidDiv = druidDiv as HTMLDivElement;
-
-    const paladinDiv = this.querySelector("#SpellPaladinDiv");
-    if (paladinDiv) this._paladinDiv = paladinDiv as HTMLDivElement;
-
-    const rangerDiv = this.querySelector("#SpellRangerDiv");
-    if (rangerDiv) this._rangerDiv = rangerDiv as HTMLDivElement;
-
-    const sorcererDiv = this.querySelector("#SpellSorcererDiv");
-    if (sorcererDiv) this._sorcererDiv = sorcererDiv as HTMLDivElement;
-
-    const wizardDiv = this.querySelector("#SpellWizardDiv");
-    if (wizardDiv) this._wizardDiv = wizardDiv as HTMLDivElement;
-
-    // Fieldsets for containing the lists
-    const bardFieldset = this.querySelector("#SpellBard");
-    if (bardFieldset) this._bardFieldset = bardFieldset as HTMLFieldSetElement;
-
-    const clericFieldset = this.querySelector("#SpellCleric");
-    if (clericFieldset) this._clericFieldset = clericFieldset as HTMLFieldSetElement;
-
-    const druidFieldset = this.querySelector("#SpellDruid");
-    if (druidFieldset) this._druidFieldset = druidFieldset as HTMLFieldSetElement;
-
-    const paladinFieldset = this.querySelector("#SpellPaladin");
-    if (paladinFieldset) this._paladinFieldset = paladinFieldset as HTMLFieldSetElement;
-
-    const rangerFieldset = this.querySelector("#SpellRanger");
-    if (rangerFieldset) this._rangerFieldset = rangerFieldset as HTMLFieldSetElement;
-
-    const sorcererFieldset = this.querySelector("#SpellSorcerer");
-    if (sorcererFieldset) this._sorcererFieldset = sorcererFieldset as HTMLFieldSetElement;
-
-    const wizardFieldset = this.querySelector("#SpellWizard");
-    if (wizardFieldset) this._wizardFieldset = wizardFieldset as HTMLFieldSetElement;
+      // Fieldsets for containing the lists
+      const fieldset = this.querySelector(`#Spell${pcClass}`) as HTMLFieldSetElement;
+      if (fieldset) this._FieldsetElements.push({ classId: currentClass, fieldset });
+    }
 
     // Controls for adding new spells
     const castingClass = this.querySelector("#Spells_Add_Class");
-    if (castingClass) this._castingClass = castingClass as HTMLSelectElement;
+    if (castingClass) {
+      this._castingClass = castingClass as HTMLSelectElement;
+      this._castingClass.addEventListener("click", () => this.castingClassClickHandler());
+      this._castingClass.addEventListener("change", (e) => this.castingClassChangeHandler(e), true);
+    }
 
     const spell = this.querySelector("#Spells_Add_Spell");
-    if (spell) this._spell = spell as HTMLSelectElement;
+    if (spell) this._spell = spell as nwnDropDownLarge;
 
     const uses = this.querySelector("#Spells_Add_Uses");
     if (uses) this._uses = uses as HTMLInputElement;
@@ -97,7 +58,10 @@ export class nwnCreatureSpells extends HTMLElement {
     if (metaMagic) this._metaMagic = metaMagic as HTMLSelectElement;
 
     const addBtn = this.querySelector("#Spells_Add_Btn");
-    if (addBtn) this._addBtn = addBtn as HTMLButtonElement;
+    if (addBtn) {
+      this._addBtn = addBtn as HTMLButtonElement;
+      this._addBtn.addEventListener("click", () => this.addClickEventHandler());
+    }
 
     // Class selectors for spells
     const class0 = document.getElementById("res_class0") as HTMLSelectElement;
@@ -110,7 +74,101 @@ export class nwnCreatureSpells extends HTMLElement {
     if (class2) this._class2 = class2;
   }
 
+  private classFieldChangeHandler(e: Event) {
+    // Ensure the level field is updated
+    const target = e.target as HTMLSelectElement;
+    if (target.value !== "-1") {
+      const id = target.id.substring(9);
+      const levelField = document.getElementById(`res_classlevel${id}`) as HTMLInputElement;
+      const level = parseInt(levelField.value);
+      this._content.setField(`class${id}`, target.value);
+      this._content.setField(`classlevel${id}`, level.toString());
+    }
+
+    this.refreshList();
+  }
+
+  private castingClassChangeHandler(e: Event) {
+    const target = e.target;
+
+    const value = (target as HTMLSelectElement).value;
+
+    if (value === "-1") {
+      this._spell.replaceChildren();
+      return;
+    }
+
+    const spellCastingClass = this.getSpellCastingClass(value);
+
+    const spells = Spells.filter((s) => this.getSpellClassLevel(spellCastingClass, s) > -1);
+
+    this._spell.setList(spells);
+  }
+
+  private castingClassClickHandler() {
+    const classes: SpellCastingClass[] = [];
+    classes.push(this.getSpellCastingClass(this._class0.value));
+    classes.push(this.getSpellCastingClass(this._class1.value));
+    classes.push(this.getSpellCastingClass(this._class2.value));
+
+    this.filterCastingClass(classes);
+  }
+
+  private getSpellCastingClass(classId: string): SpellCastingClass {
+    switch (classId) {
+      case "1":
+      case "Bard":
+        return SpellCastingClass.Bard;
+      case "Cleric":
+      case "2":
+        return SpellCastingClass.Cleric;
+      case "Druid":
+      case "3":
+        return SpellCastingClass.Druid;
+      case "Paladin":
+      case "6":
+        return SpellCastingClass.Paladin;
+      case "Ranger":
+      case "7":
+        return SpellCastingClass.Ranger;
+      case "Sorcerer":
+      case "9":
+        return SpellCastingClass.Sorcerer;
+      case "Wizard":
+      case "10":
+        return SpellCastingClass.Wizard;
+      default:
+        return -1;
+    }
+  }
+
+  private filterCastingClass(classes: SpellCastingClass[]) {
+    this._castingClass.replaceChildren();
+
+    const option = document.createElement("option");
+    option.value = "-1";
+    option.text = "Select a class";
+    this._castingClass.appendChild(option);
+
+    for (let i = 0; i < classes.length; i++) {
+      if (classes[i] === -1) continue;
+
+      const option = document.createElement("option");
+      option.value = classes[i].toString();
+      option.text = this.getClassName(classes[i]);
+      this._castingClass.appendChild(option);
+    }
+  }
+
   public Init(content: Utc) {
+    if (!this._initialized) {
+      this._initialized = true;
+
+      // bind listeners to watch for class changes
+      this._class0.addEventListener("change", (e) => this.classFieldChangeHandler(e), true);
+      this._class1.addEventListener("change", (e) => this.classFieldChangeHandler(e), true);
+      this._class2.addEventListener("change", (e) => this.classFieldChangeHandler(e), true);
+    }
     this._content = content;
 
     this.refreshList();
@@ -134,19 +192,20 @@ export class nwnCreatureSpells extends HTMLElement {
     const class1 = this._class1.value;
     const class2 = this._class2.value;
 
-    const class0Div = this.getDiv(parseInt(class0));
+    const class0Div = this._DivElements.find((x) => x.classId === this.getSpellCastingClass(class0))?.div;
     if (class0Div) class0Div.style.display = "flex";
 
-    const class1Div = this.getDiv(parseInt(class1));
+    const class1Div = this._DivElements.find((x) => x.classId === this.getSpellCastingClass(class1))?.div;
     if (class1Div) class1Div.style.display = "flex";
 
-    const class2Div = this.getDiv(parseInt(class2));
+    const class2Div = this._DivElements.find((x) => x.classId === this.getSpellCastingClass(class2))?.div;
     if (class2Div) class2Div.style.display = "flex";
   }
 
   // Add HTML elements to the list
   private addRow(spell: Spell, index: number) {
-    const fieldset = this.getField(spell.class);
+    const fieldset = this._FieldsetElements.find((x) => x.classId === spell.class)?.fieldset;
+    if (!fieldset) return;
 
     const spellListItem = buildTextField({
       id: "spell_" + this.getClassName(spell.class) + index.toString(),
@@ -162,6 +221,7 @@ export class nwnCreatureSpells extends HTMLElement {
     spellListItem.setAttribute("casterclass", spell.class.toString());
     spellListItem.setAttribute("metamagic", spell.metamagic.toString());
     spellListItem.setAttribute("uses", spell.uses.toString());
+    spellListItem.setAttribute("level", spell.level.toString());
 
     const delButton = spellListItem.querySelector("vscode-button");
     if (delButton) delButton.addEventListener("click", (e) => this.deleteClickEventHandler(e, index, spellListItem));
@@ -169,8 +229,84 @@ export class nwnCreatureSpells extends HTMLElement {
     fieldset.appendChild(spellListItem);
   }
 
-  private deleteClickEventHandler(e: Event, index: number, spellListItem: HTMLDivElement) {
-    throw new Error("Method not implemented.");
+  private deleteClickEventHandler(e: Event, index: number, spellListItem: Element) {
+    const spell: Spell = {
+      spell: parseInt(spellListItem.getAttribute("spellId") as string),
+      class: parseInt(spellListItem.getAttribute("casterclass") as string),
+      metamagic: parseInt(spellListItem.getAttribute("metamagic") as string),
+      uses: parseInt(spellListItem.getAttribute("uses") as string),
+      level: parseInt(spellListItem.getAttribute("level") as string),
+    };
+
+    const result = this._content.SpellList.removeSpell(spell);
+
+    if (result) {
+      this.refreshList();
+
+      this.dispatchEvent(
+        new CustomEvent("spellListChanged", {
+          detail: {
+            field: "spell_" + this.getClassName(spell.class) + index.toString(),
+            oldValue: spell,
+            newValue: undefined,
+          },
+        }),
+      );
+    }
+  }
+
+  private addClickEventHandler() {
+    const spellId = parseInt(this._spell.value);
+    const classId = parseInt(this._castingClass.value);
+    const metamagicId = parseInt(this._metaMagic.value);
+    const uses = parseInt(this._uses.value);
+    const level = this._content.SpellList.getSpellLevel(spellId, classId, metamagicId);
+
+    const spell: Spell = {
+      spell: spellId,
+      class: classId,
+      metamagic: metamagicId,
+      uses,
+      level,
+    };
+
+    // No class selected
+    if (classId === 0) return;
+
+    // No uses
+    if (uses < 0) return;
+
+    // No spell selected
+    if (spellId < 0) return;
+
+    if (level === -1) {
+      throw new Error("The selected spell is not available for the selected class.");
+    }
+
+    if (level > 9) {
+      throw new Error("The metamagic + innate spell level is not valid.");
+    }
+
+    const result = this._content.SpellList.addSpell(spell);
+
+    if (result) {
+      this.refreshList();
+
+      this.dispatchEvent(
+        new CustomEvent("spellListChanged", {
+          detail: {
+            field: "spell_" + this.getClassName(spell.class) + this._content.SpellList.getSpellList().length.toString(),
+            oldValue: undefined,
+            newValue: spell,
+          },
+        }),
+      );
+
+      this._castingClass.value = "0";
+      this._spell.value = "-1";
+      this._metaMagic.value = "0";
+      this._uses.value = "0";
+    }
   }
 
   private getSpellData(spellId: number): any {
@@ -182,7 +318,7 @@ export class nwnCreatureSpells extends HTMLElement {
 
     let result: string = spell.uses.toString() + " x ";
     result += data.label;
-    result += " (" + this.getSpellClassLevel(spell, data).toString() + ")";
+    result += " (" + this.getSpellClassLevel(spell.class, data).toString() + ")";
 
     if (spell.metamagic !== Metamagic.None) {
       result += " - " + Metamagic[spell.metamagic];
@@ -191,64 +327,21 @@ export class nwnCreatureSpells extends HTMLElement {
     return result;
   }
 
-  private getSpellClassLevel(spell: Spell, data: SpellData): number {
-    switch (spell.class) {
+  private getSpellClassLevel(classId: number, data: SpellData): number {
+    switch (classId) {
       case SpellCastingClass.Bard:
-        return data.dataBard;
+        return data.Bard;
       case SpellCastingClass.Cleric:
-        return data.dataCleric;
+        return data.Cleric;
       case SpellCastingClass.Druid:
-        return data.dataDruid;
+        return data.Druid;
       case SpellCastingClass.Paladin:
-        return data.dataPaladin;
+        return data.Paladin;
       case SpellCastingClass.Ranger:
-        return data.dataRanger;
+        return data.Ranger;
       case SpellCastingClass.Sorcerer:
-        return data.dataWizSorc;
       case SpellCastingClass.Wizard:
-        return data.dataWizSorc;
-      default:
-        throw new Error("Invalid casting class");
-    }
-  }
-
-  private getDiv(castingClass: SpellCastingClass): HTMLDivElement | undefined {
-    switch (castingClass) {
-      case SpellCastingClass.Bard:
-        return this._bardDiv;
-      case SpellCastingClass.Cleric:
-        return this._clericDiv;
-      case SpellCastingClass.Druid:
-        return this._druidDiv;
-      case SpellCastingClass.Paladin:
-        return this._paladinDiv;
-      case SpellCastingClass.Ranger:
-        return this._rangerDiv;
-      case SpellCastingClass.Sorcerer:
-        return this._sorcererDiv;
-      case SpellCastingClass.Wizard:
-        return this._wizardDiv;
-      default:
-        return undefined;
-    }
-  }
-
-  private getField(castingClass: SpellCastingClass): HTMLFieldSetElement {
-    switch (castingClass) {
-      case SpellCastingClass.Bard:
-        return this._bardFieldset;
-      case SpellCastingClass.Cleric:
-        return this._clericFieldset;
-      case SpellCastingClass.Druid:
-        return this._druidFieldset;
-      case SpellCastingClass.Paladin:
-        return this._paladinFieldset;
-      case SpellCastingClass.Ranger:
-        return this._rangerFieldset;
-      case SpellCastingClass.Sorcerer:
-        return this._sorcererFieldset;
-      case SpellCastingClass.Wizard:
-        return this._wizardFieldset;
+        return data.WizSorc;
       default:
         throw new Error("Invalid casting class");
     }
@@ -276,23 +369,15 @@ export class nwnCreatureSpells extends HTMLElement {
   }
 
   private removeChildren() {
-    this._bardFieldset.replaceChildren();
-    this._clericFieldset.replaceChildren();
-    this._druidFieldset.replaceChildren();
-    this._paladinFieldset.replaceChildren();
-    this._rangerFieldset.replaceChildren();
-    this._sorcererFieldset.replaceChildren();
-    this._wizardFieldset.replaceChildren();
+    for (const child of this._FieldsetElements) {
+      child.fieldset.replaceChildren();
+    }
   }
 
   private hideAll() {
-    this._bardDiv.style.display = "none";
-    this._clericDiv.style.display = "none";
-    this._druidDiv.style.display = "none";
-    this._paladinDiv.style.display = "none";
-    this._rangerDiv.style.display = "none";
-    this._sorcererDiv.style.display = "none";
-    this._wizardDiv.style.display = "none";
+    for (const child of this._DivElements) {
+      child.div.style.display = "none";
+    }
   }
 
   private readonly _html: string = `

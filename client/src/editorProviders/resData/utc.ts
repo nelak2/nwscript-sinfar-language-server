@@ -1,5 +1,5 @@
 import { ResData, VarTable } from ".";
-import { Feats } from "../../components/lists";
+import { Feats, Spells } from "../../components/lists";
 
 export class Utc extends ResData {
   private readonly _vartable: VarTable;
@@ -82,7 +82,67 @@ export class Utc extends ResData {
     }
   }
 
+  // TODO We may have an issue with spell lists for classes that are not actually assigned...
+  private setClass(id: number, value: string) {
+    // Delete the class if the value is -1 and the class is not the first class
+    if (value === "-1" && id > 0) {
+      this.data.resData[1].ClassList[1].splice(id, 1);
+      return;
+    }
+    const currentclass = this.data.resData[1].ClassList[1][id];
+    if (!currentclass) {
+      this.data.resData[1].ClassList[1][id] = [2, { Class: [5, parseInt(value)], ClassLevel: [3, 1] }];
+    } else {
+      // If the class is changing, we need to update the spell list
+      if (currentclass[1].Class[1] !== parseInt(value)) {
+        this._spellList.clearList(id);
+      }
+
+      this.data.resData[1].ClassList[1][id][1].Class[1] = this.writeField(
+        value,
+        this.data.resData[1].ClassList[1][id][1].Class[0],
+      );
+    }
+  }
+
+  private setClassLevel(id: number, value: string) {
+    this.data.resData[1].ClassList[1][id][1].ClassLevel[1] = this.writeField(
+      value,
+      this.data.resData[1].ClassList[1][id][1].ClassLevel[0],
+    );
+  }
+
   public setField(field: string, value: string) {
+    if (field.includes("classlevel")) {
+      const classId = parseInt(field.substring(10));
+      this.setClassLevel(classId, value);
+      return;
+    }
+    if (field.includes("class")) {
+      const classId = parseInt(field.substring(5));
+      this.setClass(classId, value);
+      return;
+    }
+    if (field.includes("skill")) {
+      const skillId = parseInt(field.substring(5));
+      this.data.resData[1].SkillList[1][skillId][1].Rank[1] = this.writeField(
+        value,
+        this.data.resData[1].SkillList[1][skillId][1].Rank[0],
+      );
+      return;
+    }
+
+    if (field.includes("equipped_")) {
+      const equippedId = parseInt(field.substring(9));
+
+      for (const item of this.data.resData[1].Equip_ItemList[1]) {
+        if (item[0] === equippedId) {
+          item[1].EquippedRes[1] = this.writeField(value, item[1].EquippedRes[0]);
+        }
+      }
+      return;
+    }
+
     this.data.resData[1][field][1] = this.writeField(value, this.data.resData[1][field][0]);
   }
 
@@ -191,6 +251,7 @@ export enum SpellCastingClass {
   Ranger = 7,
   Sorcerer = 9,
   Wizard = 10,
+  Invalid = -1,
 }
 
 export type Spell = {
@@ -198,6 +259,7 @@ export type Spell = {
   class: SpellCastingClass;
   uses: number;
   metamagic: Metamagic;
+  level: number;
 };
 
 class SpellList {
@@ -227,7 +289,8 @@ class SpellList {
             const exists = spells.findIndex((s) => s.spell === spellId && s.class === classId && s.metamagic === spellMetaMagic);
 
             if (exists === -1) {
-              spells.push({ spell: spellId, class: classId, uses: 1, metamagic: spellMetaMagic });
+              const level = this.getSpellLevel(spellId, classId, spellMetaMagic);
+              spells.push({ spell: spellId, class: classId, uses: 1, metamagic: spellMetaMagic, level });
             } else {
               spells[exists].uses++;
             }
@@ -236,6 +299,115 @@ class SpellList {
       }
     }
     return spells;
+  }
+
+  clearList(classId: number) {
+    const properties = Object.keys(this._data.resData[1].ClassList[1][classId][1]);
+    for (const property of properties) {
+      if (property.includes("MemorizedList")) {
+        this._data.resData[1].ClassList[1][classId][1][property][1] = [];
+      }
+    }
+  }
+
+  public removeSpell(deleteSpell: Spell): boolean {
+    let removedCount = 0;
+
+    for (const pcClass of this._data.resData[1].ClassList[1]) {
+      const classId: number = pcClass[1].Class[1];
+
+      if (classId !== deleteSpell.class) continue;
+
+      const properties = Object.keys(pcClass[1]);
+
+      for (const property of properties) {
+        if (property.includes("MemorizedList")) {
+          const spellLists = pcClass[1][property][1];
+
+          for (let i = spellLists.length - 1; i >= 0; i--) {
+            if (spellLists[i][1].Spell[1] === deleteSpell.spell && spellLists[i][1].SpellMetaMagic[1] === deleteSpell.metamagic) {
+              spellLists.splice(i, 1);
+              removedCount++;
+            }
+          }
+        }
+      }
+    }
+
+    return removedCount > 0;
+  }
+
+  public addSpell(spell: Spell): boolean {
+    // First remove the spell if it already exists
+    this.removeSpell(spell);
+
+    for (const pcClass of this._data.resData[1].ClassList[1]) {
+      const classId: number = pcClass[1].Class[1];
+
+      if (classId !== spell.class) continue;
+
+      let spellList = pcClass[1][`MemorizedList${spell.level}`];
+
+      if (!spellList) {
+        pcClass[1][`MemorizedList${spell.level}`] = [15, []];
+        spellList = pcClass[1][`MemorizedList${spell.level}`];
+      }
+
+      for (let i = 0; i < spell.uses; i++) {
+        spellList[1].push([3, { Spell: [2, spell.spell], SpellFlags: [0, 1], SpellMetaMagic: [0, spell.metamagic] }]);
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
+  public getSpellLevel(spellID: number, classID: SpellCastingClass, metamagic: Metamagic): number {
+    const spellData = Spells.find((s) => s.value === spellID);
+
+    if (!spellData) return -1;
+
+    switch (classID) {
+      case SpellCastingClass.Bard:
+        if (spellData.Bard === -1) return -1;
+        return spellData.Bard + this.getMetamagicLevel(metamagic);
+      case SpellCastingClass.Cleric:
+        if (spellData.Cleric === -1) return -1;
+        return spellData.Cleric + this.getMetamagicLevel(metamagic);
+      case SpellCastingClass.Druid:
+        if (spellData.Druid === -1) return -1;
+        return spellData.Druid + this.getMetamagicLevel(metamagic);
+      case SpellCastingClass.Paladin:
+        if (spellData.Paladin === -1) return -1;
+        return spellData.Paladin + this.getMetamagicLevel(metamagic);
+      case SpellCastingClass.Ranger:
+        if (spellData.Ranger === -1) return -1;
+        return spellData.Ranger + this.getMetamagicLevel(metamagic);
+      case SpellCastingClass.Sorcerer:
+      case SpellCastingClass.Wizard:
+        if (spellData.WizSorc === -1) return -1;
+        return spellData.WizSorc + this.getMetamagicLevel(metamagic);
+      default:
+        return -1;
+    }
+  }
+
+  public getMetamagicLevel(metamagic: Metamagic): number {
+    switch (metamagic) {
+      case Metamagic.Extend:
+      case Metamagic.Still:
+      case Metamagic.Silent:
+        return 1;
+      case Metamagic.Empower:
+        return 2;
+      case Metamagic.Maximize:
+        return 3;
+      case Metamagic.Quicken:
+        return 4;
+      default:
+        return 0;
+    }
   }
 }
 
