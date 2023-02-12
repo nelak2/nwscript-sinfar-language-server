@@ -102,7 +102,7 @@ export class nwnCreatureSpells extends HTMLElement {
 
     const spells = Spells.filter((s) => this.getSpellClassLevel(spellCastingClass, s) > -1);
 
-    this._spell.setList(spells);
+    void this._spell.setList(spells);
   }
 
   private castingClassClickHandler() {
