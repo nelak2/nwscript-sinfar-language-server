@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { DropdownListItem, PLCAppearances, CreatureAppearances, Portraits, SoundSet, Feats, Abilities, Spells } from "./lists";
+import { PLCAppearances, CreatureAppearances, Portraits, SoundSet, Feats, Abilities, Spells } from "./lists";
 import { Index } from "flexsearch";
 
 export class nwnDropDownLarge extends HTMLElement {
@@ -9,9 +9,9 @@ export class nwnDropDownLarge extends HTMLElement {
 
   private readonly ITEM_HEIGHT = 22;
 
-  private _originalList: DropdownListItem[] = [];
+  private _originalList: any[] = [];
 
-  private _list: DropdownListItem[] = [];
+  private _list: any[] = [];
   private _optionBox!: HTMLDivElement;
   private _searchBox!: HTMLInputElement;
   private _placeholder!: HTMLDivElement;
@@ -61,6 +61,12 @@ export class nwnDropDownLarge extends HTMLElement {
 
     this.ResetFilteredList(index);
     this.SetSelectedOption(index);
+  }
+
+  public async setList(list: any[]) {
+    this._originalList = list;
+    await this.InitSearch();
+    this.ResetFilteredList(0);
   }
 
   connectedCallback() {
