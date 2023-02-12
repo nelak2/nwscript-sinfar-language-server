@@ -37,6 +37,35 @@
   "preview": true,
   "main": "./client/out/extension",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "nwn-editor",
+          "title": "Sinfar",
+          "icon": "nwn-icon.png"
+        }
+      ]
+    },
+    "views": {
+      "nwn-editor": [
+        {
+          "id": "nwn-editor.open",
+          "name": "Open Editors"
+        },
+        {
+          "id": "nwn-editor.favorites",
+          "name": "Favorite ERFs"
+        },
+        {
+          "id": "nwn-editor.all",
+          "name": "All ERFs"
+        },
+        {
+          "id": "nwn-editor.misc",
+          "name": "Tools"
+        }
+      ]
+    },
     "languages": [
       {
         "id": "nwscript",
