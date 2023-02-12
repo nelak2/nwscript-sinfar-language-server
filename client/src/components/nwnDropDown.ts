@@ -38,7 +38,7 @@ import {
   FootstepSound,
   LawChaos,
   GoodEvil,
-  Class,
+  CharacterClass,
   Race,
   Metamagic,
   CastingClass,
@@ -174,7 +174,7 @@ export class nwnDropDown extends HTMLElement {
         this.list = GoodEvil;
         break;
       case "Class":
-        this.list = Class;
+        this.list = CharacterClass;
         break;
       case "Race":
         this.list = Race;
