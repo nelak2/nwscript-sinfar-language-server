@@ -114,6 +114,11 @@ class RestrictionList {
   public getItemList(): string[] {
     const items: string[] = [];
 
+    // Verify that the restriction list exists
+    if (!this._data.resData[1][this._restrictionType]) {
+      return items;
+    }
+
     for (const item of this._data.resData[1][this._restrictionType][1]) {
       items.push(this.readItem(item));
     }
@@ -121,6 +126,11 @@ class RestrictionList {
   }
 
   public addItem(item: string): string | undefined {
+    // Verify that the restriction list exists
+    if (!this._data.resData[1][this._restrictionType]) {
+      this._data.resData[1][this._restrictionType] = [15, []];
+    }
+
     if (this.getExists(item)) return undefined;
 
     this._data.resData[1][this._restrictionType][1].push(this.writeItem(item));
@@ -179,6 +189,11 @@ class InventoryList {
 
   public getItemList(category: number): InventoryItem[] {
     const items: InventoryItem[] = [];
+
+    // Verify the item list exists
+    if (!this._data.resData[1].StoreList[1][category]) {
+      return items;
+    }
 
     for (const item of this._data.resData[1].StoreList[1][category][1].ItemList[1]) {
       items.push(this.readItem(item, category));

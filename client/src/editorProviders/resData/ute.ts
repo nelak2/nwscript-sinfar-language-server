@@ -40,6 +40,11 @@ class CreatureList {
   public getItemList(): CreatureListItem[] {
     const creatures: CreatureListItem[] = [];
 
+    // verify the creature list exists
+    if (!this._data.resData[1].CreatureList) {
+      return creatures;
+    }
+
     for (const creature of this._data.resData[1].CreatureList[1]) {
       creatures.push(this.readItem(creature));
     }
@@ -59,6 +64,11 @@ class CreatureList {
    * @returns Added item or undefined if item already exists
    */
   public addItem(item: CreatureListItem): CreatureListItem | undefined {
+    // verify the creature list exists
+    if (!this._data.resData[1].CreatureList) {
+      this._data.resData[1].CreatureList = [15, []];
+    }
+
     if (this.getExists(item.Resref)) return undefined;
 
     this._data.resData[1].CreatureList[1].push(this.writeItem(item));

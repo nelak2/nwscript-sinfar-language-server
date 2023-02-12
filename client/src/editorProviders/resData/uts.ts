@@ -71,6 +71,11 @@ class SoundList {
   public getSoundList(): string[] {
     const sounds: string[] = [];
 
+    // Ensure the sound list exists
+    if (!this._data.resData[1].Sounds) {
+      return sounds;
+    }
+
     for (const sound of this._data.resData[1].Sounds[1]) {
       sounds.push(sound[1].Sound[1]);
     }
@@ -85,6 +90,11 @@ class SoundList {
    * @remarks duplicates are allowed
    */
   public addSound(sound: string): string | undefined {
+    // Ensure the sound list exists
+    if (!this._data.resData[1].Sounds) {
+      this._data.resData[1].Sounds = [15, []];
+    }
+
     this._data.resData[1].Sounds[1].push([0, { Sound: [11, sound] }]);
     return sound;
   }

@@ -62,6 +62,11 @@ class ItemProperties {
   public getPropertyList(): ItemProperty[] {
     const properties: ItemProperty[] = [];
 
+    // verify that the property list exists
+    if (!this._data.resData[1].PropertiesList) {
+      return properties;
+    }
+
     for (const property of this._data.resData[1].PropertiesList[1]) {
       const prop = this.readProperty(property);
 
@@ -130,6 +135,11 @@ class ItemProperties {
   }
 
   public addProperty(property: ItemProperty) {
+    // verify the properties list exists
+    if (!this._data.resData[1].PropertiesList) {
+      this._data.resData[1].PropertiesList = [15, []];
+    }
+
     this._data.resData[1].PropertiesList[1].push([
       0,
       {

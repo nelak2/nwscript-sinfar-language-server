@@ -59,6 +59,11 @@ export class VarTable {
   }
 
   public addVariable(variable: Variable) {
+    // Ensure the variable table exists
+    if (!this.VarTable) {
+      this.VarTable = [15, []];
+    }
+
     const name = [10, variable.Name];
     const varType = [4, variable.Type];
     const value = [VarTable.getNWNGFFType(variable.Type), VarTable.formatValue(variable.Value, variable.Type)];
@@ -92,6 +97,12 @@ export class VarTable {
   // Return a list of variables from the raw VarTable
   public get List() {
     const list: Variable[] = [];
+
+    // Ensure the variable table exists
+    if (!this.VarTable) {
+      return list;
+    }
+
     for (const variable of this.VarTable[1]) {
       list.push({
         Name: variable[1].Name[1],

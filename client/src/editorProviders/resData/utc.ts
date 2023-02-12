@@ -480,6 +480,9 @@ class InventoryList {
   public getItemList(): string[] {
     const items: string[] = [];
 
+    // Ensure the creature has an inventory
+    if (!this._data.resData[1].ItemList) return items;
+
     for (const item of this._data.resData[1].ItemList[1]) {
       let itemStr: string = item[1].InventoryRes[1];
 
@@ -492,6 +495,11 @@ class InventoryList {
   }
 
   public addItem(resref: string, dropable: boolean, pickpocketable: boolean): Boolean {
+    // Ensure the creature has an inventory
+    if (!this._data.resData[1].ItemList) {
+      this._data.resData[1].ItemList = [15, []];
+    }
+
     const item = [
       0,
       { Dropable: [0, dropable ? 1 : 0], InventoryRes: [11, resref], Pickpocketable: [0, pickpocketable ? 1 : 0] },

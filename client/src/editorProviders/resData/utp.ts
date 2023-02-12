@@ -40,6 +40,11 @@ class InventoryList {
   public getItemList(): string[] {
     const items: string[] = [];
 
+    // Verify the item list exists
+    if (!this._data.resData[1].ItemList) {
+      return items;
+    }
+
     for (const item of this._data.resData[1].ItemList[1]) {
       items.push(item[1].InventoryRes[1]);
     }
@@ -47,6 +52,11 @@ class InventoryList {
   }
 
   public addItem(item: string): string | undefined {
+    // Verify the item list exists
+    if (!this._data.resData[1].ItemList) {
+      this._data.resData[1].ItemList = [15, []];
+    }
+
     this._data.resData[1].ItemList[1].push([0, { InventoryRes: [11, item] }]);
     return item;
   }
