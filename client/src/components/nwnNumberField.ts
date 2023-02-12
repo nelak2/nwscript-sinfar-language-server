@@ -117,7 +117,7 @@ export class nwnNumberField extends HTMLElement {
         numberField.value = 0;
         break;
       case "level":
-        numberField.setAttribute("min", "0");
+        numberField.setAttribute("min", "1");
         numberField.setAttribute("max", "60");
         numberField.style.width = "100px";
         numberField.value = 0;
