@@ -60,7 +60,7 @@ export enum ResourceType {
   DLG = "dlg",
   ARE = "are",
   GIT = "git",
-  _2DA = "_2da",
+  "2DA" = "2da",
   UTD = "utd",
   NSS = "nss",
   UTS = "uts",
