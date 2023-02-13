@@ -49,23 +49,34 @@
     "views": {
       "nwn-editor": [
         {
-          "id": "nwn-editor.open",
-          "name": "Open Editors"
+          "id": "nwn-editor.open-docs",
+          "name": "Open Editors",
+          "visibility": "collapsed",
+          "initialSize": 0.5
         },
         {
-          "id": "nwn-editor.favorites",
-          "name": "Favorite ERFs"
+          "id": "nwn-editor.open-erfs",
+          "name": "Open ERFs",
+          "visibility": "collapsed"
         },
         {
           "id": "nwn-editor.all",
-          "name": "All ERFs"
+          "name": "All ERFs",
+          "visibility": "visible"
         },
         {
           "id": "nwn-editor.misc",
-          "name": "Tools"
+          "name": "Tools",
+          "visibility": "collapsed"
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "nwn-editor.all",
+        "contents": "Welcome to the Sinfar Toolset!\n\nTo get started, create a new workspace\n[Create Sinfar Workspace](command:sinfar.setup)\n\nOnce the workspace is created Login with your Sinfar credentials\n\n[Login to Sinfar](command:sinfar.login)\n\nIf you have any questions, please contact NelaK on Discord."
+      }
+    ],
     "languages": [
       {
         "id": "nwscript",
@@ -187,6 +198,10 @@
         "title": "Login to Sinfar"
       },
       {
+        "command": "sinfar.openERF",
+        "title": "Open ERF"
+      },
+      {
         "command": "sinfar.logout",
         "title": "Logout from Sinfar"
       },
@@ -227,6 +242,12 @@
           "command": "sinfar.gotoNSS",
           "when": "resourceScheme == 'sinfar' && !explorerResourceIsFolder",
           "group": "sinfar"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "sinfar.openERF",
+          "when": "view == nwn-editor.all && viewItem == erf"
         }
       ]
     },

@@ -1,16 +1,14 @@
 import path, { join } from "path";
 import { LanguageClient, ServerOptions, TransportKind } from "vscode-languageclient/node";
 import * as vscode from "vscode";
-
 import type { LanguageClientOptions } from "vscode-languageclient/node";
 import { ExtensionContext } from "vscode";
-
 import { SinfarFS } from "./providers/fileSystemProvider";
 import { CookieAuthenticationProvider } from "./providers/authProvider";
 import { SinfarAPI } from "./api/sinfarAPI";
-// import { GitEditorProvider } from "./editorProviders/gitEditorProvider";
 import { EditorProvider } from "./editorProviders/editorProvider";
 import { ERF } from "./api/types";
+import { Entry, ERFTreeDataProvider } from "./providers/erfTreeDataProvider";
 
 let client: LanguageClient;
 let fs: SinfarFS;
@@ -19,15 +17,31 @@ const serverConfig = (serverPath: string) => {
   return { module: serverPath, transport: TransportKind.ipc };
 };
 
-export async function activate(context: ExtensionContext) {
+export function activate(context: ExtensionContext) {
   InitSinfar(context);
   InitLSP(context);
-  await InitEditors(context);
+  InitEditors(context);
 }
 
-export async function InitEditors(context: ExtensionContext) {
-  // context.subscriptions.push(GitEditorProvider.register(context));
+export function InitEditors(context: ExtensionContext) {
   context.subscriptions.push(EditorProvider.register(context));
+
+  const allERF = new ERFTreeDataProvider(remoteAPI, fs, context, "all");
+  const openERF = new ERFTreeDataProvider(remoteAPI, fs, context, "open");
+  allERF.setLinked(openERF);
+  openERF.setLinked(allERF);
+
+  const allERFTree = vscode.window.createTreeView("nwn-editor.all", { treeDataProvider: allERF });
+  const openERFTree = vscode.window.createTreeView("nwn-editor.open-erfs", { treeDataProvider: openERF });
+
+  allERFTree.onDidCollapseElement((e) => allERF.onDidCollapseElement(e));
+  allERFTree.onDidExpandElement((e) => allERF.onDidExpandElement(e));
+  openERFTree.onDidCollapseElement((e) => openERF.onDidCollapseElement(e));
+  openERFTree.onDidExpandElement((e) => openERF.onDidExpandElement(e));
+
+  vscode.commands.registerCommand("sinfar.openERF", (e: Entry) => {
+    openERF.openERF(e);
+  });
 }
 
 export function InitLSP(context: ExtensionContext) {
