@@ -202,6 +202,22 @@
         "title": "Open ERF"
       },
       {
+        "command": "sinfar.erfHistory",
+        "title": "View ERF History"
+      },
+      {
+        "command": "sinfar.rebuildScripts",
+        "title": "Rebuild Scripts"
+      },
+      {
+        "command": "sinfar.viewLogs",
+        "title": "View ERF Logs"
+      },
+      {
+        "command": "sinfar.downloadERF",
+        "title": "Download ERF"
+      },
+      {
         "command": "sinfar.logout",
         "title": "Logout from Sinfar"
       },
@@ -247,6 +263,26 @@
       "view/item/context": [
         {
           "command": "sinfar.openERF",
+          "when": "view == nwn-editor.all && viewItem == erf"
+        },
+        {
+          "command": "sinfar.gotoERF",
+          "when": "view == nwn-editor.all && viewItem == erf"
+        },
+        {
+          "command": "sinfar.erfHistory",
+          "when": "view == nwn-editor.all && viewItem == erf"
+        },
+        {
+          "command": "sinfar.rebuildScripts",
+          "when": "view == nwn-editor.all && viewItem == erf"
+        },
+        {
+          "command": "sinfar.viewLogs",
+          "when": "view == nwn-editor.all && viewItem == erf"
+        },
+        {
+          "command": "sinfar.downloadERF",
           "when": "view == nwn-editor.all && viewItem == erf"
         }
       ]

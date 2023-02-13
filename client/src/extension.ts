@@ -8,7 +8,7 @@ import { CookieAuthenticationProvider } from "./providers/authProvider";
 import { SinfarAPI } from "./api/sinfarAPI";
 import { EditorProvider } from "./editorProviders/editorProvider";
 import { ERF } from "./api/types";
-import { Entry, ERFTreeDataProvider } from "./providers/erfTreeDataProvider";
+import { Entry, EntryInterface, ERFEntry, ERFTreeDataProvider } from "./providers/erfTreeDataProvider";
 
 let client: LanguageClient;
 let fs: SinfarFS;
@@ -41,6 +41,13 @@ export function InitEditors(context: ExtensionContext) {
 
   vscode.commands.registerCommand("sinfar.openERF", (e: Entry) => {
     openERF.openERF(e);
+  });
+
+  vscode.commands.registerCommand("sinfar.viewLogs", (e: Entry) => {
+    const erf = (e.data as ERFEntry).erf;
+    void vscode.workspace.openTextDocument(vscode.Uri.parse("sinfar:/logs/" + erf.id.toString() + ".log")).then((doc) => {
+      void vscode.window.showTextDocument(doc);
+    });
   });
 }
 

@@ -7,6 +7,14 @@ import path from "path";
 import { Directory, SinfarFS } from "../providers/fileSystemProvider";
 import { CompilerReturn, ERF, ResourceType } from "./types";
 
+type logEntry = {
+  time: Date;
+  msgType: string;
+  server: string;
+  msg: string;
+  script: string;
+};
+
 export class SinfarAPI {
   private _erfStore: ERF[] = [];
 
@@ -41,13 +49,75 @@ export class SinfarAPI {
     }
 
     let data = "";
-    if (ext !== ".nss") {
+    if (ext === ".log") {
+      data = await this.readLog(resref, ext);
+    } else if (ext !== ".nss") {
       data = await this.readResource(resref, ext);
     } else {
       data = await this.readScript(resref, ext);
     }
 
     return new TextEncoder().encode(data ?? "");
+  }
+
+  private async readLog(id: string, ext: string): Promise<string> {
+    const token = await this._getCookies();
+    // Query the server for the log
+    const url = "https://nwn.sinfar.net/erf_logs.php?erf_id=" + "805";
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        accept: "*/*",
+        cookie: token,
+      },
+    });
+    // We get the full html page back. We use cheerio to parse out the script block which contains
+    // the scriptData variable
+    const $ = cheerio.load(await res.text());
+
+    // Extract the scriptData variable from the script block
+
+    const resource = $(".game_structure").html();
+
+    const variableLines =
+      resource?.match(
+        /((?<=<td>)[\d :-]{19})(?:<\/td><td>)((?<=<td>)\d{4})(?:<\/td><td>)(INFO|WARNING|VERBOSE|DEBUG|ERROR|WTF)(?:<\/td><td>)[a-zA-Z0-9_]{1,16}(?:<\/td><td class="log_msg">)(.*)(?=<\/td>)/g,
+      ) ?? "";
+
+    const parsedValues: logEntry[] = [];
+
+    if (variableLines.length > 0) {
+      for (let i = 0; i < variableLines.length; i++) {
+        const timeMatch = variableLines
+          .at(i)
+          ?.match(/^([\d :-]{19})/g)
+          ?.at(0);
+
+        const time = new Date(timeMatch ?? "");
+
+        const server = variableLines
+          .at(i)
+          ?.match(/((?<=<\/td><td>)\d{4})/g)
+          ?.at(0);
+
+        const msgType = variableLines
+          .at(i)
+          ?.match(/(?<=<\/td><td>)(INFO|WARNING|VERBOSE|DEBUG|ERROR|WTF)/g)
+          ?.at(0);
+        const msg = variableLines
+          .at(i)
+          ?.match(/(?<=<\/td><td class="log_msg">)(.*)/g)
+          ?.at(0);
+        const script = variableLines
+          .at(i)
+          ?.match(/(?<=<\/td><td>)[a-zA-Z0-9_]{1,16}(?=<\/td><td class)/g)
+          ?.at(0);
+
+        parsedValues.push({ time, server: server || "", msgType: msgType || "", msg: msg || "", script: script || "" });
+      }
+    }
+
+    return JSON.stringify(parsedValues, null, 2);
   }
 
   private async readResource(resref: string, ext: string): Promise<string> {

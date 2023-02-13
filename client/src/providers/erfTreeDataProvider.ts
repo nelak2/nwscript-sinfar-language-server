@@ -114,13 +114,15 @@ export class ERFTreeDataProvider implements vscode.TreeDataProvider<Entry> {
     this._onDidChangeTreeData.fire();
   }
 
-  //   resolveTreeItem?(
-  //     item: vscode.TreeItem,
-  //     element: Entry,
-  //     token: vscode.CancellationToken,
-  //   ): vscode.ProviderResult<vscode.TreeItem> {
-  //     throw new Error("Method not implemented.");
-  //   }
+  // Can be used to resolve the command property of a tree item
+  // Happens on mouse over or click on the tree item
+  // resolveTreeItem?(
+  //   item: vscode.TreeItem,
+  //   element: Entry,
+  //   token: vscode.CancellationToken,
+  // ): vscode.ProviderResult<vscode.TreeItem> {
+  //   throw new Error("Method not implemented.");
+  // }
 
   onDidCollapseElement(e: vscode.TreeViewExpansionEvent<Entry>): any {
     e.element.iconPath = e.element.data.getIconPath(false);
