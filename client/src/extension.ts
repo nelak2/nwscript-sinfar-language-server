@@ -8,7 +8,7 @@ import { CookieAuthenticationProvider } from "./providers/authProvider";
 import { SinfarAPI } from "./api/sinfarAPI";
 import { EditorProvider } from "./editorProviders/editorProvider";
 import { ERF } from "./api/types";
-import { Entry, EntryInterface, ERFEntry, ERFTreeDataProvider } from "./providers/erfTreeDataProvider";
+import { Entry, ERFEntry, ERFTreeDataProvider } from "./providers/erfTreeDataProvider";
 
 let client: LanguageClient;
 let fs: SinfarFS;
