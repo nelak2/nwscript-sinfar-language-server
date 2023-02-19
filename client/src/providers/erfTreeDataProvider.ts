@@ -95,6 +95,10 @@ export class ERFTreeDataProvider implements vscode.TreeDataProvider<Entry> {
       return [];
     }
 
+    for (const _erf of erfList) {
+      await this.remoteAPI.createERFFolder(_erf, this.fs, false);
+    }
+
     const entries = erfList.map((erf) => new Entry(vscode.TreeItemCollapsibleState.Collapsed, new ERFEntry(erf)));
 
     return entries.sort((a, b) => (a.label?.toString() || "").localeCompare(b.label?.toString() || ""));
