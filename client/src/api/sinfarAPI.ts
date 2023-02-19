@@ -50,7 +50,13 @@ export class SinfarAPI {
 
     let data = "";
     if (ext === ".log") {
-      data = await this.readLog(resref, ext);
+      const id = path.parse(uri.path).dir.split("/").at(1) || "";
+
+      if (resref === "erf_all") {
+        data = await this.readLog(id, ext, false, true);
+      } else {
+        data = await this.readLog(id, ext, false, false);
+      }
     } else if (ext !== ".nss") {
       data = await this.readResource(resref, ext);
     } else {
@@ -60,10 +66,10 @@ export class SinfarAPI {
     return new TextEncoder().encode(data ?? "");
   }
 
-  private async readLog(id: string, ext: string): Promise<string> {
+  private async fetchLogMessages(id: string, page: number): Promise<{ logEntry: logEntry[]; pageCount: number }> {
     const token = await this._getCookies();
     // Query the server for the log
-    const url = "https://nwn.sinfar.net/erf_logs.php?erf_id=" + "805";
+    const url = "https://nwn.sinfar.net/erf_logs.php?erf_id=" + id + "&page=" + page.toString();
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -75,7 +81,11 @@ export class SinfarAPI {
     // the scriptData variable
     const $ = cheerio.load(await res.text());
 
-    // Extract the scriptData variable from the script block
+    let pageCount = 0;
+    try {
+      const lastPager: any = $(".sinfar_pager")[0].children[$(".sinfar_pager")[0].children.length - 4];
+      pageCount = lastPager?.children[0]?.data;
+    } catch (e) {}
 
     const resource = $(".game_structure").html();
 
@@ -117,7 +127,35 @@ export class SinfarAPI {
       }
     }
 
-    return JSON.stringify(parsedValues, null, 2);
+    return { logEntry: parsedValues, pageCount: parseInt(pageCount ?? "1") };
+  }
+
+  private async readLog(id: string, ext: string, JSONFormatted?: Boolean, ReadAll?: Boolean): Promise<string> {
+    const result = await this.fetchLogMessages(id, 1);
+    let logMessages = result.logEntry;
+
+    if (ReadAll) {
+      for (let i = 2; i <= result.pageCount; i++) {
+        const extraResults = await this.fetchLogMessages(id, i);
+        logMessages = logMessages.concat(extraResults.logEntry);
+      }
+    }
+
+    if (!JSONFormatted) {
+      // Return as tab separated values
+      let output = "SERVER\t\t\t\t\t\tSERVER\tSCRIPT\t\t\tTYPE\tMESSAGE\n";
+      for (let i = 0; i < logMessages.length; i++) {
+        output += logMessages[i].time.toISOString() + "\t";
+        output += logMessages[i].server + "\t";
+        output += logMessages[i].script + "\t";
+        output += logMessages[i].msgType + "\t";
+        output += logMessages[i].msg + "\n";
+      }
+      return output;
+    }
+
+    // Return as JSON
+    return JSON.stringify(logMessages, null, 2);
   }
 
   private async readResource(resref: string, ext: string): Promise<string> {
@@ -390,9 +428,14 @@ export class SinfarAPI {
   } // TODO
 
   public async createERFFolder(erf: ERF, fs: SinfarFS, onlyScripts: boolean) {
+    // Change from the original to use the ERF ID instead of the title
+    /*
     const folder =
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       "sinfar:/" + erf.prefix + " - " + erf.title.replace(/[/\\*."\\[\]:;|,<>?]/g, "") + " (" + erf.id + ")";
+      */
+    const folder = "sinfar:/" + erf.id.toString();
+
     const folderUri = vscode.Uri.parse(folder);
 
     fs.createDirectoryInit(folderUri);
@@ -577,5 +620,18 @@ export class SinfarAPI {
         });
       }
     }
+
+    // Create folder for virtual metadata files on the ERF (eg. logs, etc.)
+    fs.createDirectoryInit(vscode.Uri.parse(root + "/Metadata"));
+    await fs.writeFile(vscode.Uri.parse(root + "/Metadata/erf_all.log"), new Uint8Array(0), {
+      create: true,
+      overwrite: false,
+      initializing: true,
+    });
+    await fs.writeFile(vscode.Uri.parse(root + "/Metadata/erf_recent.log"), new Uint8Array(0), {
+      create: true,
+      overwrite: false,
+      initializing: true,
+    });
   }
 }
