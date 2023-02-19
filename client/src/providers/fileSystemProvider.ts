@@ -91,10 +91,6 @@ export class SinfarFS implements vscode.FileSystemProvider {
     try {
       const basename = path.posix.basename(uri.path);
 
-      if (path.posix.extname(uri.path) === ".log") {
-        return enc;
-      }
-
       const parent = this._lookupParentDirectory(uri);
       const entry = parent.entries.get(basename);
       if (entry && entry instanceof File) {
