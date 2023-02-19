@@ -211,7 +211,11 @@
       },
       {
         "command": "sinfar.viewLogs",
-        "title": "View ERF Logs"
+        "title": "View ERF Logs (Only recent)"
+      },
+      {
+        "command": "sinfar.viewAllLogs",
+        "title": "View ERF Logs (All)"
       },
       {
         "command": "sinfar.downloadERF",
@@ -279,6 +283,10 @@
         },
         {
           "command": "sinfar.viewLogs",
+          "when": "view == nwn-editor.all && viewItem == erf"
+        },
+        {
+          "command": "sinfar.viewAllLogs",
           "when": "view == nwn-editor.all && viewItem == erf"
         },
         {

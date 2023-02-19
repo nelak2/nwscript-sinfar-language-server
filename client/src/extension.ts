@@ -45,9 +45,22 @@ export function InitEditors(context: ExtensionContext) {
 
   vscode.commands.registerCommand("sinfar.viewLogs", (e: Entry) => {
     const erf = (e.data as ERFEntry).erf;
-    void vscode.workspace.openTextDocument(vscode.Uri.parse("sinfar:/logs/" + erf.id.toString() + ".log")).then((doc) => {
-      void vscode.window.showTextDocument(doc);
-    });
+
+    void vscode.workspace
+      .openTextDocument(vscode.Uri.parse("sinfar:/" + erf.id.toString() + "/Metadata/erf_recent.log"))
+      .then((doc) => {
+        void vscode.window.showTextDocument(doc);
+      });
+  });
+
+  vscode.commands.registerCommand("sinfar.viewAllLogs", (e: Entry) => {
+    const erf = (e.data as ERFEntry).erf;
+
+    void vscode.workspace
+      .openTextDocument(vscode.Uri.parse("sinfar:/" + erf.id.toString() + "/Metadata/erf_all.log"))
+      .then((doc) => {
+        void vscode.window.showTextDocument(doc);
+      });
   });
 }
 
