@@ -11,7 +11,8 @@ export class ERFTreeDataProvider implements vscode.TreeDataProvider<Entry> {
   private readonly context: vscode.ExtensionContext;
   private readonly type: "all" | "open";
   private linked: ERFTreeDataProvider | undefined;
-  private readonly openERFs: ERFEntry[] = [];
+  private readonly openERFs: Entry[] = [];
+  private allERFs: Entry[] = [];
 
   private readonly _onDidChangeTreeData: vscode.EventEmitter<Entry | undefined | void> = new vscode.EventEmitter<
     Entry | undefined | void
@@ -27,8 +28,10 @@ export class ERFTreeDataProvider implements vscode.TreeDataProvider<Entry> {
   }
 
   public openERF(entry: Entry) {
-    const erf = entry.data as ERFEntry;
-    this.openERFs.push(erf);
+    const exists = this.openERFs.find((e) => e.label === entry.label);
+    if (exists) return;
+
+    this.openERFs.push(new Entry(vscode.TreeItemCollapsibleState.Collapsed, entry.data));
     void this.refresh();
   }
 
@@ -52,6 +55,8 @@ export class ERFTreeDataProvider implements vscode.TreeDataProvider<Entry> {
   }
 
   private async getResources(element: Entry): Promise<Entry[]> {
+    if (element.children.length > 0) return element.children;
+
     const erf = (element.data as ResourceGroupEntry).erf;
     const resourceType = (element.data as ResourceGroupEntry).groupType;
     const resources = (element.data as ResourceGroupEntry).resources;
@@ -64,48 +69,57 @@ export class ERFTreeDataProvider implements vscode.TreeDataProvider<Entry> {
       (resource) => new Entry(vscode.TreeItemCollapsibleState.None, new ResourceEntry(erf, resourceType, resource)),
     );
 
-    return entries.sort((a, b) => (a.label?.toString() || "").localeCompare(b.label?.toString() || ""));
+    element.children = entries.sort((a, b) => (a.label?.toString() || "").localeCompare(b.label?.toString() || ""));
+    return element.children;
   }
 
   private async getResGroups(element: Entry): Promise<Entry[]> {
-    const erf = (element.data as ERFEntry).erf;
+    if (element.children.length <= 0) {
+      const erf = (element.data as ERFEntry).erf;
 
-    if (!erf.resources) {
-      return [];
+      if (!erf.resources) {
+        return [];
+      }
+
+      const properties = Object.entries(erf.resources);
+
+      const entries: Entry[] = [];
+
+      for (const property of properties) {
+        entries.push(
+          new Entry(vscode.TreeItemCollapsibleState.Collapsed, new ResourceGroupEntry(erf, property[0] as ResourceType)),
+        );
+      }
+
+      element.children = entries;
+      return entries;
     }
-
-    const properties = Object.entries(erf.resources);
-
-    const entries: Entry[] = [];
-
-    for (const property of properties) {
-      entries.push(
-        new Entry(vscode.TreeItemCollapsibleState.Collapsed, new ResourceGroupEntry(erf, property[0] as ResourceType)),
-      );
-    }
-
-    return entries;
+    return element.children;
   }
 
   private async getERFEntries(): Promise<Entry[]> {
-    const erfList = await this.remoteAPI.getAllResources();
+    if (this.allERFs.length <= 0) {
+      const erfList = await this.remoteAPI.getAllResources(this.refresh.bind(this));
 
-    if (typeof erfList === "string") {
-      void vscode.window.showErrorMessage(erfList);
-      return [];
+      if (typeof erfList === "string") {
+        void vscode.window.showErrorMessage(erfList);
+        return [];
+      }
+
+      // for (const _erf of erfList) {
+      //   await this.remoteAPI.createERFFolder(_erf, this.fs);
+      // }
+
+      const entries = erfList.map((erf) => new Entry(vscode.TreeItemCollapsibleState.Collapsed, new ERFEntry(erf)));
+
+      this.allERFs = entries.sort((a, b) => (a.label?.toString() || "").localeCompare(b.label?.toString() || ""));
+      return this.allERFs;
     }
-
-    for (const _erf of erfList) {
-      await this.remoteAPI.createERFFolder(_erf, this.fs, false);
-    }
-
-    const entries = erfList.map((erf) => new Entry(vscode.TreeItemCollapsibleState.Collapsed, new ERFEntry(erf)));
-
-    return entries.sort((a, b) => (a.label?.toString() || "").localeCompare(b.label?.toString() || ""));
+    return this.allERFs;
   }
 
   private async getOpenERFEntries(): Promise<Entry[]> {
-    const entries = this.openERFs.map((erf) => new Entry(vscode.TreeItemCollapsibleState.Collapsed, erf));
+    const entries = this.openERFs.map((erf) => new Entry(vscode.TreeItemCollapsibleState.Collapsed, erf.data));
 
     return entries.sort((a, b) => (a.label?.toString() || "").localeCompare(b.label?.toString() || ""));
   }
@@ -140,6 +154,7 @@ export class ERFTreeDataProvider implements vscode.TreeDataProvider<Entry> {
 }
 
 export class Entry extends vscode.TreeItem {
+  children: Entry[] = [];
   constructor(public collapsibleState: vscode.TreeItemCollapsibleState, public readonly data: EntryInterface) {
     super(data.label, collapsibleState);
     this.tooltip = data.tooltip;
@@ -180,7 +195,8 @@ export class ERFEntry implements EntryInterface {
     this.tooltip.supportHtml = true;
     this.contextValue = "erf";
 
-    this.command = { command: "sinfar.openERF", title: "Open ERF", arguments: [this] };
+    // this.command = { command: "sinfar.openERF", title: "Open ERF", arguments: [this] };
+    // this.command = { command: "sinfar.openERF", title: "Open ERF" };
   }
 
   public getIconPath(state: boolean): { light: string; dark: string } {
@@ -364,7 +380,7 @@ export class ResourceEntry implements EntryInterface {
     this.description = undefined;
     this.tooltip = undefined;
     this.contextValue = "resource";
-    this.command = undefined;
+    this.command = { command: "sinfar.openFile", title: "Open File", arguments: [this] };
   }
 
   public getIconPath(state: boolean): { light: string; dark: string } {
