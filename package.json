@@ -244,6 +244,10 @@
       {
         "command": "sinfar.git.new",
         "title": "New Area - GIT"
+      },
+      {
+        "command": "sinfar.openFile",
+        "title": "Open File"
       }
     ],
     "menus": {
@@ -292,6 +296,10 @@
         {
           "command": "sinfar.downloadERF",
           "when": "view == nwn-editor.all && viewItem == erf"
+        },
+        {
+          "command": "sinfar.openFile",
+          "when": "view == nwn-editor.all && viewItem == resource"
         }
       ]
     },
