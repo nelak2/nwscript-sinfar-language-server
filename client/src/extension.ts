@@ -102,8 +102,8 @@ export async function deactivate() {
 }
 
 export function InitSinfar(context: ExtensionContext) {
-  fs = new SinfarFS();
   remoteAPI = new SinfarAPI();
+  fs = new SinfarFS(remoteAPI);
   context.subscriptions.push(
     vscode.workspace.registerFileSystemProvider("sinfar", fs, {
       isCaseSensitive: false,
@@ -115,7 +115,7 @@ export function InitSinfar(context: ExtensionContext) {
     vscode.authentication.registerAuthenticationProvider(
       CookieAuthenticationProvider.id,
       "Sinfar Dev",
-      new CookieAuthenticationProvider(context.secrets),
+      new CookieAuthenticationProvider(context.secrets, remoteAPI),
     ),
   );
 
@@ -212,7 +212,7 @@ export function InitSinfar(context: ExtensionContext) {
             }
 
             for (const _erf of erfList) {
-              await remoteAPI.createERFFolder(_erf, fs, false);
+              await remoteAPI.createERFFolder(_erf, fs);
             }
 
             void vscode.window.showInformationMessage("ERF's loaded! Workspace ready for use");

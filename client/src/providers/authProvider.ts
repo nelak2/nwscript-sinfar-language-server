@@ -27,7 +27,7 @@ export class CookieAuthenticationProvider implements AuthenticationProvider {
   private readonly _sessionChangeEmitter = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
   static id = "SinfarAuth";
   private static readonly secretKey = "SinfarAuth";
-  private readonly remoteAPI = new SinfarAPI();
+  private readonly remoteAPI: SinfarAPI;
 
   // this property is used to determine if the token has been changed in another window of VS Code.
   // It is used in the checkForUpdates function.
@@ -39,7 +39,9 @@ export class CookieAuthenticationProvider implements AuthenticationProvider {
     return this._onDidChangeSessions.event;
   }
 
-  constructor(private readonly secretStorage: SecretStorage) {}
+  constructor(private readonly secretStorage: SecretStorage, api: SinfarAPI) {
+    this.remoteAPI = api;
+  }
 
   dispose(): void {
     this.initializedDisposable?.dispose();
