@@ -45,13 +45,17 @@ export type Entry = File | Directory;
 
 export class SinfarFS implements vscode.FileSystemProvider {
   root = new Directory("");
-  remoteAPI = new SinfarAPI();
+  remoteAPI;
   private readonly diagCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection("Sinfar");
+
+  constructor(api: SinfarAPI) {
+    this.remoteAPI = api;
+  }
 
   // --- manage file metadata
 
-  stat(uri: vscode.Uri): vscode.FileStat {
-    return this._lookup(uri, false);
+  async stat(uri: vscode.Uri): Promise<vscode.FileStat> {
+    return await this._lookup(uri, false);
   }
 
   readDirectory(uri: vscode.Uri): [string, vscode.FileType][] {
@@ -115,39 +119,41 @@ export class SinfarFS implements vscode.FileSystemProvider {
     content: Uint8Array,
     options: { create: boolean; overwrite: boolean; initializing: boolean },
   ): Promise<void> {
-    const basename = path.posix.basename(uri.path);
-    const parent = this._lookupParentDirectory(uri);
-    const erfDir = this._lookupERFDirectory(uri);
-    let entry = parent.entries.get(basename);
+    const parsedUri = this.parseUri(uri);
 
-    if (entry instanceof Directory) {
+    if (!parsedUri) throw new Error("Invalid URI");
+
+    if (parsedUri?.fileExt === "log") {
+      void vscode.window.showInformationMessage("Cannot write to Log files. Use 'Save As' if you'd like to save a copy");
+      return;
+    }
+
+    // Check if the file exists
+    const file = await this.remoteAPI.lookup(parsedUri);
+    const parentERF = await this.remoteAPI.lookup({ erfId: parsedUri.erfId, category: "", resref: "", fileExt: "", uri });
+
+    if (!parentERF || parentERF instanceof File) {
+      throw new Error("Invalid ERF");
+    }
+
+    if (parsedUri.resref === "") {
       throw vscode.FileSystemError.FileIsADirectory(uri);
     }
-    if (!entry && !options.create) {
+    if (!file && !options.create) {
       throw vscode.FileSystemError.FileNotFound(uri);
     }
-    if (entry && options.create && !options.overwrite) {
+    if (file && options.create && !options.overwrite) {
       throw vscode.FileSystemError.FileExists(uri);
     }
-    // Ensure files in the VFS are always created with an nss extension so the language server can
-    // pick them up
-    // const scriptPrefix = basename.split("_")[0];
-    // basename = path.parse(basename).name + ".nss";
-    const newUri = vscode.Uri.from({ scheme: "sinfar", path: `/${parent.name}/${basename}` });
 
     // Create new file
-    if (!entry) {
-      // if (!parent.erf) {
-      //   throw new Error("Invalid ERF");
-      // }
+    if (!file) {
+      const basename = path.posix.basename(uri.path);
+      const prefix = basename.split("_")[0];
 
-      // if (!options.initializing && scriptPrefix !== parent.erf.prefix) {
-      //   throw new Error("All resource prefixes must match the parent ERF prefix");
-      // }
-
-      // if (path.parse(basename).ext !== ".nss") {
-      //   throw new Error("Script must have a .nss extension");
-      // }
+      if (!options.initializing && prefix !== parentERF.erf?.prefix) {
+        throw new Error("All resource prefixes must match the parent ERF prefix");
+      }
 
       // Check for resref name length. It is limited to 16 characters + 4 characters for the file extension
       if (basename.length > 20) {
@@ -157,16 +163,19 @@ export class SinfarFS implements vscode.FileSystemProvider {
         }
       }
 
-      entry = new File(basename); // Read from the server
-      parent.entries.set(basename, entry);
+      const newFile = new File(basename);
+      await this.remoteAPI.writeFileVirtual(parsedUri.uri.path, newFile);
 
-      this._fireSoon({ type: vscode.FileChangeType.Created, uri: newUri });
+      this._fireSoon({ type: vscode.FileChangeType.Created, uri });
     }
 
+    if (file instanceof Directory) throw new Error("Cannot write to a directory");
+    if (!file) throw new Error("File not found");
+
     // Update virtual file
-    entry.mtime = Date.now();
-    entry.size = content.byteLength;
-    entry.data = content;
+    file.mtime = Date.now();
+    file.size = content.byteLength;
+    file.data = content;
 
     // The virtual file system is initialized with empty files to avoid excessive server requests.
     // The actual file contents are downloaded when the file is read. We want to ensure that we
@@ -175,13 +184,13 @@ export class SinfarFS implements vscode.FileSystemProvider {
     // safely upload the files to the server.
     if (!options.initializing) {
       // Verify our folder is correctly associated with an ERF
-      if (!erfDir.erf) {
+      if (!parentERF.erf) {
         throw new Error("Invalid ERF");
       }
 
       // Clear diagnostics
       this.diagCollection.delete(uri);
-      const results = await this.remoteAPI.writeFile(erfDir.erf.id.toString(), uri, content, this);
+      const results = await this.remoteAPI.writeFile(parentERF.erf.id.toString(), uri, content, this);
       if (results.status) {
         void vscode.window.showInformationMessage("The script has been successfully saved and compiled.");
       } else {
@@ -193,7 +202,7 @@ export class SinfarFS implements vscode.FileSystemProvider {
         }
       }
     }
-    this._fireSoon({ type: vscode.FileChangeType.Changed, uri: newUri });
+    this._fireSoon({ type: vscode.FileChangeType.Changed, uri });
   }
 
   // --- manage files/folders
@@ -206,11 +215,11 @@ export class SinfarFS implements vscode.FileSystemProvider {
    * @param options
    */
   async rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
-    if (!options.overwrite && this._lookup(newUri, true)) {
+    if (!options.overwrite && (await this._lookup(newUri, true))) {
       throw vscode.FileSystemError.FileExists(newUri);
     }
 
-    const entry = this._lookup(oldUri, false);
+    const entry = await this._lookup(oldUri, false);
     const oldParent = this._lookupParentDirectory(oldUri);
 
     // Prevent users from renaming directories/ERFs
@@ -329,30 +338,71 @@ export class SinfarFS implements vscode.FileSystemProvider {
 
   // --- lookup
 
-  private _lookup(uri: vscode.Uri, silent: false): Entry;
-  private _lookup(uri: vscode.Uri, silent: boolean): Entry | undefined;
-  private _lookup(uri: vscode.Uri, silent: boolean): Entry | undefined {
-    const parts = uri.path.split("/");
-    let entry: Entry = this.root;
-    for (const part of parts) {
-      if (!part) {
-        continue;
-      }
+  private async _lookup(uri: vscode.Uri, silent: false): Promise<Entry>;
+  private async _lookup(uri: vscode.Uri, silent: boolean): Promise<Entry | undefined>;
+  private async _lookup(uri: vscode.Uri, silent: boolean): Promise<Entry | undefined> {
+    console.log("lookup: " + uri.toString());
 
-      let child: Entry | undefined;
-      if (entry instanceof Directory) {
-        child = entry.entries.get(part);
+    let res: Entry | undefined;
+    const parsedUri = this.parseUri(uri);
+    if (parsedUri) res = await this.remoteAPI.lookup(parsedUri);
+
+    if (!res) {
+      if (!silent) {
+        throw vscode.FileSystemError.FileNotFound(uri);
+      } else {
+        return undefined;
       }
-      if (!child) {
-        if (!silent) {
-          throw vscode.FileSystemError.FileNotFound(uri);
-        } else {
-          return undefined;
-        }
-      }
-      entry = child;
     }
-    return entry;
+
+    return res;
+    // for (const part of parts) {
+    //   if (!part) {
+    //     continue;
+    //   }
+
+    //   let child: Entry | undefined;
+    //   if (entry instanceof Directory) {
+    //     child = entry.entries.get(part);
+    //   }
+    //   if (!child) {
+    //     if (!silent) {
+    //       throw vscode.FileSystemError.FileNotFound(uri);
+    //     } else {
+    //       return undefined;
+    //     }
+    //   }
+    //   entry = child;
+    // }
+    // return entry;
+  }
+
+  private parseUri(
+    uri: vscode.Uri,
+  ): { erfId: number; category: string; resref: string; fileExt: string; uri: vscode.Uri } | undefined {
+    const parts = uri.path.split("/");
+    let erfId: number;
+    let category: string, resref: string, fileExt: string;
+    if (parts.length === 4) {
+      erfId = parseInt(parts[1]);
+      category = parts[2];
+      resref = parts[3];
+      fileExt = uri.path.split(".").pop() || "";
+    } else if (parts.length === 3) {
+      erfId = parseInt(parts[1]);
+      category = parts[2];
+      resref = "";
+      fileExt = "";
+    } else if (parts.length === 2) {
+      erfId = parseInt(parts[1]);
+      category = "";
+      resref = "";
+      fileExt = "";
+    } else {
+      return undefined;
+    }
+
+    return { erfId, category, resref, fileExt, uri };
   }
 
   private _lookupAsDirectory(uri: vscode.Uri, silent: boolean): Directory {
@@ -384,7 +434,7 @@ export class SinfarFS implements vscode.FileSystemProvider {
   // --- manage file events
 
   private readonly _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
-  private _bufferedEvents: vscode.FileChangeEvent[] = [];
+  private readonly _bufferedEvents: vscode.FileChangeEvent[] = [];
   private _fireSoonHandle?: NodeJS.Timer;
 
   readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;

@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { CookieAuthenticationProvider } from "../providers/authProvider";
 import fetch from "cross-fetch";
 import path from "path";
-import { Directory, SinfarFS } from "../providers/fileSystemProvider";
+import { Directory, Entry, File, SinfarFS } from "../providers/fileSystemProvider";
 import { CompilerReturn, ERF, ResourceType } from "./types";
 
 type logEntry = {
@@ -15,8 +15,27 @@ type logEntry = {
   script: string;
 };
 
+type parsedUri = {
+  erfId: number;
+  category: string;
+  resref: string;
+  fileExt: string;
+  uri: vscode.Uri;
+};
+
 export class SinfarAPI {
-  private _erfStore: ERF[] = [];
+  private _erfCache: ERF[] = [];
+  // Tracks if the cache has been initialized since ERF's could be added prior to initialization
+  // to handle open files on editor startup
+  private initialized = false;
+  private readonly _extPath: string;
+  private readonly _cachePath: string;
+  private readonly fileCache: Map<string, File> = new Map();
+
+  constructor() {
+    this._extPath = vscode.extensions.getExtension("NelaK.nwscript-sinfar-scripters-extension")?.extensionPath || "";
+    this._cachePath = path.join(this._extPath, "client", "out", "cache");
+  }
 
   private async _getCookies(): Promise<string> {
     const session = await vscode.authentication.getSession(CookieAuthenticationProvider.id, []);
@@ -36,6 +55,64 @@ export class SinfarAPI {
       return parts[1].trimStart();
     }
     return "";
+  }
+
+  public async lookup(parsedUri: parsedUri): Promise<Entry | undefined> {
+    let erf = this._erfCache.find((erf) => erf.id === parsedUri.erfId);
+
+    if (!erf) {
+      // If the cache hasn't been initialized yet attempt a quick init
+      // this happens when the user closes the editor with a file open
+      // and on the next startup the editor tries to open the file again
+      // before the cache has been initialized
+      if (this._erfCache.length === 0) await this.getERF(parsedUri.erfId.toString());
+      erf = this._erfCache.find((erf) => erf.id === parsedUri.erfId);
+
+      if (!erf) return undefined;
+    }
+
+    if (parsedUri.erfId && !parsedUri.resref) {
+      let dir: Directory;
+      // If we are looking for a category, return a directory
+      if (parsedUri.category) {
+        dir = new Directory(parsedUri.category);
+      } else {
+        // If we are looking for an ERF, return an ERF
+        dir = new Directory(parsedUri.erfId.toString());
+      }
+      dir.erf = erf;
+      return dir;
+    }
+
+    // ERF has no resources
+    if (!erf.resources) return undefined;
+
+    // If we are looking for a file
+    // Check the cache first
+    let file: Entry | undefined;
+    if (parsedUri.resref !== "") {
+      file = this.fileCache.get(parsedUri.uri.path);
+
+      if (file) return file;
+    }
+
+    // If we are looking for a metadata file
+    if (parsedUri.category === "Metadata") {
+      if (parsedUri.fileExt === "log") {
+        this.fileCache.set(parsedUri.uri.path, new File(parsedUri.resref));
+        return new File(parsedUri.resref);
+      }
+    }
+
+    const resources = (erf.resources as any)[parsedUri.fileExt];
+    if (!resources) return undefined;
+
+    const resName = path.parse(parsedUri.resref).name;
+    const resource = resources.find((resource: string) => resource === resName);
+    if (!resource) return undefined;
+
+    this.fileCache.set(parsedUri.uri.path, new File(parsedUri.resref));
+    return new File(parsedUri.resref);
   }
 
   // Currently requesting once for text editor and again from LSP
@@ -127,7 +204,7 @@ export class SinfarAPI {
       }
     }
 
-    return { logEntry: parsedValues, pageCount: parseInt(pageCount ?? "1") };
+    return { logEntry: parsedValues, pageCount };
   }
 
   private async readLog(id: string, ext: string, JSONFormatted?: Boolean, ReadAll?: Boolean): Promise<string> {
@@ -228,6 +305,10 @@ export class SinfarAPI {
         '"}',
     );
     return script.scriptData;
+  }
+
+  public async writeFileVirtual(path: string, content: File): Promise<void> {
+    this.fileCache.set(path, content);
   }
 
   public async writeFile(
@@ -340,9 +421,50 @@ export class SinfarAPI {
     return await res.text();
   }
 
-  // Gets a JSON list of all the resources in all ERFs
-  // return JSON representation of the ERF list or an error message
-  public async getAllResources(): Promise<ERF[] | string> {
+  /**
+   * Fetches a JSON list of all the resources in all ERFs from the server
+   * We will return from the memory cache if we have it, otherwise we will try to load from the file system cache
+   * If we don't have a cache on the file system, we will fetch from the server and cache the result
+   * If a callback function is provided, we will return from the cache but also call the callback function when
+   * the cache is updated
+   * @param callback Optional callback function to be called when the resource list is updated
+   * @returns JSON representation of the ERF list or an error message
+   */
+  public async getAllResources(callback?: Function): Promise<ERF[] | string> {
+    // Check if we have a cached version of the resource list in memory
+    if (this._erfCache.length > 0 && this.initialized) {
+      return this._erfCache;
+    }
+
+    // Check if we have a cached version of the resource list on the file system
+    const allResourceCachePath = path.join(this._cachePath, "allResources.json");
+    let fsCache: Uint8Array;
+    try {
+      fsCache = await vscode.workspace.fs.readFile(vscode.Uri.file(allResourceCachePath));
+    } catch (e) {
+      fsCache = new Uint8Array();
+    }
+    if (fsCache.byteLength > 0) {
+      // load the cache from the file system
+      this._erfCache = JSON.parse(fsCache.toString());
+
+      // We return the cache here but still fetch from the server in the background
+      // So that the cache is updated if the server has changed
+      if (callback) {
+        void this.getAllResourcesFromServer();
+      }
+
+      this.initialized = true;
+      return this._erfCache;
+    }
+
+    this.initialized = true;
+    // If memory and file system cache are empty, fetch and return from the server
+    return await this.getAllResourcesFromServer();
+  }
+
+  private async getAllResourcesFromServer(callback?: Function): Promise<ERF[] | string> {
+    // If memory and file system cache are empty, fetch from the server
     const token = await this._getCookies();
 
     const res = await fetch("https://nwn.sinfar.net/erf/api", {
@@ -356,11 +478,18 @@ export class SinfarAPI {
 
     // If the return is 401 (unauthorized) rather than an erfList as expected
     if (typeof erfList === "number") {
-      return "Unauthorized. Please sign out then sign in again";
+      throw new Error("Unauthorized. Please sign out then sign in again");
     }
 
-    this._erfStore = erfList;
+    // Cache the list in memory
+    this._erfCache = erfList;
+    // Cache the list on the file system
+    const allResourceCachePath = path.join(this._cachePath, "allResources.json");
+    await vscode.workspace.fs.writeFile(vscode.Uri.file(allResourceCachePath), Buffer.from(JSON.stringify(erfList)));
 
+    if (callback) {
+      callback();
+    }
     return erfList;
   }
 
@@ -383,6 +512,14 @@ export class SinfarAPI {
     // If the return is 401 (unauthorized) rather than an erf as expected
     if (typeof erf === "number") {
       return "Unauthorized. Please sign out then sign in again";
+    }
+
+    // Update the cache
+    let existingERF = this._erfCache.find((e) => e.id === parseInt(erfID));
+    if (existingERF) {
+      existingERF = erf;
+    } else {
+      this._erfCache.push(erf);
     }
 
     return erf;
@@ -427,7 +564,7 @@ export class SinfarAPI {
     throw new Error("Method not implemented.");
   } // TODO
 
-  public async createERFFolder(erf: ERF, fs: SinfarFS, onlyScripts: boolean) {
+  public async createERFFolder(erf: ERF, fs: SinfarFS) {
     // Change from the original to use the ERF ID instead of the title
     /*
     const folder =
@@ -439,199 +576,187 @@ export class SinfarAPI {
     const folderUri = vscode.Uri.parse(folder);
 
     fs.createDirectoryInit(folderUri);
-    const dir = fs.stat(folderUri);
+    const dir = await fs.stat(folderUri);
     if (dir instanceof Directory) {
       dir.erf = erf;
     }
 
-    if (onlyScripts) {
-      if (erf.resources?.nss) {
-        for (const _nss of erf.resources.nss) {
-          await fs.writeFile(vscode.Uri.parse(folder + "/" + _nss + ".nss"), new Uint8Array(0), {
-            create: true,
-            overwrite: false,
-            initializing: true,
-          });
-        }
-      }
-    } else {
-      await this.createERFSubFolders(erf, dir as Directory, folderUri, fs);
-    }
+    await this.createERFSubFolders(erf, dir as Directory, folderUri, fs);
   }
 
   public async createERFSubFolders(erf: ERF, erfDir: Directory, erfPath: vscode.Uri, fs: SinfarFS) {
     const root = erfPath.toString();
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Scripts"));
-    if (erf.resources?.nss) {
-      for (const nss of erf.resources.nss) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Scripts/" + nss + ".nss"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.nss) {
+    //   for (const nss of erf.resources.nss) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Scripts/" + nss + ".nss"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Areas"));
-    if (erf.resources?.are) {
-      for (const are of erf.resources.are) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Areas/" + are + ".are"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-        await fs.writeFile(vscode.Uri.parse(root + "/Areas/" + are + ".git"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.are) {
+    //   for (const are of erf.resources.are) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Areas/" + are + ".are"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Areas/" + are + ".git"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Conversation"));
-    if (erf.resources?.dlg) {
-      for (const dlg of erf.resources.dlg) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Conversation/" + dlg + ".dlg"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.dlg) {
+    //   for (const dlg of erf.resources.dlg) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Conversation/" + dlg + ".dlg"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Items"));
-    if (erf.resources?.uti) {
-      for (const uti of erf.resources.uti) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Items/" + uti + ".uti"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.uti) {
+    //   for (const uti of erf.resources.uti) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Items/" + uti + ".uti"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Creatures"));
-    if (erf.resources?.utc) {
-      for (const utc of erf.resources.utc) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Creatures/" + utc + ".utc"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.utc) {
+    //   for (const utc of erf.resources.utc) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Creatures/" + utc + ".utc"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Placeables"));
-    if (erf.resources?.utp) {
-      for (const utp of erf.resources.utp) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Placeables/" + utp + ".utp"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.utp) {
+    //   for (const utp of erf.resources.utp) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Placeables/" + utp + ".utp"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Encounters"));
-    if (erf.resources?.ute) {
-      for (const ute of erf.resources.ute) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Encounters/" + ute + ".ute"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.ute) {
+    //   for (const ute of erf.resources.ute) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Encounters/" + ute + ".ute"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Triggers"));
-    if (erf.resources?.utt) {
-      for (const utt of erf.resources.utt) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Triggers/" + utt + ".utt"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.utt) {
+    //   for (const utt of erf.resources.utt) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Triggers/" + utt + ".utt"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Merchants"));
-    if (erf.resources?.utm) {
-      for (const utm of erf.resources.utm) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Merchants/" + utm + ".utm"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.utm) {
+    //   for (const utm of erf.resources.utm) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Merchants/" + utm + ".utm"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Doors"));
-    if (erf.resources?.utd) {
-      for (const utd of erf.resources.utd) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Doors/" + utd + ".utd"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.utd) {
+    //   for (const utd of erf.resources.utd) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Doors/" + utd + ".utd"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Waypoints"));
-    if (erf.resources?.utw) {
-      for (const utw of erf.resources.utw) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Waypoints/" + utw + ".utw"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.utw) {
+    //   for (const utw of erf.resources.utw) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Waypoints/" + utw + ".utw"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Sounds"));
-    if (erf.resources?.uts) {
-      for (const uts of erf.resources.uts) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Sounds/" + uts + ".uts"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.uts) {
+    //   for (const uts of erf.resources.uts) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Sounds/" + uts + ".uts"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/2DA"));
-    if (erf.resources?.["2da"]) {
-      for (const _2da of erf.resources["2da"]) {
-        await fs.writeFile(vscode.Uri.parse(root + "/2DA/" + _2da + ".2da"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.["2da"]) {
+    //   for (const _2da of erf.resources["2da"]) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/2DA/" + _2da + ".2da"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Module Info"));
-    if (erf.resources?.ifo) {
-      for (const ifo of erf.resources.ifo) {
-        await fs.writeFile(vscode.Uri.parse(root + "/Module Info/" + ifo + ".ifo"), new Uint8Array(0), {
-          create: true,
-          overwrite: false,
-          initializing: true,
-        });
-      }
-    }
+    // if (erf.resources?.ifo) {
+    //   for (const ifo of erf.resources.ifo) {
+    //     await fs.writeFile(vscode.Uri.parse(root + "/Module Info/" + ifo + ".ifo"), new Uint8Array(0), {
+    //       create: true,
+    //       overwrite: false,
+    //       initializing: true,
+    //     });
+    //   }
+    // }
 
     // Create folder for virtual metadata files on the ERF (eg. logs, etc.)
     fs.createDirectoryInit(vscode.Uri.parse(root + "/Metadata"));
-    await fs.writeFile(vscode.Uri.parse(root + "/Metadata/erf_all.log"), new Uint8Array(0), {
-      create: true,
-      overwrite: false,
-      initializing: true,
-    });
-    await fs.writeFile(vscode.Uri.parse(root + "/Metadata/erf_recent.log"), new Uint8Array(0), {
-      create: true,
-      overwrite: false,
-      initializing: true,
-    });
+    // await fs.writeFile(vscode.Uri.parse(root + "/Metadata/erf_all.log"), new Uint8Array(0), {
+    //   create: true,
+    //   overwrite: false,
+    //   initializing: true,
+    // });
+    // await fs.writeFile(vscode.Uri.parse(root + "/Metadata/erf_recent.log"), new Uint8Array(0), {
+    //   create: true,
+    //   overwrite: false,
+    //   initializing: true,
+    // });
   }
 }
