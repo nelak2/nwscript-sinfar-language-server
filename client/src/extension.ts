@@ -8,7 +8,7 @@ import { CookieAuthenticationProvider } from "./providers/authProvider";
 import { SinfarAPI } from "./api/sinfarAPI";
 import { EditorProvider } from "./editorProviders/editorProvider";
 import { ERF } from "./api/types";
-import { Entry, ERFEntry, ERFTreeDataProvider } from "./providers/erfTreeDataProvider";
+import { Entry, ERFEntry, ERFTreeDataProvider, ResourceEntry } from "./providers/erfTreeDataProvider";
 
 let client: LanguageClient;
 let fs: SinfarFS;
@@ -43,24 +43,40 @@ export function InitEditors(context: ExtensionContext) {
     openERF.openERF(e);
   });
 
+  vscode.commands.registerCommand("sinfar.openFile", (e: ResourceEntry) => {
+    const erf = e.erf;
+    const resref = e.label + "." + e.groupType;
+
+    if (e.groupType === "nss") {
+      void vscode.window.showTextDocument(vscode.Uri.parse("sinfar:/" + erf.id.toString() + "/" + e.groupType + "/" + resref), {
+        preview: false,
+        viewColumn: vscode.ViewColumn.Active,
+      });
+    } else {
+      void vscode.commands.executeCommand(
+        "vscode.openWith",
+        vscode.Uri.parse("sinfar:/" + erf.id.toString() + "/" + e.groupType + "/" + resref),
+        "sinfar.areaGitEditor",
+      );
+    }
+  });
+
   vscode.commands.registerCommand("sinfar.viewLogs", (e: Entry) => {
     const erf = (e.data as ERFEntry).erf;
 
-    void vscode.workspace
-      .openTextDocument(vscode.Uri.parse("sinfar:/" + erf.id.toString() + "/Metadata/erf_recent.log"))
-      .then((doc) => {
-        void vscode.window.showTextDocument(doc);
-      });
+    void vscode.window.showTextDocument(vscode.Uri.parse("sinfar:/" + erf.id.toString() + "/Metadata/erf_recent.log"), {
+      preview: false,
+      viewColumn: vscode.ViewColumn.Active,
+    });
   });
 
   vscode.commands.registerCommand("sinfar.viewAllLogs", (e: Entry) => {
     const erf = (e.data as ERFEntry).erf;
 
-    void vscode.workspace
-      .openTextDocument(vscode.Uri.parse("sinfar:/" + erf.id.toString() + "/Metadata/erf_all.log"))
-      .then((doc) => {
-        void vscode.window.showTextDocument(doc);
-      });
+    void vscode.window.showTextDocument(vscode.Uri.parse("sinfar:/" + erf.id.toString() + "/Metadata/erf_all.log"), {
+      preview: false,
+      viewColumn: vscode.ViewColumn.Active,
+    });
   });
 }
 
